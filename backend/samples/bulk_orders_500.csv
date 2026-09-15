@@ -1,0 +1,501 @@
+order_no,receiver_name,receiver_phone,receiver_postcode,receiver_city,receiver_state,receiver_address,address_type,goods_name,item_variant,quantity,actual_weight,length,width,height,payment_type,cod_amount,order_value,remark
+20000,Anne Sinnasamy,0175935458,40170,Shah Alam,Selangor,"No 144, Jalan Ara 4, Taman Rinting",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,,1,0.5,0,0,0,PREPAID,0,73.23,Paid Order
+20001,Nalini Mohamed,0183765108,41100,Klang,Selangor,"No. 31-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,M,1,1.8,0,0,0,COD,223.55,223.55,COD collect on delivery
+20002,Menaga Gunasengaran,0136064787,41100,Klang,Selangor,"No 42, Jalan Ara 4, Taman Rinting",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,0.7,0,0,0,COD,260.22,260.22,COD collect on delivery
+20003,Suresh Subramaniam,0195042830,81750,Masai,Johor,"No 39, Jalan Ara 4, Taman Rinting",HOME,Embroidered Maxi Chic,L,1,1.3,0,0,0,COD,197.77,197.77,COD collect on delivery
+20004,Menaga Ng,0112940621,88000,Kota Kinabalu,Sabah,"No. 201, Jalan Mangga, Off Jalan Dato Dollah",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XXL,1,3.0,0,0,0,COD,52.77,52.77,COD collect on delivery
+20005,Wong Tan,0158280390,80100,Johor Bahru,Johor,"No. 102-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,1.1,0,0,0,COD,302.67,302.67,COD collect on delivery
+20006,Farah Raj,0132685445,25200,Kuantan,Pahang,"No 59, Jalan Ara 4, Taman Rinting",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,1.1,0,0,0,COD,59.97,59.97,COD collect on delivery
+20007,Aina Kaur,0112862339,25200,Kuantan,Pahang,"No. 200, Jalan Mangga, Off Jalan Dato Dollah",HOME,Embroidered Maxi Chic,,1,1.4,0,0,0,PREPAID,0,297.33,Paid Order
+20008,Nurul Selvi,0167249645,43200,Cheras,Selangor,"No. 201, Lang Damai 3, Desa Lang Damai",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,3.0,0,0,0,PREPAID,0,199.35,Paid Order
+20009,Priya Abdullah,0182655119,81750,Masai,Johor,"No. 136-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Chiffon Georgette Party Set with Farshi Palazzo,,1,2.3,0,0,0,COD,317.06,317.06,COD collect on delivery
+20010,Wong Yusof,0113695128,11950,Bayan Lepas,Penang,"206-15-16 The Promenade Condominium, Barat Daya",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,S,1,1.0,0,0,0,COD,307.43,307.43,COD collect on delivery
+20011,Kirendeep Tan,0194309265,43200,Cheras,Selangor,"A172K Langat Jaya Condo, Jalan Dato Alias",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XL,1,1.3,0,0,0,PREPAID,0,264.99,Paid Order
+20012,Priya Hassan,0194843752,41100,Klang,Selangor,"No 115, Jalan Ara 4, Taman Rinting",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,L,1,1.3,0,0,0,PREPAID,0,159.17,Paid Order
+20013,Kirendeep Kaur,0114112558,47810,Petaling Jaya,Selangor,"A77K Langat Jaya Condo, Jalan Dato Alias",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XXL,1,1.7,0,0,0,PREPAID,0,70.26,Paid Order
+20014,Nurul Rahman,0151671156,11900,Bayan Lepas,Penang,"169, Lorong 22E8A, Taman Desa Ilmu",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,1.8,0,0,0,PREPAID,0,177.71,Paid Order
+20015,Aina Subramaniam,0175383365,43200,Cheras,Selangor,"A29K Langat Jaya Condo, Jalan Dato Alias",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XXL,1,1.5,0,0,0,PREPAID,0,64.61,Paid Order
+20016,Wong Ng,0149806921,40170,Shah Alam,Selangor,"No. 162, Lang Damai 3, Desa Lang Damai",HOME,Embroidered Maxi Chic,XL,1,2.7,0,0,0,COD,205.87,205.87,COD collect on delivery
+20017,Nalini Selvi,0151743980,11950,Bayan Lepas,Penang,"No. 15-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Chiffon Georgette Party Set with Farshi Palazzo,L,1,0.6,0,0,0,PREPAID,0,287.13,Paid Order
+20018,Aina Gunasengaran,0172410649,11900,Bayan Lepas,Penang,"No. 179-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,1.7,0,0,0,PREPAID,0,112.52,Paid Order
+20019,Siti Kaur,0131435381,70100,Seremban,Negeri Sembilan,"No. 67, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,L,1,1.8,0,0,0,COD,305.84,305.84,COD collect on delivery
+20020,Lim Hassan,0138864047,70100,Seremban,Negeri Sembilan,"No. 219, Lang Damai 3, Desa Lang Damai",HOME,Chiffon Georgette Party Set with Farshi Palazzo,L,1,1.7,0,0,0,COD,216.36,216.36,COD collect on delivery
+20021,Elizabeth Selvi,0128124951,88000,Kota Kinabalu,Sabah,"No. 34, Lang Damai 3, Desa Lang Damai",HOME,Pearl Hand Embellished 3 Piece Suit,,1,2.5,0,0,0,PREPAID,0,312.36,Paid Order
+20022,Suresh Wong,0149011064,94300,Kota Samarahan,Sarawak,"No. 62-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XL,1,1.7,0,0,0,PREPAID,0,162.13,Paid Order
+20023,Suresh Selvi,0164526721,43200,Cheras,Selangor,"No. 200-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Embroidered Maxi Chic,XL,1,2.4,0,0,0,COD,260.63,260.63,COD collect on delivery
+20024,Nalini Abdullah,0151733053,11900,Bayan Lepas,Penang,"A1K Langat Jaya Condo, Jalan Dato Alias",HOME,Chiffon Georgette Party Set with Farshi Palazzo,M,1,1.6,0,0,0,PREPAID,0,228.68,Paid Order
+20025,Kirendeep Raj,0141249752,94300,Kota Samarahan,Sarawak,"193, Lorong 22E8A, Taman Desa Ilmu",HOME,Pure Chiffon Bandhani Gown,,1,2.8,0,0,0,PREPAID,0,273.18,Paid Order
+20026,Ahmad Yusof,0118180591,43200,Cheras,Selangor,"No. 218-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Embroidered Maxi Chic,L,1,0.9,0,0,0,PREPAID,0,240.82,Paid Order
+20027,Siti Hassan,0126574461,47810,Petaling Jaya,Selangor,"No 16, Jalan Ara 4, Taman Rinting",HOME,Chiffon Georgette Party Set with Farshi Palazzo,XL,1,2.1,0,0,0,PREPAID,0,130.91,Paid Order
+20028,Wanie Mohamed,0114744528,88000,Kota Kinabalu,Sabah,"No. 75, Jalan Mangga, Off Jalan Dato Dollah",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,M,1,1.8,0,0,0,PREPAID,0,113.23,Paid Order
+20029,Elizabeth Duim,0155102977,10050,George Town,Penang,"No. 118, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,S,1,2.9,0,0,0,PREPAID,0,248.80,Paid Order
+20030,Wong Ng,0163379319,80100,Johor Bahru,Johor,"Lot 223, Persiaran Mahsuri 1, Bandar Baru",HOME,Pure Chiffon Bandhani Gown,L,1,1.1,0,0,0,PREPAID,0,173.00,Paid Order
+20031,Wong Duim,0117477439,41100,Klang,Selangor,"A177K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,2.4,0,0,0,PREPAID,0,153.49,Paid Order
+20032,Zulkifli Lim,0149099979,41100,Klang,Selangor,"No. 179, Lang Damai 3, Desa Lang Damai",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,1.3,0,0,0,PREPAID,0,191.00,Paid Order
+20033,Wanie Wong,0151252830,10050,George Town,Penang,"46-15-16 The Promenade Condominium, Barat Daya",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XL,1,2.8,0,0,0,PREPAID,0,300.16,Paid Order
+20034,Hafiz Selvi,0194056758,88000,Kota Kinabalu,Sabah,"No. 100, Jalan Mangga, Off Jalan Dato Dollah",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XL,1,2.0,0,0,0,PREPAID,0,284.15,Paid Order
+20035,Emily Sinnasamy,0189927312,11900,Bayan Lepas,Penang,"Lot 57, Persiaran Mahsuri 1, Bandar Baru",HOME,Pure Chiffon Bandhani Gown,XL,1,2.7,0,0,0,COD,175.15,175.15,COD collect on delivery
+20036,Chong Balakrishnan,0155903921,25200,Kuantan,Pahang,"No. 202, Lang Damai 3, Desa Lang Damai",OFFICE,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XL,1,2.7,0,0,0,COD,114.26,114.26,COD collect on delivery
+20037,Chong Hassan,0191440180,25200,Kuantan,Pahang,"No. 166-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,2.2,0,0,0,COD,148.66,148.66,COD collect on delivery
+20038,Nurul Rahman,0124806745,50450,Kuala Lumpur,Kuala Lumpur,"A107K Langat Jaya Condo, Jalan Dato Alias",OFFICE,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,1.3,0,0,0,COD,86.07,86.07,COD collect on delivery
+20039,Priya Rahman,0119525372,47810,Petaling Jaya,Selangor,"13-15-16 The Promenade Condominium, Barat Daya",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,2.7,0,0,0,COD,159.40,159.40,COD collect on delivery
+20040,Raj Subramaniam,0124728851,94300,Kota Samarahan,Sarawak,"45, Lorong 22E8A, Taman Desa Ilmu",HOME,Embroidered Maxi Chic,XXL,1,0.4,0,0,0,COD,111.17,111.17,COD collect on delivery
+20041,Hafiz Wong,0155489573,40170,Shah Alam,Selangor,"No. 89, Jalan Mangga, Off Jalan Dato Dollah",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,L,1,2.3,0,0,0,PREPAID,0,246.32,Paid Order
+20042,Elizabeth Sabapathie,0175662905,94300,Kota Samarahan,Sarawak,"123, Lorong 22E8A, Taman Desa Ilmu",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,L,1,2.1,0,0,0,PREPAID,0,231.88,Paid Order
+20043,Hafiz Duim,0142574130,10050,George Town,Penang,"No. 233, Jalan Mangga, Off Jalan Dato Dollah",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XL,1,0.8,0,0,0,COD,271.52,271.52,COD collect on delivery
+20044,Tan Kaur,0192212953,43200,Cheras,Selangor,"No. 1-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,S,1,2.4,0,0,0,PREPAID,0,81.46,Paid Order
+20045,Hafiz Balakrishnan,0199769055,31350,Kinta,Perak,"No. 163-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,M,1,0.9,0,0,0,PREPAID,0,295.92,Paid Order
+20046,Kavitha Duim,0148765829,11950,Bayan Lepas,Penang,"Lot 212, Persiaran Mahsuri 1, Bandar Baru",HOME,Embroidered Maxi Chic,XXL,1,2.6,0,0,0,PREPAID,0,167.79,Paid Order
+20047,Wanie Balakrishnan,0113057210,11950,Bayan Lepas,Penang,"No. 151, Lang Damai 3, Desa Lang Damai",HOME,Pure Chiffon Bandhani Gown,S,1,2.3,0,0,0,COD,294.36,294.36,COD collect on delivery
+20048,Wong Balakrishnan,0132365307,81750,Masai,Johor,"No 58, Jalan Ara 4, Taman Rinting",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XXL,1,1.7,0,0,0,COD,159.02,159.02,COD collect on delivery
+20049,Tan Rahman,0158272507,70100,Seremban,Negeri Sembilan,"40, Lorong 22E8A, Taman Desa Ilmu",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,1.9,0,0,0,COD,59.97,59.97,COD collect on delivery
+20050,Priya Kaur,0156970250,31350,Kinta,Perak,"48-15-16 The Promenade Condominium, Barat Daya",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,2.2,0,0,0,COD,216.48,216.48,COD collect on delivery
+20051,Wong Wong,0157009770,11950,Bayan Lepas,Penang,"153, Lorong 22E8A, Taman Desa Ilmu",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,L,1,2.9,0,0,0,COD,216.03,216.03,COD collect on delivery
+20052,Kavitha Mohamed,0173064325,70100,Seremban,Negeri Sembilan,"No. 64, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,,1,2.6,0,0,0,PREPAID,0,215.24,Paid Order
+20053,Farah Selvi,0147096445,43200,Cheras,Selangor,"No 240, Jalan Ara 4, Taman Rinting",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,M,1,1.4,0,0,0,PREPAID,0,282.38,Paid Order
+20054,Zulkifli Raj,0149479752,43000,Kajang,Selangor,"No. 183, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XL,1,1.5,0,0,0,COD,113.97,113.97,COD collect on delivery
+20055,Chong Subramaniam,0166797273,94300,Kota Samarahan,Sarawak,"A224K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,L,1,2.6,0,0,0,PREPAID,0,76.81,Paid Order
+20056,Tan Rahman,0129802531,31350,Kinta,Perak,"Lot 63, Persiaran Mahsuri 1, Bandar Baru",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,1.7,0,0,0,COD,312.08,312.08,COD collect on delivery
+20057,Siti Gunasengaran,0143233854,11900,Bayan Lepas,Penang,"A229K Langat Jaya Condo, Jalan Dato Alias",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,,1,1.0,0,0,0,PREPAID,0,250.86,Paid Order
+20058,Anne Lim,0151581463,47810,Petaling Jaya,Selangor,"No. 36, Lang Damai 3, Desa Lang Damai",HOME,Pure Chiffon Bandhani Gown,XL,1,0.6,0,0,0,COD,68.93,68.93,COD collect on delivery
+20059,Farah Abdullah,0153013580,50450,Kuala Lumpur,Kuala Lumpur,"No. 140, Lang Damai 3, Desa Lang Damai",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,L,1,0.4,0,0,0,PREPAID,0,236.67,Paid Order
+20060,Ahmad Wong,0143773189,43000,Kajang,Selangor,"Lot 102, Persiaran Mahsuri 1, Bandar Baru",HOME,Chiffon Georgette Party Set with Farshi Palazzo,L,1,0.4,0,0,0,COD,303.91,303.91,COD collect on delivery
+20061,Siti Tan,0193021823,11900,Bayan Lepas,Penang,"Lot 18, Persiaran Mahsuri 1, Bandar Baru",HOME,Chiffon Georgette Party Set with Farshi Palazzo,,1,1.7,0,0,0,COD,232.26,232.26,COD collect on delivery
+20062,Farah Yusof,0116299913,10050,George Town,Penang,"No 87, Jalan Ara 4, Taman Rinting",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XXL,1,0.5,0,0,0,COD,68.91,68.91,COD collect on delivery
+20063,Wong Sinnasamy,0161472605,40170,Shah Alam,Selangor,"No 202, Jalan Ara 4, Taman Rinting",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,2.6,0,0,0,PREPAID,0,77.76,Paid Order
+20064,Siti Raj,0194540879,43200,Cheras,Selangor,"No. 141, Jalan Mangga, Off Jalan Dato Dollah",HOME,Embroidered Maxi Chic,S,1,0.7,0,0,0,COD,217.87,217.87,COD collect on delivery
+20065,Kirendeep Mohamed,0167397765,70100,Seremban,Negeri Sembilan,"107, Lorong 22E8A, Taman Desa Ilmu",HOME,Pure Chiffon Bandhani Gown,M,1,1.8,0,0,0,PREPAID,0,268.43,Paid Order
+20066,Suresh Lim,0127860651,70100,Seremban,Negeri Sembilan,"No. 149, Lang Damai 3, Desa Lang Damai",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,2.4,0,0,0,PREPAID,0,267.42,Paid Order
+20067,Wong Yusof,0184045571,50450,Kuala Lumpur,Kuala Lumpur,"163-15-16 The Promenade Condominium, Barat Daya",HOME,Pearl Hand Embellished 3 Piece Suit,M,1,0.5,0,0,0,PREPAID,0,151.63,Paid Order
+20068,Siti Sinnasamy,0131353580,31350,Kinta,Perak,"No. 69, Jalan Mangga, Off Jalan Dato Dollah",HOME,Embroidered Maxi Chic,M,1,1.2,0,0,0,PREPAID,0,97.24,Paid Order
+20069,Wanie Hassan,0187230945,80100,Johor Bahru,Johor,"No. 111, Lang Damai 3, Desa Lang Damai",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,2.5,0,0,0,COD,73.73,73.73,COD collect on delivery
+20070,Wong Raj,0127043405,75300,Melaka,Melaka,"63, Lorong 22E8A, Taman Desa Ilmu",OFFICE,Embroidered Maxi Chic,S,1,1.1,0,0,0,PREPAID,0,308.44,Paid Order
+20071,Kirendeep Sinnasamy,0143219723,43000,Kajang,Selangor,"No 102, Jalan Ara 4, Taman Rinting",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,M,1,1.3,0,0,0,PREPAID,0,292.27,Paid Order
+20072,Wanie Sinnasamy,0118683919,47810,Petaling Jaya,Selangor,"No 213, Jalan Ara 4, Taman Rinting",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,2.6,0,0,0,PREPAID,0,62.93,Paid Order
+20073,Nalini Gunasengaran,0146534231,43200,Cheras,Selangor,"No. 54, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,M,1,2.2,0,0,0,PREPAID,0,284.04,Paid Order
+20074,Chong Ismail,0148209151,41100,Klang,Selangor,"A171K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,M,1,2.4,0,0,0,PREPAID,0,98.17,Paid Order
+20075,Aina Subramaniam,0127801771,11950,Bayan Lepas,Penang,"Lot 121, Persiaran Mahsuri 1, Bandar Baru",HOME,Chiffon Georgette Party Set with Farshi Palazzo,,1,2.0,0,0,0,PREPAID,0,235.01,Paid Order
+20076,Nurul Mohamed,0116839389,70100,Seremban,Negeri Sembilan,"A11K Langat Jaya Condo, Jalan Dato Alias",HOME,Embroidered Maxi Chic,XXL,1,1.0,0,0,0,COD,105.40,105.40,COD collect on delivery
+20077,Tan Tan,0183820233,11900,Bayan Lepas,Penang,"Lot 29, Persiaran Mahsuri 1, Bandar Baru",HOME,Chiffon Georgette Party Set with Farshi Palazzo,XL,1,1.6,0,0,0,COD,168.25,168.25,COD collect on delivery
+20078,Emily Selvi,0111836038,43000,Kajang,Selangor,"No. 76, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pure Chiffon Bandhani Gown,S,1,3.0,0,0,0,COD,258.85,258.85,COD collect on delivery
+20079,Chong Yusof,0151395222,31350,Kinta,Perak,"No. 177, Jalan Mangga, Off Jalan Dato Dollah",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,2.7,0,0,0,COD,289.79,289.79,COD collect on delivery
+20080,Ahmad Rahman,0194317169,11950,Bayan Lepas,Penang,"144, Lorong 22E8A, Taman Desa Ilmu",HOME,Chiffon Georgette Party Set with Farshi Palazzo,,1,1.7,0,0,0,PREPAID,0,255.00,Paid Order
+20081,Emily Sabapathie,0162331727,41100,Klang,Selangor,"No. 115, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pearl Hand Embellished 3 Piece Suit,XL,1,2.1,0,0,0,PREPAID,0,158.75,Paid Order
+20082,Zulkifli Subramaniam,0127439685,94300,Kota Samarahan,Sarawak,"No. 215, Lang Damai 3, Desa Lang Damai",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,1.6,0,0,0,COD,133.28,133.28,COD collect on delivery
+20083,Priya Balakrishnan,0161984780,70100,Seremban,Negeri Sembilan,"A187K Langat Jaya Condo, Jalan Dato Alias",OFFICE,Pure Chiffon Bandhani Gown,M,1,2.9,0,0,0,PREPAID,0,95.64,Paid Order
+20084,Wong Subramaniam,0143395393,43200,Cheras,Selangor,"145-15-16 The Promenade Condominium, Barat Daya",OFFICE,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,0.5,0,0,0,COD,219.11,219.11,COD collect on delivery
+20085,Wong Gunasengaran,0184387345,40170,Shah Alam,Selangor,"No. 107, Lang Damai 3, Desa Lang Damai",HOME,Chiffon Georgette Party Set with Farshi Palazzo,M,1,2.2,0,0,0,PREPAID,0,249.17,Paid Order
+20086,Nurul Ismail,0173162918,30010,Ipoh,Perak,"No. 141-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pure Chiffon Bandhani Gown,XXL,1,1.5,0,0,0,COD,211.98,211.98,COD collect on delivery
+20087,Siti Gunasengaran,0156258298,81750,Masai,Johor,"No. 77, Lang Damai 3, Desa Lang Damai",HOME,Embroidered Maxi Chic,,1,2.4,0,0,0,COD,58.63,58.63,COD collect on delivery
+20088,Kirendeep Duim,0135817979,25200,Kuantan,Pahang,"Lot 182, Persiaran Mahsuri 1, Bandar Baru",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,,1,2.3,0,0,0,COD,199.67,199.67,COD collect on delivery
+20089,Anne Subramaniam,0114734316,80100,Johor Bahru,Johor,"No. 20-1, Jalan PJU 5/21, The Strand, Kota Damansara",OFFICE,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,,1,0.5,0,0,0,COD,247.13,247.13,COD collect on delivery
+20090,Elizabeth Duim,0175919767,10050,George Town,Penang,"A103K Langat Jaya Condo, Jalan Dato Alias",HOME,Pure Chiffon Bandhani Gown,S,1,2.0,0,0,0,COD,279.79,279.79,COD collect on delivery
+20091,Anne Sinnasamy,0119844995,41100,Klang,Selangor,"A20K Langat Jaya Condo, Jalan Dato Alias",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,2.9,0,0,0,PREPAID,0,54.00,Paid Order
+20092,Anne Ng,0133266197,70100,Seremban,Negeri Sembilan,"No. 20, Jalan Mangga, Off Jalan Dato Dollah",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,L,1,1.3,0,0,0,COD,315.18,315.18,COD collect on delivery
+20093,Kirendeep Balakrishnan,0175012517,81750,Masai,Johor,"No 237, Jalan Ara 4, Taman Rinting",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,L,1,1.7,0,0,0,COD,305.50,305.50,COD collect on delivery
+20094,Ahmad Rahman,0187052831,10050,George Town,Penang,"52, Lorong 22E8A, Taman Desa Ilmu",HOME,Pure Chiffon Bandhani Gown,M,1,0.7,0,0,0,PREPAID,0,118.77,Paid Order
+20095,Emily Mohamed,0147238879,40170,Shah Alam,Selangor,"229, Lorong 22E8A, Taman Desa Ilmu",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,2.0,0,0,0,COD,62.60,62.60,COD collect on delivery
+20096,Chong Mohamed,0123407217,31350,Kinta,Perak,"A70K Langat Jaya Condo, Jalan Dato Alias",OFFICE,Embroidered Maxi Chic,XXL,1,3.0,0,0,0,COD,58.72,58.72,COD collect on delivery
+20097,Nurul Rahman,0191710303,40170,Shah Alam,Selangor,"No. 92-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,0.6,0,0,0,PREPAID,0,203.00,Paid Order
+20098,Siti Yusof,0161833168,10050,George Town,Penang,"A5K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,0.3,0,0,0,PREPAID,0,290.08,Paid Order
+20099,Priya Wong,0129750140,11950,Bayan Lepas,Penang,"No. 28, Jalan Mangga, Off Jalan Dato Dollah",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,0.9,0,0,0,COD,150.69,150.69,COD collect on delivery
+20100,Priya Yusof,0196619926,70100,Seremban,Negeri Sembilan,"No. 161, Jalan Mangga, Off Jalan Dato Dollah",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XL,1,1.6,0,0,0,PREPAID,0,112.35,Paid Order
+20101,Farah Lim,0197571178,11950,Bayan Lepas,Penang,"A140K Langat Jaya Condo, Jalan Dato Alias",HOME,Pure Chiffon Bandhani Gown,L,1,1.8,0,0,0,PREPAID,0,315.36,Paid Order
+20102,Lim Ng,0125207116,41100,Klang,Selangor,"No. 60, Jalan Mangga, Off Jalan Dato Dollah",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XXL,1,2.9,0,0,0,PREPAID,0,225.76,Paid Order
+20103,Farah Mohamed,0185227107,80100,Johor Bahru,Johor,"No 82, Jalan Ara 4, Taman Rinting",HOME,Embroidered Maxi Chic,XXL,1,2.9,0,0,0,PREPAID,0,88.02,Paid Order
+20104,Hafiz Chandran,0117163787,30010,Ipoh,Perak,"No. 1-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,0.7,0,0,0,PREPAID,0,55.61,Paid Order
+20105,Elizabeth Kaur,0184174656,75300,Melaka,Melaka,"Lot 37, Persiaran Mahsuri 1, Bandar Baru",OFFICE,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,S,1,1.4,0,0,0,PREPAID,0,284.46,Paid Order
+20106,Hafiz Tan,0125757415,43200,Cheras,Selangor,"No. 223, Jalan Mangga, Off Jalan Dato Dollah",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,L,1,2.7,0,0,0,PREPAID,0,217.05,Paid Order
+20107,Wanie Wong,0158349777,81750,Masai,Johor,"No. 223, Lang Damai 3, Desa Lang Damai",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,0.5,0,0,0,PREPAID,0,126.35,Paid Order
+20108,Wong Rahman,0158303662,30010,Ipoh,Perak,"No. 55, Lang Damai 3, Desa Lang Damai",HOME,Embroidered Maxi Chic,M,1,2.3,0,0,0,PREPAID,0,143.39,Paid Order
+20109,Kirendeep Chandran,0119537315,81750,Masai,Johor,"No. 141, Jalan Mangga, Off Jalan Dato Dollah",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,L,1,1.9,0,0,0,COD,255.77,255.77,COD collect on delivery
+20110,Suresh Sabapathie,0189272882,11950,Bayan Lepas,Penang,"132-15-16 The Promenade Condominium, Barat Daya",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,1.9,0,0,0,PREPAID,0,80.93,Paid Order
+20111,Wong Hassan,0138431768,47810,Petaling Jaya,Selangor,"No. 70, Lang Damai 3, Desa Lang Damai",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,1.4,0,0,0,PREPAID,0,151.80,Paid Order
+20112,Ahmad Ng,0151115409,11950,Bayan Lepas,Penang,"No. 102, Lang Damai 3, Desa Lang Damai",HOME,Embroidered Maxi Chic,,1,0.4,0,0,0,COD,146.20,146.20,COD collect on delivery
+20113,Nurul Sabapathie,0159479466,11900,Bayan Lepas,Penang,"No. 22, Lang Damai 3, Desa Lang Damai",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,0.3,0,0,0,COD,214.80,214.80,COD collect on delivery
+20114,Nalini Hassan,0168117865,40170,Shah Alam,Selangor,"No. 230, Lang Damai 3, Desa Lang Damai",OFFICE,Embroidered Maxi Chic,M,1,2.3,0,0,0,COD,129.63,129.63,COD collect on delivery
+20115,Suresh Ng,0185513550,47810,Petaling Jaya,Selangor,"A167K Langat Jaya Condo, Jalan Dato Alias",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,,1,0.3,0,0,0,COD,112.22,112.22,COD collect on delivery
+20116,Muhammad Lim,0176390968,11900,Bayan Lepas,Penang,"No. 135-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XL,1,0.9,0,0,0,PREPAID,0,184.61,Paid Order
+20117,Siti Hassan,0153190955,11900,Bayan Lepas,Penang,"190, Lorong 22E8A, Taman Desa Ilmu",HOME,Pearl Hand Embellished 3 Piece Suit,L,1,1.4,0,0,0,PREPAID,0,91.98,Paid Order
+20118,Suresh Balakrishnan,0172859327,80100,Johor Bahru,Johor,"No. 208-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,S,1,2.7,0,0,0,PREPAID,0,260.88,Paid Order
+20119,Zulkifli Kaur,0116979574,43200,Cheras,Selangor,"139-15-16 The Promenade Condominium, Barat Daya",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,,1,0.6,0,0,0,COD,59.55,59.55,COD collect on delivery
+20120,Kirendeep Gunasengaran,0139957939,31350,Kinta,Perak,"No. 124, Lang Damai 3, Desa Lang Damai",HOME,Chiffon Georgette Party Set with Farshi Palazzo,L,1,1.9,0,0,0,PREPAID,0,83.05,Paid Order
+20121,Tan Lim,0198836219,11950,Bayan Lepas,Penang,"17, Lorong 22E8A, Taman Desa Ilmu",HOME,Embroidered Maxi Chic,XL,1,1.2,0,0,0,PREPAID,0,162.91,Paid Order
+20122,Kavitha Wong,0112423353,31350,Kinta,Perak,"217, Lorong 22E8A, Taman Desa Ilmu",OFFICE,Pure Chiffon Bandhani Gown,,1,2.1,0,0,0,PREPAID,0,270.10,Paid Order
+20123,Chong Rahman,0168391056,70100,Seremban,Negeri Sembilan,"No. 148, Jalan Mangga, Off Jalan Dato Dollah",HOME,Embroidered Maxi Chic,XL,1,2.9,0,0,0,PREPAID,0,146.28,Paid Order
+20124,Wanie Mohamed,0127755494,30010,Ipoh,Perak,"No 99, Jalan Ara 4, Taman Rinting",HOME,Pure Chiffon Bandhani Gown,XL,1,1.6,0,0,0,PREPAID,0,65.89,Paid Order
+20125,Muhammad Duim,0192718179,81750,Masai,Johor,"No. 79, Lang Damai 3, Desa Lang Damai",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,0.5,0,0,0,PREPAID,0,87.58,Paid Order
+20126,Chong Sinnasamy,0195635699,43200,Cheras,Selangor,"No. 163-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Embroidered Maxi Chic,L,1,0.7,0,0,0,COD,216.66,216.66,COD collect on delivery
+20127,Lim Sinnasamy,0143133843,31350,Kinta,Perak,"A23K Langat Jaya Condo, Jalan Dato Alias",HOME,Embroidered Maxi Chic,L,1,2.1,0,0,0,PREPAID,0,134.93,Paid Order
+20128,Suresh Tan,0129582958,10050,George Town,Penang,"No 237, Jalan Ara 4, Taman Rinting",HOME,Embroidered Maxi Chic,,1,1.0,0,0,0,COD,132.02,132.02,COD collect on delivery
+20129,Suresh Subramaniam,0173413472,30010,Ipoh,Perak,"163, Lorong 22E8A, Taman Desa Ilmu",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,L,1,2.6,0,0,0,PREPAID,0,89.53,Paid Order
+20130,Zulkifli Subramaniam,0172128203,75300,Melaka,Melaka,"Lot 51, Persiaran Mahsuri 1, Bandar Baru",HOME,Chiffon Georgette Party Set with Farshi Palazzo,,1,1.6,0,0,0,COD,56.74,56.74,COD collect on delivery
+20131,Lim Lim,0192328474,25200,Kuantan,Pahang,"No 121, Jalan Ara 4, Taman Rinting",HOME,Embroidered Maxi Chic,XXL,1,2.3,0,0,0,COD,116.81,116.81,COD collect on delivery
+20132,Nalini Lim,0199237576,30010,Ipoh,Perak,"No. 56, Jalan Mangga, Off Jalan Dato Dollah",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XXL,1,1.2,0,0,0,PREPAID,0,66.97,Paid Order
+20133,Farah Rahman,0116506631,50450,Kuala Lumpur,Kuala Lumpur,"130-15-16 The Promenade Condominium, Barat Daya",OFFICE,Embroidered Maxi Chic,,1,0.6,0,0,0,PREPAID,0,191.65,Paid Order
+20134,Kavitha Kaur,0112071998,11950,Bayan Lepas,Penang,"34, Lorong 22E8A, Taman Desa Ilmu",HOME,Embroidered Maxi Chic,L,1,1.4,0,0,0,PREPAID,0,67.20,Paid Order
+20135,Farah Subramaniam,0136318493,31350,Kinta,Perak,"Lot 134, Persiaran Mahsuri 1, Bandar Baru",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,L,1,2.5,0,0,0,COD,301.64,301.64,COD collect on delivery
+20136,Wanie Balakrishnan,0188887589,30010,Ipoh,Perak,"A170K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XL,1,0.5,0,0,0,PREPAID,0,265.99,Paid Order
+20137,Chong Yusof,0147497141,43000,Kajang,Selangor,"A164K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,S,1,0.7,0,0,0,PREPAID,0,292.37,Paid Order
+20138,Siti Abdullah,0192865017,30010,Ipoh,Perak,"237-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,0.7,0,0,0,COD,95.53,95.53,COD collect on delivery
+20139,Farah Hassan,0156884664,88000,Kota Kinabalu,Sabah,"No 11, Jalan Ara 4, Taman Rinting",OFFICE,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,M,1,2.2,0,0,0,COD,173.40,173.40,COD collect on delivery
+20140,Kavitha Kaur,0115204717,50450,Kuala Lumpur,Kuala Lumpur,"151-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,M,1,1.3,0,0,0,PREPAID,0,100.07,Paid Order
+20141,Menaga Sabapathie,0158243224,25200,Kuantan,Pahang,"Lot 150, Persiaran Mahsuri 1, Bandar Baru",HOME,Pure Chiffon Bandhani Gown,,1,2.0,0,0,0,COD,101.23,101.23,COD collect on delivery
+20142,Zulkifli Hassan,0165194194,70100,Seremban,Negeri Sembilan,"No 105, Jalan Ara 4, Taman Rinting",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XL,1,3.0,0,0,0,PREPAID,0,99.02,Paid Order
+20143,Ahmad Lim,0145763474,11900,Bayan Lepas,Penang,"151-15-16 The Promenade Condominium, Barat Daya",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,S,1,1.2,0,0,0,COD,224.23,224.23,COD collect on delivery
+20144,Chong Hassan,0118196663,25200,Kuantan,Pahang,"A228K Langat Jaya Condo, Jalan Dato Alias",OFFICE,Pearl Hand Embellished 3 Piece Suit,L,1,1.0,0,0,0,COD,53.75,53.75,COD collect on delivery
+20145,Farah Balakrishnan,0132887899,75300,Melaka,Melaka,"No. 52, Lang Damai 3, Desa Lang Damai",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,L,1,0.7,0,0,0,COD,306.43,306.43,COD collect on delivery
+20146,Anne Tan,0147692826,88000,Kota Kinabalu,Sabah,"No. 115-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,0.7,0,0,0,PREPAID,0,101.27,Paid Order
+20147,Suresh Subramaniam,0115514824,70100,Seremban,Negeri Sembilan,"No 165, Jalan Ara 4, Taman Rinting",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,2.8,0,0,0,PREPAID,0,240.35,Paid Order
+20148,Suresh Wong,0175195480,47810,Petaling Jaya,Selangor,"No. 142-1, Jalan PJU 5/21, The Strand, Kota Damansara",OFFICE,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,S,1,2.2,0,0,0,PREPAID,0,211.34,Paid Order
+20149,Siti Wong,0126158256,43200,Cheras,Selangor,"No 208, Jalan Ara 4, Taman Rinting",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,M,1,0.9,0,0,0,PREPAID,0,132.96,Paid Order
+20150,Zulkifli Tan,0147376569,40170,Shah Alam,Selangor,"No. 218, Lang Damai 3, Desa Lang Damai",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,2.5,0,0,0,COD,166.33,166.33,COD collect on delivery
+20151,Kirendeep Balakrishnan,0139468752,75300,Melaka,Melaka,"No. 173-1, Jalan PJU 5/21, The Strand, Kota Damansara",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,2.0,0,0,0,COD,307.63,307.63,COD collect on delivery
+20152,Ahmad Balakrishnan,0138017953,40170,Shah Alam,Selangor,"Lot 116, Persiaran Mahsuri 1, Bandar Baru",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,0.7,0,0,0,PREPAID,0,219.45,Paid Order
+20153,Elizabeth Kaur,0192412606,88000,Kota Kinabalu,Sabah,"No 79, Jalan Ara 4, Taman Rinting",HOME,Embroidered Maxi Chic,L,1,1.3,0,0,0,PREPAID,0,214.37,Paid Order
+20154,Tan Balakrishnan,0196542762,70100,Seremban,Negeri Sembilan,"164-15-16 The Promenade Condominium, Barat Daya",OFFICE,Embroidered Maxi Chic,,1,2.6,0,0,0,COD,188.68,188.68,COD collect on delivery
+20155,Nurul Balakrishnan,0137332116,25200,Kuantan,Pahang,"No 161, Jalan Ara 4, Taman Rinting",OFFICE,Embroidered Maxi Chic,M,1,0.5,0,0,0,PREPAID,0,276.57,Paid Order
+20156,Elizabeth Chandran,0112948917,43200,Cheras,Selangor,"A157K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,1.0,0,0,0,COD,90.43,90.43,COD collect on delivery
+20157,Tan Tan,0196792039,88000,Kota Kinabalu,Sabah,"A234K Langat Jaya Condo, Jalan Dato Alias",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,M,1,1.4,0,0,0,PREPAID,0,258.27,Paid Order
+20158,Elizabeth Selvi,0161075796,47810,Petaling Jaya,Selangor,"No. 63-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pure Chiffon Bandhani Gown,,1,2.2,0,0,0,COD,217.73,217.73,COD collect on delivery
+20159,Menaga Gunasengaran,0162398425,31350,Kinta,Perak,"No. 225, Jalan Mangga, Off Jalan Dato Dollah",HOME,Embroidered Maxi Chic,M,1,1.0,0,0,0,COD,237.55,237.55,COD collect on delivery
+20160,Chong Kaur,0185717346,88000,Kota Kinabalu,Sabah,"No. 134, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pearl Hand Embellished 3 Piece Suit,S,1,1.0,0,0,0,PREPAID,0,239.06,Paid Order
+20161,Wong Kaur,0136857100,47810,Petaling Jaya,Selangor,"No. 39, Jalan Mangga, Off Jalan Dato Dollah",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,,1,0.7,0,0,0,COD,139.47,139.47,COD collect on delivery
+20162,Wanie Hassan,0145479012,11900,Bayan Lepas,Penang,"No. 13-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,0.9,0,0,0,PREPAID,0,308.26,Paid Order
+20163,Wanie Abdullah,0178170097,75300,Melaka,Melaka,"No. 162, Lang Damai 3, Desa Lang Damai",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XXL,1,0.8,0,0,0,COD,92.39,92.39,COD collect on delivery
+20164,Muhammad Yusof,0124698888,43200,Cheras,Selangor,"No. 172, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,L,1,1.1,0,0,0,COD,241.98,241.98,COD collect on delivery
+20165,Tan Subramaniam,0134369776,88000,Kota Kinabalu,Sabah,"No 181, Jalan Ara 4, Taman Rinting",HOME,Chiffon Georgette Party Set with Farshi Palazzo,L,1,1.1,0,0,0,COD,50.12,50.12,COD collect on delivery
+20166,Lim Duim,0116956780,75300,Melaka,Melaka,"220, Lorong 22E8A, Taman Desa Ilmu",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,0.8,0,0,0,COD,123.12,123.12,COD collect on delivery
+20167,Aina Balakrishnan,0124950526,43000,Kajang,Selangor,"22-15-16 The Promenade Condominium, Barat Daya",HOME,Pearl Hand Embellished 3 Piece Suit,,1,2.1,0,0,0,COD,47.31,47.31,COD collect on delivery
+20168,Suresh Raj,0147184575,30010,Ipoh,Perak,"No. 144-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,L,1,1.7,0,0,0,PREPAID,0,279.76,Paid Order
+20169,Tan Raj,0168290744,43200,Cheras,Selangor,"No. 192-1, Jalan PJU 5/21, The Strand, Kota Damansara",OFFICE,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,,1,2.2,0,0,0,PREPAID,0,65.57,Paid Order
+20170,Ahmad Wong,0139376775,50450,Kuala Lumpur,Kuala Lumpur,"83, Lorong 22E8A, Taman Desa Ilmu",HOME,Chiffon Georgette Party Set with Farshi Palazzo,,1,1.6,0,0,0,COD,50.75,50.75,COD collect on delivery
+20171,Menaga Ng,0178614545,47810,Petaling Jaya,Selangor,"No. 149, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pearl Hand Embellished 3 Piece Suit,S,1,0.7,0,0,0,PREPAID,0,159.46,Paid Order
+20172,Suresh Duim,0112297153,40170,Shah Alam,Selangor,"No. 219-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,1.9,0,0,0,PREPAID,0,230.62,Paid Order
+20173,Nurul Subramaniam,0122424441,47810,Petaling Jaya,Selangor,"Lot 144, Persiaran Mahsuri 1, Bandar Baru",OFFICE,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XXL,1,2.0,0,0,0,COD,232.63,232.63,COD collect on delivery
+20174,Tan Duim,0197766039,81750,Masai,Johor,"2-15-16 The Promenade Condominium, Barat Daya",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,,1,1.1,0,0,0,COD,165.99,165.99,COD collect on delivery
+20175,Wanie Duim,0116603128,50450,Kuala Lumpur,Kuala Lumpur,"No. 68-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,2.2,0,0,0,PREPAID,0,158.19,Paid Order
+20176,Ahmad Yusof,0196142555,40170,Shah Alam,Selangor,"Lot 185, Persiaran Mahsuri 1, Bandar Baru",HOME,Embroidered Maxi Chic,M,1,1.8,0,0,0,COD,305.96,305.96,COD collect on delivery
+20177,Kirendeep Raj,0196156891,80100,Johor Bahru,Johor,"No. 158-1, Jalan PJU 5/21, The Strand, Kota Damansara",OFFICE,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,M,1,1.0,0,0,0,PREPAID,0,127.92,Paid Order
+20178,Anne Hassan,0191863018,25200,Kuantan,Pahang,"Lot 194, Persiaran Mahsuri 1, Bandar Baru",OFFICE,Chiffon Georgette Party Set with Farshi Palazzo,XL,1,1.1,0,0,0,PREPAID,0,264.07,Paid Order
+20179,Ahmad Rahman,0135087741,75300,Melaka,Melaka,"No. 137, Lang Damai 3, Desa Lang Damai",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,M,1,1.3,0,0,0,PREPAID,0,197.56,Paid Order
+20180,Siti Gunasengaran,0195893438,47810,Petaling Jaya,Selangor,"No. 240, Lang Damai 3, Desa Lang Damai",HOME,Chiffon Georgette Party Set with Farshi Palazzo,XL,1,0.7,0,0,0,PREPAID,0,260.80,Paid Order
+20181,Farah Ismail,0191526958,30010,Ipoh,Perak,"No 40, Jalan Ara 4, Taman Rinting",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,1.0,0,0,0,COD,47.77,47.77,COD collect on delivery
+20182,Hafiz Balakrishnan,0125880830,41100,Klang,Selangor,"No 145, Jalan Ara 4, Taman Rinting",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,L,1,2.1,0,0,0,COD,235.53,235.53,COD collect on delivery
+20183,Elizabeth Gunasengaran,0166791089,11900,Bayan Lepas,Penang,"A139K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,1.0,0,0,0,COD,65.14,65.14,COD collect on delivery
+20184,Farah Hassan,0145907184,10050,George Town,Penang,"143-15-16 The Promenade Condominium, Barat Daya",OFFICE,Pure Chiffon Bandhani Gown,L,1,0.3,0,0,0,PREPAID,0,107.75,Paid Order
+20185,Aina Mohamed,0143217223,10050,George Town,Penang,"A162K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,M,1,1.0,0,0,0,PREPAID,0,250.96,Paid Order
+20186,Nalini Tan,0113500629,41100,Klang,Selangor,"136, Lorong 22E8A, Taman Desa Ilmu",OFFICE,Plazzo And Duppata Set Fully Stitched Ready to Wear,XXL,1,2.0,0,0,0,PREPAID,0,181.86,Paid Order
+20187,Elizabeth Abdullah,0199974763,10050,George Town,Penang,"No. 36, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pure Chiffon Bandhani Gown,L,1,1.7,0,0,0,COD,193.78,193.78,COD collect on delivery
+20188,Chong Yusof,0111056008,11900,Bayan Lepas,Penang,"No. 59-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pearl Hand Embellished 3 Piece Suit,XL,1,1.1,0,0,0,COD,298.98,298.98,COD collect on delivery
+20189,Muhammad Subramaniam,0181427652,88000,Kota Kinabalu,Sabah,"No 184, Jalan Ara 4, Taman Rinting",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,M,1,2.3,0,0,0,COD,270.21,270.21,COD collect on delivery
+20190,Ahmad Ng,0151717367,41100,Klang,Selangor,"Lot 108, Persiaran Mahsuri 1, Bandar Baru",HOME,Pure Chiffon Bandhani Gown,M,1,0.4,0,0,0,PREPAID,0,70.21,Paid Order
+20191,Anne Hassan,0157789984,80100,Johor Bahru,Johor,"Lot 63, Persiaran Mahsuri 1, Bandar Baru",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,L,1,2.3,0,0,0,PREPAID,0,51.04,Paid Order
+20192,Raj Duim,0164853205,30010,Ipoh,Perak,"16-15-16 The Promenade Condominium, Barat Daya",OFFICE,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,2.7,0,0,0,COD,291.37,291.37,COD collect on delivery
+20193,Tan Ismail,0176090066,10050,George Town,Penang,"A213K Langat Jaya Condo, Jalan Dato Alias",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,1.4,0,0,0,COD,179.73,179.73,COD collect on delivery
+20194,Wanie Hassan,0114059258,75300,Melaka,Melaka,"No. 90, Lang Damai 3, Desa Lang Damai",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,S,1,1.9,0,0,0,PREPAID,0,137.44,Paid Order
+20195,Kavitha Sinnasamy,0187835554,30010,Ipoh,Perak,"No 60, Jalan Ara 4, Taman Rinting",OFFICE,Plazzo And Duppata Set Fully Stitched Ready to Wear,S,1,2.0,0,0,0,PREPAID,0,184.60,Paid Order
+20196,Menaga Duim,0189607828,30010,Ipoh,Perak,"218-15-16 The Promenade Condominium, Barat Daya",HOME,Pearl Hand Embellished 3 Piece Suit,XL,1,0.3,0,0,0,PREPAID,0,147.25,Paid Order
+20197,Nurul Selvi,0134324485,80100,Johor Bahru,Johor,"No. 105-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,M,1,1.0,0,0,0,COD,259.49,259.49,COD collect on delivery
+20198,Ahmad Chandran,0173767900,43200,Cheras,Selangor,"No. 156, Jalan Mangga, Off Jalan Dato Dollah",HOME,Chiffon Georgette Party Set with Farshi Palazzo,M,1,2.6,0,0,0,COD,273.39,273.39,COD collect on delivery
+20199,Nurul Raj,0114334158,43200,Cheras,Selangor,"No. 134, Jalan Mangga, Off Jalan Dato Dollah",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XXL,1,1.9,0,0,0,COD,229.96,229.96,COD collect on delivery
+20200,Wong Ismail,0176651259,30010,Ipoh,Perak,"No 186, Jalan Ara 4, Taman Rinting",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,2.5,0,0,0,PREPAID,0,169.21,Paid Order
+20201,Aina Sinnasamy,0143657255,11950,Bayan Lepas,Penang,"No. 56, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pure Chiffon Bandhani Gown,XXL,1,1.4,0,0,0,PREPAID,0,144.79,Paid Order
+20202,Farah Ng,0183802472,88000,Kota Kinabalu,Sabah,"Lot 147, Persiaran Mahsuri 1, Bandar Baru",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,S,1,1.2,0,0,0,PREPAID,0,96.61,Paid Order
+20203,Elizabeth Selvi,0145652507,94300,Kota Samarahan,Sarawak,"221-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,1.1,0,0,0,PREPAID,0,274.68,Paid Order
+20204,Anne Selvi,0124782543,70100,Seremban,Negeri Sembilan,"No. 208-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XL,1,1.8,0,0,0,COD,181.11,181.11,COD collect on delivery
+20205,Nalini Balakrishnan,0145547020,81750,Masai,Johor,"No. 229, Jalan Mangga, Off Jalan Dato Dollah",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,,1,0.9,0,0,0,PREPAID,0,265.95,Paid Order
+20206,Tan Mohamed,0121881560,25200,Kuantan,Pahang,"No. 186, Lang Damai 3, Desa Lang Damai",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XXL,1,2.8,0,0,0,PREPAID,0,271.96,Paid Order
+20207,Anne Yusof,0176752385,47810,Petaling Jaya,Selangor,"No. 127, Jalan Mangga, Off Jalan Dato Dollah",OFFICE,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,,1,1.3,0,0,0,COD,278.16,278.16,COD collect on delivery
+20208,Anne Wong,0121580802,11900,Bayan Lepas,Penang,"No. 211, Lang Damai 3, Desa Lang Damai",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XL,1,2.2,0,0,0,COD,133.06,133.06,COD collect on delivery
+20209,Kavitha Mohamed,0153265888,50450,Kuala Lumpur,Kuala Lumpur,"No. 38, Lang Damai 3, Desa Lang Damai",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XXL,1,3.0,0,0,0,PREPAID,0,168.98,Paid Order
+20210,Chong Sinnasamy,0161755454,81750,Masai,Johor,"No. 56-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,2.4,0,0,0,PREPAID,0,164.95,Paid Order
+20211,Wanie Tan,0179099390,10050,George Town,Penang,"No. 127, Jalan Mangga, Off Jalan Dato Dollah",HOME,Embroidered Maxi Chic,S,1,0.6,0,0,0,PREPAID,0,54.13,Paid Order
+20212,Raj Chandran,0132676069,47810,Petaling Jaya,Selangor,"174-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XL,1,2.6,0,0,0,COD,250.87,250.87,COD collect on delivery
+20213,Emily Yusof,0186778860,75300,Melaka,Melaka,"No. 212, Jalan Mangga, Off Jalan Dato Dollah",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XXL,1,2.0,0,0,0,COD,278.88,278.88,COD collect on delivery
+20214,Kirendeep Hassan,0131410615,81750,Masai,Johor,"No. 143-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pearl Hand Embellished 3 Piece Suit,XL,1,2.3,0,0,0,COD,235.50,235.50,COD collect on delivery
+20215,Elizabeth Hassan,0177451925,43200,Cheras,Selangor,"26, Lorong 22E8A, Taman Desa Ilmu",HOME,Embroidered Maxi Chic,,1,2.5,0,0,0,PREPAID,0,269.59,Paid Order
+20216,Kirendeep Hassan,0124208874,81750,Masai,Johor,"No. 76, Lang Damai 3, Desa Lang Damai",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XL,1,2.5,0,0,0,COD,85.09,85.09,COD collect on delivery
+20217,Aina Mohamed,0199153325,50450,Kuala Lumpur,Kuala Lumpur,"A34K Langat Jaya Condo, Jalan Dato Alias",OFFICE,Pearl Hand Embellished 3 Piece Suit,M,1,0.4,0,0,0,PREPAID,0,167.86,Paid Order
+20218,Ahmad Chandran,0154523985,31350,Kinta,Perak,"Lot 209, Persiaran Mahsuri 1, Bandar Baru",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,1.9,0,0,0,COD,218.37,218.37,COD collect on delivery
+20219,Farah Mohamed,0138746367,80100,Johor Bahru,Johor,"No. 113-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Embroidered Maxi Chic,L,1,0.4,0,0,0,PREPAID,0,252.55,Paid Order
+20220,Wong Abdullah,0122440537,88000,Kota Kinabalu,Sabah,"No. 113, Lang Damai 3, Desa Lang Damai",HOME,Pearl Hand Embellished 3 Piece Suit,XXL,1,2.2,0,0,0,PREPAID,0,115.77,Paid Order
+20221,Kavitha Tan,0184240040,43000,Kajang,Selangor,"A4K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,L,1,1.6,0,0,0,COD,264.32,264.32,COD collect on delivery
+20222,Nalini Duim,0194632752,88000,Kota Kinabalu,Sabah,"No. 93, Lang Damai 3, Desa Lang Damai",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,,1,2.4,0,0,0,COD,190.42,190.42,COD collect on delivery
+20223,Lim Gunasengaran,0197805745,81750,Masai,Johor,"198, Lorong 22E8A, Taman Desa Ilmu",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XL,1,2.9,0,0,0,COD,279.62,279.62,COD collect on delivery
+20224,Muhammad Ng,0117901930,25200,Kuantan,Pahang,"No. 92, Lang Damai 3, Desa Lang Damai",HOME,Pearl Hand Embellished 3 Piece Suit,XXL,1,1.4,0,0,0,COD,241.59,241.59,COD collect on delivery
+20225,Ahmad Abdullah,0145179601,43200,Cheras,Selangor,"No. 150-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,2.3,0,0,0,PREPAID,0,272.23,Paid Order
+20226,Kirendeep Ng,0153480009,41100,Klang,Selangor,"No. 184, Lang Damai 3, Desa Lang Damai",HOME,Embroidered Maxi Chic,L,1,1.7,0,0,0,PREPAID,0,289.29,Paid Order
+20227,Raj Abdullah,0144893103,50450,Kuala Lumpur,Kuala Lumpur,"No. 95, Jalan Mangga, Off Jalan Dato Dollah",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,,1,2.0,0,0,0,PREPAID,0,175.92,Paid Order
+20228,Kavitha Ismail,0166041299,30010,Ipoh,Perak,"No. 97-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pearl Hand Embellished 3 Piece Suit,S,1,1.9,0,0,0,COD,159.75,159.75,COD collect on delivery
+20229,Suresh Subramaniam,0176508386,11950,Bayan Lepas,Penang,"A6K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,XXL,1,2.4,0,0,0,COD,184.18,184.18,COD collect on delivery
+20230,Hafiz Balakrishnan,0193452299,11900,Bayan Lepas,Penang,"Lot 98, Persiaran Mahsuri 1, Bandar Baru",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,0.9,0,0,0,PREPAID,0,86.76,Paid Order
+20231,Kirendeep Sinnasamy,0138002749,94300,Kota Samarahan,Sarawak,"No. 223, Jalan Mangga, Off Jalan Dato Dollah",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,M,1,2.1,0,0,0,PREPAID,0,271.23,Paid Order
+20232,Kavitha Ismail,0174180187,94300,Kota Samarahan,Sarawak,"115, Lorong 22E8A, Taman Desa Ilmu",HOME,Pearl Hand Embellished 3 Piece Suit,,1,1.6,0,0,0,COD,148.75,148.75,COD collect on delivery
+20233,Elizabeth Chandran,0163029089,81750,Masai,Johor,"Lot 44, Persiaran Mahsuri 1, Bandar Baru",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XL,1,2.3,0,0,0,PREPAID,0,280.34,Paid Order
+20234,Raj Duim,0149478019,47810,Petaling Jaya,Selangor,"Lot 13, Persiaran Mahsuri 1, Bandar Baru",HOME,Embroidered Maxi Chic,XXL,1,1.1,0,0,0,COD,86.19,86.19,COD collect on delivery
+20235,Priya Sinnasamy,0135837477,11900,Bayan Lepas,Penang,"92-15-16 The Promenade Condominium, Barat Daya",HOME,Pure Chiffon Bandhani Gown,S,1,2.5,0,0,0,PREPAID,0,208.54,Paid Order
+20236,Hafiz Selvi,0158638936,25200,Kuantan,Pahang,"Lot 115, Persiaran Mahsuri 1, Bandar Baru",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,2.5,0,0,0,COD,197.41,197.41,COD collect on delivery
+20237,Aina Raj,0154767455,11950,Bayan Lepas,Penang,"101, Lorong 22E8A, Taman Desa Ilmu",OFFICE,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XL,1,2.4,0,0,0,COD,141.91,141.91,COD collect on delivery
+20238,Elizabeth Lim,0183667567,75300,Melaka,Melaka,"62-15-16 The Promenade Condominium, Barat Daya",HOME,Embroidered Maxi Chic,L,1,1.3,0,0,0,COD,240.74,240.74,COD collect on delivery
+20239,Anne Lim,0122291278,10050,George Town,Penang,"No. 131-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pearl Hand Embellished 3 Piece Suit,S,1,2.5,0,0,0,PREPAID,0,95.13,Paid Order
+20240,Zulkifli Yusof,0198285302,10050,George Town,Penang,"No. 42, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,S,1,1.0,0,0,0,PREPAID,0,204.99,Paid Order
+20241,Muhammad Gunasengaran,0129986372,75300,Melaka,Melaka,"93-15-16 The Promenade Condominium, Barat Daya",HOME,Embroidered Maxi Chic,M,1,1.2,0,0,0,COD,72.07,72.07,COD collect on delivery
+20242,Chong Rahman,0151617430,43200,Cheras,Selangor,"Lot 223, Persiaran Mahsuri 1, Bandar Baru",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,S,1,2.4,0,0,0,PREPAID,0,143.28,Paid Order
+20243,Siti Yusof,0161124255,43200,Cheras,Selangor,"10, Lorong 22E8A, Taman Desa Ilmu",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,1.9,0,0,0,COD,50.65,50.65,COD collect on delivery
+20244,Muhammad Kaur,0118091106,70100,Seremban,Negeri Sembilan,"196-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,0.9,0,0,0,COD,149.28,149.28,COD collect on delivery
+20245,Siti Selvi,0132273902,50450,Kuala Lumpur,Kuala Lumpur,"No. 102-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Embroidered Maxi Chic,S,1,1.0,0,0,0,COD,195.77,195.77,COD collect on delivery
+20246,Nurul Rahman,0127710529,94300,Kota Samarahan,Sarawak,"No. 11-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XL,1,2.8,0,0,0,COD,56.72,56.72,COD collect on delivery
+20247,Aina Selvi,0173353670,41100,Klang,Selangor,"No. 93, Jalan Mangga, Off Jalan Dato Dollah",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,2.0,0,0,0,COD,81.96,81.96,COD collect on delivery
+20248,Suresh Sabapathie,0138058684,88000,Kota Kinabalu,Sabah,"Lot 85, Persiaran Mahsuri 1, Bandar Baru",OFFICE,Embroidered Maxi Chic,,1,2.1,0,0,0,COD,246.69,246.69,COD collect on delivery
+20249,Kirendeep Ng,0171544238,30010,Ipoh,Perak,"No. 82, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pearl Hand Embellished 3 Piece Suit,XXL,1,2.5,0,0,0,PREPAID,0,112.61,Paid Order
+20250,Lim Subramaniam,0166329862,31350,Kinta,Perak,"A153K Langat Jaya Condo, Jalan Dato Alias",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,,1,1.2,0,0,0,COD,290.03,290.03,COD collect on delivery
+20251,Zulkifli Lim,0196658236,47810,Petaling Jaya,Selangor,"229-15-16 The Promenade Condominium, Barat Daya",HOME,Pure Chiffon Bandhani Gown,S,1,2.9,0,0,0,PREPAID,0,109.61,Paid Order
+20252,Zulkifli Sabapathie,0136825442,41100,Klang,Selangor,"203-15-16 The Promenade Condominium, Barat Daya",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,S,1,1.9,0,0,0,PREPAID,0,247.64,Paid Order
+20253,Aina Balakrishnan,0158335261,70100,Seremban,Negeri Sembilan,"No 235, Jalan Ara 4, Taman Rinting",HOME,Chiffon Georgette Party Set with Farshi Palazzo,,1,1.3,0,0,0,PREPAID,0,218.27,Paid Order
+20254,Wong Rahman,0182570699,50450,Kuala Lumpur,Kuala Lumpur,"No. 112-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,M,1,2.4,0,0,0,PREPAID,0,225.35,Paid Order
+20255,Wong Mohamed,0138797739,43200,Cheras,Selangor,"No. 171, Lang Damai 3, Desa Lang Damai",HOME,Chiffon Georgette Party Set with Farshi Palazzo,,1,2.7,0,0,0,COD,297.75,297.75,COD collect on delivery
+20256,Hafiz Selvi,0185117028,25200,Kuantan,Pahang,"No 168, Jalan Ara 4, Taman Rinting",HOME,Pearl Hand Embellished 3 Piece Suit,,1,1.6,0,0,0,COD,163.33,163.33,COD collect on delivery
+20257,Farah Rahman,0166973599,41100,Klang,Selangor,"No. 226, Lang Damai 3, Desa Lang Damai",HOME,Embroidered Maxi Chic,M,1,0.7,0,0,0,PREPAID,0,50.33,Paid Order
+20258,Nalini Lim,0123564951,75300,Melaka,Melaka,"No 92, Jalan Ara 4, Taman Rinting",HOME,Pure Chiffon Bandhani Gown,,1,2.7,0,0,0,PREPAID,0,316.13,Paid Order
+20259,Ahmad Balakrishnan,0186295317,30010,Ipoh,Perak,"132, Lorong 22E8A, Taman Desa Ilmu",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,1.7,0,0,0,COD,318.09,318.09,COD collect on delivery
+20260,Kirendeep Abdullah,0188594193,80100,Johor Bahru,Johor,"No. 34, Lang Damai 3, Desa Lang Damai",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,1.4,0,0,0,COD,49.68,49.68,COD collect on delivery
+20261,Nurul Mohamed,0184911377,81750,Masai,Johor,"A29K Langat Jaya Condo, Jalan Dato Alias",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,L,1,1.3,0,0,0,PREPAID,0,248.34,Paid Order
+20262,Wanie Subramaniam,0161224656,94300,Kota Samarahan,Sarawak,"No. 211, Lang Damai 3, Desa Lang Damai",HOME,Pearl Hand Embellished 3 Piece Suit,,1,0.7,0,0,0,PREPAID,0,223.38,Paid Order
+20263,Kirendeep Balakrishnan,0146762354,10050,George Town,Penang,"175-15-16 The Promenade Condominium, Barat Daya",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XL,1,1.7,0,0,0,COD,188.11,188.11,COD collect on delivery
+20264,Kavitha Subramaniam,0162905666,43000,Kajang,Selangor,"No. 178-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XL,1,2.2,0,0,0,PREPAID,0,141.89,Paid Order
+20265,Farah Sinnasamy,0114219406,81750,Masai,Johor,"No. 90, Jalan Mangga, Off Jalan Dato Dollah",HOME,Embroidered Maxi Chic,,1,2.4,0,0,0,COD,122.15,122.15,COD collect on delivery
+20266,Hafiz Yusof,0151244431,25200,Kuantan,Pahang,"Lot 164, Persiaran Mahsuri 1, Bandar Baru",HOME,Chiffon Georgette Party Set with Farshi Palazzo,,1,1.8,0,0,0,PREPAID,0,168.69,Paid Order
+20267,Lim Ismail,0142937293,11950,Bayan Lepas,Penang,"No. 151, Jalan Mangga, Off Jalan Dato Dollah",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,S,1,0.9,0,0,0,PREPAID,0,154.48,Paid Order
+20268,Muhammad Hassan,0197053759,88000,Kota Kinabalu,Sabah,"No. 103-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pearl Hand Embellished 3 Piece Suit,M,1,0.8,0,0,0,PREPAID,0,235.03,Paid Order
+20269,Elizabeth Kaur,0186884446,31350,Kinta,Perak,"No 49, Jalan Ara 4, Taman Rinting",HOME,Embroidered Maxi Chic,,1,1.2,0,0,0,PREPAID,0,102.86,Paid Order
+20270,Tan Mohamed,0189856376,11900,Bayan Lepas,Penang,"122, Lorong 22E8A, Taman Desa Ilmu",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XL,1,1.6,0,0,0,PREPAID,0,206.55,Paid Order
+20271,Anne Rahman,0172597105,31350,Kinta,Perak,"No. 125, Lang Damai 3, Desa Lang Damai",OFFICE,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,,1,2.7,0,0,0,COD,118.87,118.87,COD collect on delivery
+20272,Aina Balakrishnan,0158514579,11950,Bayan Lepas,Penang,"No 176, Jalan Ara 4, Taman Rinting",HOME,Pure Chiffon Bandhani Gown,S,1,2.2,0,0,0,PREPAID,0,137.24,Paid Order
+20273,Hafiz Selvi,0169840829,11950,Bayan Lepas,Penang,"233-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,S,1,2.7,0,0,0,COD,222.29,222.29,COD collect on delivery
+20274,Wong Yusof,0163675022,81750,Masai,Johor,"69, Lorong 22E8A, Taman Desa Ilmu",HOME,Pearl Hand Embellished 3 Piece Suit,XXL,1,2.0,0,0,0,COD,141.65,141.65,COD collect on delivery
+20275,Emily Ng,0183411254,25200,Kuantan,Pahang,"No. 176, Lang Damai 3, Desa Lang Damai",HOME,Pearl Hand Embellished 3 Piece Suit,S,1,0.6,0,0,0,COD,199.59,199.59,COD collect on delivery
+20276,Elizabeth Duim,0151353676,81750,Masai,Johor,"A103K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XL,1,1.8,0,0,0,PREPAID,0,176.77,Paid Order
+20277,Kirendeep Rahman,0187287448,11950,Bayan Lepas,Penang,"42, Lorong 22E8A, Taman Desa Ilmu",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XL,1,2.0,0,0,0,COD,298.00,298.00,COD collect on delivery
+20278,Chong Sabapathie,0131066072,31350,Kinta,Perak,"Lot 207, Persiaran Mahsuri 1, Bandar Baru",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,S,1,1.1,0,0,0,COD,219.46,219.46,COD collect on delivery
+20279,Hafiz Sinnasamy,0157963938,81750,Masai,Johor,"43, Lorong 22E8A, Taman Desa Ilmu",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,1.1,0,0,0,PREPAID,0,191.84,Paid Order
+20280,Kavitha Raj,0114844255,94300,Kota Samarahan,Sarawak,"No. 239-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,,1,2.0,0,0,0,PREPAID,0,86.81,Paid Order
+20281,Aina Balakrishnan,0164014776,10050,George Town,Penang,"No. 145, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pure Chiffon Bandhani Gown,XXL,1,2.8,0,0,0,PREPAID,0,91.04,Paid Order
+20282,Aina Sabapathie,0189453208,30010,Ipoh,Perak,"A166K Langat Jaya Condo, Jalan Dato Alias",OFFICE,Chiffon Georgette Party Set with Farshi Palazzo,S,1,1.9,0,0,0,PREPAID,0,117.50,Paid Order
+20283,Tan Kaur,0168972587,80100,Johor Bahru,Johor,"Lot 219, Persiaran Mahsuri 1, Bandar Baru",HOME,Chiffon Georgette Party Set with Farshi Palazzo,M,1,0.6,0,0,0,PREPAID,0,47.83,Paid Order
+20284,Muhammad Raj,0142119072,75300,Melaka,Melaka,"152-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XL,1,2.3,0,0,0,PREPAID,0,186.26,Paid Order
+20285,Zulkifli Duim,0117818703,80100,Johor Bahru,Johor,"No. 114, Jalan Mangga, Off Jalan Dato Dollah",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,,1,1.5,0,0,0,PREPAID,0,291.18,Paid Order
+20286,Elizabeth Subramaniam,0119752363,94300,Kota Samarahan,Sarawak,"A160K Langat Jaya Condo, Jalan Dato Alias",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,1.9,0,0,0,COD,274.88,274.88,COD collect on delivery
+20287,Suresh Selvi,0153432269,94300,Kota Samarahan,Sarawak,"Lot 174, Persiaran Mahsuri 1, Bandar Baru",HOME,Pure Chiffon Bandhani Gown,L,1,0.7,0,0,0,COD,165.36,165.36,COD collect on delivery
+20288,Anne Abdullah,0199618936,94300,Kota Samarahan,Sarawak,"18-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,2.0,0,0,0,PREPAID,0,152.73,Paid Order
+20289,Nalini Yusof,0154401937,11950,Bayan Lepas,Penang,"No. 120, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,,1,3.0,0,0,0,COD,63.44,63.44,COD collect on delivery
+20290,Anne Ismail,0172127896,43200,Cheras,Selangor,"No. 71, Jalan Mangga, Off Jalan Dato Dollah",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,1.2,0,0,0,PREPAID,0,286.24,Paid Order
+20291,Priya Subramaniam,0188252471,40170,Shah Alam,Selangor,"15-15-16 The Promenade Condominium, Barat Daya",HOME,Embroidered Maxi Chic,L,1,2.4,0,0,0,PREPAID,0,278.31,Paid Order
+20292,Priya Hassan,0151436821,40170,Shah Alam,Selangor,"122-15-16 The Promenade Condominium, Barat Daya",HOME,Chiffon Georgette Party Set with Farshi Palazzo,L,1,2.0,0,0,0,PREPAID,0,57.15,Paid Order
+20293,Wong Sabapathie,0179780832,80100,Johor Bahru,Johor,"No. 76, Lang Damai 3, Desa Lang Damai",HOME,Pure Chiffon Bandhani Gown,XXL,1,1.5,0,0,0,PREPAID,0,149.99,Paid Order
+20294,Nurul Mohamed,0179442707,94300,Kota Samarahan,Sarawak,"A235K Langat Jaya Condo, Jalan Dato Alias",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,0.8,0,0,0,COD,265.64,265.64,COD collect on delivery
+20295,Hafiz Kaur,0143250337,10050,George Town,Penang,"8-15-16 The Promenade Condominium, Barat Daya",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,2.0,0,0,0,PREPAID,0,284.34,Paid Order
+20296,Elizabeth Abdullah,0197984645,81750,Masai,Johor,"No. 60-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,L,1,0.9,0,0,0,COD,160.56,160.56,COD collect on delivery
+20297,Nalini Ng,0123062275,47810,Petaling Jaya,Selangor,"No. 47, Lang Damai 3, Desa Lang Damai",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,1.9,0,0,0,COD,295.41,295.41,COD collect on delivery
+20298,Nurul Sabapathie,0166067144,10050,George Town,Penang,"148, Lorong 22E8A, Taman Desa Ilmu",HOME,Pearl Hand Embellished 3 Piece Suit,XXL,1,2.7,0,0,0,PREPAID,0,264.60,Paid Order
+20299,Lim Wong,0131846726,81750,Masai,Johor,"Lot 137, Persiaran Mahsuri 1, Bandar Baru",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,L,1,1.0,0,0,0,PREPAID,0,203.92,Paid Order
+20300,Ahmad Wong,0163240648,30010,Ipoh,Perak,"A37K Langat Jaya Condo, Jalan Dato Alias",HOME,Embroidered Maxi Chic,XL,1,1.3,0,0,0,PREPAID,0,117.14,Paid Order
+20301,Emily Ismail,0173805317,50450,Kuala Lumpur,Kuala Lumpur,"217-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,2.8,0,0,0,COD,160.81,160.81,COD collect on delivery
+20302,Suresh Selvi,0113376176,88000,Kota Kinabalu,Sabah,"No 51, Jalan Ara 4, Taman Rinting",HOME,Embroidered Maxi Chic,XL,1,1.7,0,0,0,COD,216.33,216.33,COD collect on delivery
+20303,Nalini Sinnasamy,0183688441,11950,Bayan Lepas,Penang,"No. 81-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,M,1,1.7,0,0,0,COD,291.94,291.94,COD collect on delivery
+20304,Chong Rahman,0149241325,47810,Petaling Jaya,Selangor,"No. 180, Jalan Mangga, Off Jalan Dato Dollah",HOME,Chiffon Georgette Party Set with Farshi Palazzo,XL,1,2.2,0,0,0,PREPAID,0,197.51,Paid Order
+20305,Kavitha Kaur,0138342961,11950,Bayan Lepas,Penang,"66, Lorong 22E8A, Taman Desa Ilmu",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XXL,1,2.4,0,0,0,COD,210.60,210.60,COD collect on delivery
+20306,Wanie Hassan,0116477286,47810,Petaling Jaya,Selangor,"A91K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,L,1,0.3,0,0,0,PREPAID,0,309.39,Paid Order
+20307,Suresh Tan,0156842690,40170,Shah Alam,Selangor,"A203K Langat Jaya Condo, Jalan Dato Alias",HOME,Pure Chiffon Bandhani Gown,XXL,1,1.7,0,0,0,PREPAID,0,77.36,Paid Order
+20308,Muhammad Ismail,0133867759,11900,Bayan Lepas,Penang,"No. 76, Jalan Mangga, Off Jalan Dato Dollah",OFFICE,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,1.3,0,0,0,PREPAID,0,315.15,Paid Order
+20309,Wanie Rahman,0154456887,11950,Bayan Lepas,Penang,"No 76, Jalan Ara 4, Taman Rinting",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,0.7,0,0,0,PREPAID,0,281.41,Paid Order
+20310,Anne Chandran,0113941459,43000,Kajang,Selangor,"No. 111-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,M,1,1.3,0,0,0,COD,104.37,104.37,COD collect on delivery
+20311,Lim Duim,0172821307,40170,Shah Alam,Selangor,"No. 237-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,1.0,0,0,0,COD,98.26,98.26,COD collect on delivery
+20312,Wong Ng,0141367625,80100,Johor Bahru,Johor,"No. 117, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pure Chiffon Bandhani Gown,S,1,0.9,0,0,0,COD,63.06,63.06,COD collect on delivery
+20313,Chong Gunasengaran,0171086766,43000,Kajang,Selangor,"A103K Langat Jaya Condo, Jalan Dato Alias",OFFICE,Plazzo And Duppata Set Fully Stitched Ready to Wear,L,1,1.3,0,0,0,COD,249.35,249.35,COD collect on delivery
+20314,Kirendeep Gunasengaran,0147691604,11900,Bayan Lepas,Penang,"No. 18, Lang Damai 3, Desa Lang Damai",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,2.8,0,0,0,COD,198.37,198.37,COD collect on delivery
+20315,Hafiz Mohamed,0152487999,25200,Kuantan,Pahang,"Lot 40, Persiaran Mahsuri 1, Bandar Baru",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,M,1,1.8,0,0,0,PREPAID,0,295.29,Paid Order
+20316,Elizabeth Lim,0161949317,40170,Shah Alam,Selangor,"No. 109-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pearl Hand Embellished 3 Piece Suit,L,1,0.4,0,0,0,PREPAID,0,67.14,Paid Order
+20317,Suresh Abdullah,0153493005,25200,Kuantan,Pahang,"A19K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,1.7,0,0,0,PREPAID,0,286.26,Paid Order
+20318,Farah Selvi,0183366261,80100,Johor Bahru,Johor,"No 41, Jalan Ara 4, Taman Rinting",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,1.2,0,0,0,PREPAID,0,142.64,Paid Order
+20319,Priya Raj,0148699548,31350,Kinta,Perak,"No 118, Jalan Ara 4, Taman Rinting",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,1.2,0,0,0,COD,105.20,105.20,COD collect on delivery
+20320,Chong Rahman,0195391190,43200,Cheras,Selangor,"92-15-16 The Promenade Condominium, Barat Daya",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,L,1,1.5,0,0,0,PREPAID,0,125.17,Paid Order
+20321,Nurul Gunasengaran,0188594261,88000,Kota Kinabalu,Sabah,"No 150, Jalan Ara 4, Taman Rinting",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,1.8,0,0,0,PREPAID,0,307.87,Paid Order
+20322,Suresh Subramaniam,0192071339,41100,Klang,Selangor,"No. 216-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,2.6,0,0,0,PREPAID,0,109.87,Paid Order
+20323,Farah Ng,0123682745,43200,Cheras,Selangor,"155, Lorong 22E8A, Taman Desa Ilmu",OFFICE,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,L,1,1.0,0,0,0,COD,111.97,111.97,COD collect on delivery
+20324,Raj Ng,0184120907,81750,Masai,Johor,"No. 51-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XL,1,2.9,0,0,0,COD,286.50,286.50,COD collect on delivery
+20325,Priya Gunasengaran,0173928210,10050,George Town,Penang,"No. 211-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Chiffon Georgette Party Set with Farshi Palazzo,L,1,1.7,0,0,0,PREPAID,0,124.19,Paid Order
+20326,Chong Raj,0191470255,10050,George Town,Penang,"No. 32, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pearl Hand Embellished 3 Piece Suit,,1,1.4,0,0,0,PREPAID,0,264.08,Paid Order
+20327,Wong Rahman,0185339214,80100,Johor Bahru,Johor,"A98K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,XL,1,1.8,0,0,0,PREPAID,0,257.03,Paid Order
+20328,Anne Lim,0131296711,11950,Bayan Lepas,Penang,"A16K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,3.0,0,0,0,COD,104.61,104.61,COD collect on delivery
+20329,Hafiz Rahman,0111460640,94300,Kota Samarahan,Sarawak,"No. 210, Lang Damai 3, Desa Lang Damai",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,1.4,0,0,0,PREPAID,0,275.57,Paid Order
+20330,Nalini Tan,0199502519,70100,Seremban,Negeri Sembilan,"No. 9, Jalan Mangga, Off Jalan Dato Dollah",HOME,Chiffon Georgette Party Set with Farshi Palazzo,,1,1.2,0,0,0,COD,170.98,170.98,COD collect on delivery
+20331,Emily Mohamed,0127766591,43200,Cheras,Selangor,"No. 13, Lang Damai 3, Desa Lang Damai",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,,1,2.3,0,0,0,PREPAID,0,55.81,Paid Order
+20332,Muhammad Abdullah,0176937876,88000,Kota Kinabalu,Sabah,"214-15-16 The Promenade Condominium, Barat Daya",HOME,Chiffon Georgette Party Set with Farshi Palazzo,L,1,1.8,0,0,0,COD,179.46,179.46,COD collect on delivery
+20333,Kavitha Hassan,0165442290,41100,Klang,Selangor,"No. 16-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XL,1,0.6,0,0,0,COD,296.58,296.58,COD collect on delivery
+20334,Chong Selvi,0196321151,11900,Bayan Lepas,Penang,"No 117, Jalan Ara 4, Taman Rinting",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,L,1,0.3,0,0,0,PREPAID,0,176.64,Paid Order
+20335,Muhammad Mohamed,0199464336,80100,Johor Bahru,Johor,"No. 70-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pure Chiffon Bandhani Gown,S,1,1.3,0,0,0,PREPAID,0,127.10,Paid Order
+20336,Wong Ismail,0134770939,75300,Melaka,Melaka,"44-15-16 The Promenade Condominium, Barat Daya",OFFICE,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XL,1,2.5,0,0,0,PREPAID,0,161.81,Paid Order
+20337,Aina Ng,0169431166,50450,Kuala Lumpur,Kuala Lumpur,"No. 31, Jalan Mangga, Off Jalan Dato Dollah",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,S,1,2.7,0,0,0,PREPAID,0,201.29,Paid Order
+20338,Elizabeth Kaur,0127977546,40170,Shah Alam,Selangor,"55-15-16 The Promenade Condominium, Barat Daya",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XL,1,1.0,0,0,0,COD,300.25,300.25,COD collect on delivery
+20339,Nurul Selvi,0127254008,25200,Kuantan,Pahang,"Lot 27, Persiaran Mahsuri 1, Bandar Baru",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,0.7,0,0,0,COD,283.61,283.61,COD collect on delivery
+20340,Wong Chandran,0156496711,31350,Kinta,Perak,"No. 165-1, Jalan PJU 5/21, The Strand, Kota Damansara",OFFICE,Embroidered Maxi Chic,S,1,0.4,0,0,0,PREPAID,0,75.13,Paid Order
+20341,Suresh Hassan,0115954258,88000,Kota Kinabalu,Sabah,"No. 230, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pure Chiffon Bandhani Gown,M,1,2.0,0,0,0,COD,276.74,276.74,COD collect on delivery
+20342,Ahmad Balakrishnan,0124326146,40170,Shah Alam,Selangor,"171, Lorong 22E8A, Taman Desa Ilmu",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XXL,1,0.4,0,0,0,COD,194.39,194.39,COD collect on delivery
+20343,Wong Sinnasamy,0157759513,47810,Petaling Jaya,Selangor,"Lot 126, Persiaran Mahsuri 1, Bandar Baru",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XL,1,2.4,0,0,0,PREPAID,0,182.58,Paid Order
+20344,Lim Wong,0116465889,43200,Cheras,Selangor,"No. 145-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pearl Hand Embellished 3 Piece Suit,L,1,1.7,0,0,0,PREPAID,0,310.31,Paid Order
+20345,Menaga Duim,0164692270,81750,Masai,Johor,"No. 55, Lang Damai 3, Desa Lang Damai",HOME,Pure Chiffon Bandhani Gown,XL,1,0.4,0,0,0,COD,176.97,176.97,COD collect on delivery
+20346,Menaga Gunasengaran,0197653222,43200,Cheras,Selangor,"No. 92-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,1.6,0,0,0,COD,234.17,234.17,COD collect on delivery
+20347,Wanie Sabapathie,0171000840,47810,Petaling Jaya,Selangor,"31-15-16 The Promenade Condominium, Barat Daya",OFFICE,Pearl Hand Embellished 3 Piece Suit,XL,1,1.5,0,0,0,COD,190.31,190.31,COD collect on delivery
+20348,Suresh Ng,0145899953,50450,Kuala Lumpur,Kuala Lumpur,"No 141, Jalan Ara 4, Taman Rinting",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XL,1,1.3,0,0,0,PREPAID,0,62.17,Paid Order
+20349,Wanie Gunasengaran,0167344246,43000,Kajang,Selangor,"No. 66-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Chiffon Georgette Party Set with Farshi Palazzo,M,1,0.7,0,0,0,PREPAID,0,223.48,Paid Order
+20350,Zulkifli Kaur,0149202013,43200,Cheras,Selangor,"63, Lorong 22E8A, Taman Desa Ilmu",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,S,1,0.7,0,0,0,PREPAID,0,304.75,Paid Order
+20351,Muhammad Hassan,0118498172,10050,George Town,Penang,"Lot 213, Persiaran Mahsuri 1, Bandar Baru",HOME,Pure Chiffon Bandhani Gown,,1,1.6,0,0,0,PREPAID,0,176.42,Paid Order
+20352,Suresh Hassan,0138062113,31350,Kinta,Perak,"No 156, Jalan Ara 4, Taman Rinting",HOME,Pearl Hand Embellished 3 Piece Suit,L,1,0.3,0,0,0,PREPAID,0,53.78,Paid Order
+20353,Raj Selvi,0112046390,31350,Kinta,Perak,"Lot 182, Persiaran Mahsuri 1, Bandar Baru",OFFICE,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,,1,2.0,0,0,0,PREPAID,0,236.68,Paid Order
+20354,Aina Raj,0178401271,75300,Melaka,Melaka,"No 1, Jalan Ara 4, Taman Rinting",OFFICE,Plazzo And Duppata Set Fully Stitched Ready to Wear,S,1,0.4,0,0,0,PREPAID,0,319.55,Paid Order
+20355,Ahmad Balakrishnan,0158235455,41100,Klang,Selangor,"No. 107-1, Jalan PJU 5/21, The Strand, Kota Damansara",OFFICE,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,2.0,0,0,0,COD,235.94,235.94,COD collect on delivery
+20356,Wanie Wong,0155751174,43200,Cheras,Selangor,"No 61, Jalan Ara 4, Taman Rinting",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,L,1,1.5,0,0,0,PREPAID,0,163.70,Paid Order
+20357,Aina Raj,0189584049,75300,Melaka,Melaka,"No. 146-1, Jalan PJU 5/21, The Strand, Kota Damansara",OFFICE,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,1.2,0,0,0,PREPAID,0,123.92,Paid Order
+20358,Siti Sinnasamy,0143430352,40170,Shah Alam,Selangor,"No. 12, Jalan Mangga, Off Jalan Dato Dollah",OFFICE,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,M,1,1.3,0,0,0,COD,258.05,258.05,COD collect on delivery
+20359,Hafiz Balakrishnan,0191952536,43000,Kajang,Selangor,"86-15-16 The Promenade Condominium, Barat Daya",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,L,1,1.4,0,0,0,COD,126.20,126.20,COD collect on delivery
+20360,Emily Selvi,0172251330,40170,Shah Alam,Selangor,"Lot 147, Persiaran Mahsuri 1, Bandar Baru",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,1.5,0,0,0,COD,59.89,59.89,COD collect on delivery
+20361,Emily Subramaniam,0169549778,25200,Kuantan,Pahang,"No. 105, Jalan Mangga, Off Jalan Dato Dollah",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XXL,1,1.2,0,0,0,COD,162.12,162.12,COD collect on delivery
+20362,Siti Duim,0145923426,31350,Kinta,Perak,"223-15-16 The Promenade Condominium, Barat Daya",OFFICE,Chiffon Georgette Party Set with Farshi Palazzo,XXL,1,2.2,0,0,0,PREPAID,0,226.63,Paid Order
+20363,Siti Subramaniam,0118290407,43200,Cheras,Selangor,"227, Lorong 22E8A, Taman Desa Ilmu",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,L,1,2.4,0,0,0,PREPAID,0,211.52,Paid Order
+20364,Tan Hassan,0158821964,30010,Ipoh,Perak,"No. 115, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pearl Hand Embellished 3 Piece Suit,S,1,1.4,0,0,0,PREPAID,0,199.77,Paid Order
+20365,Wanie Abdullah,0178613717,41100,Klang,Selangor,"155-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,1.5,0,0,0,COD,77.11,77.11,COD collect on delivery
+20366,Nurul Sinnasamy,0118970864,80100,Johor Bahru,Johor,"A236K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,,1,1.7,0,0,0,PREPAID,0,315.72,Paid Order
+20367,Farah Yusof,0193957307,70100,Seremban,Negeri Sembilan,"Lot 11, Persiaran Mahsuri 1, Bandar Baru",HOME,Embroidered Maxi Chic,XXL,1,1.7,0,0,0,COD,284.89,284.89,COD collect on delivery
+20368,Zulkifli Wong,0177614999,43200,Cheras,Selangor,"No. 67, Jalan Mangga, Off Jalan Dato Dollah",OFFICE,Plazzo And Duppata Set Fully Stitched Ready to Wear,XL,1,2.4,0,0,0,PREPAID,0,260.06,Paid Order
+20369,Ahmad Subramaniam,0151592245,88000,Kota Kinabalu,Sabah,"No. 72, Jalan Mangga, Off Jalan Dato Dollah",OFFICE,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XL,1,1.8,0,0,0,PREPAID,0,84.17,Paid Order
+20370,Nurul Wong,0197569625,88000,Kota Kinabalu,Sabah,"No. 223-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Embroidered Maxi Chic,M,1,2.8,0,0,0,COD,122.38,122.38,COD collect on delivery
+20371,Kirendeep Raj,0132977646,25200,Kuantan,Pahang,"No. 74, Lang Damai 3, Desa Lang Damai",HOME,Embroidered Maxi Chic,L,1,2.6,0,0,0,COD,179.70,179.70,COD collect on delivery
+20372,Hafiz Lim,0165755702,40170,Shah Alam,Selangor,"A167K Langat Jaya Condo, Jalan Dato Alias",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,L,1,2.2,0,0,0,PREPAID,0,191.78,Paid Order
+20373,Farah Hassan,0167529371,31350,Kinta,Perak,"No. 21-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Embroidered Maxi Chic,L,1,1.0,0,0,0,PREPAID,0,109.77,Paid Order
+20374,Chong Yusof,0179490524,30010,Ipoh,Perak,"No. 54, Lang Damai 3, Desa Lang Damai",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,2.7,0,0,0,PREPAID,0,174.79,Paid Order
+20375,Anne Yusof,0114549486,11950,Bayan Lepas,Penang,"No 199, Jalan Ara 4, Taman Rinting",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,0.5,0,0,0,PREPAID,0,142.28,Paid Order
+20376,Anne Yusof,0186905871,31350,Kinta,Perak,"No. 91, Lang Damai 3, Desa Lang Damai",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,,1,2.4,0,0,0,PREPAID,0,143.72,Paid Order
+20377,Lim Chandran,0193414773,43000,Kajang,Selangor,"No 111, Jalan Ara 4, Taman Rinting",HOME,Pure Chiffon Bandhani Gown,S,1,1.5,0,0,0,PREPAID,0,188.66,Paid Order
+20378,Suresh Yusof,0169115519,81750,Masai,Johor,"No. 118-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Chiffon Georgette Party Set with Farshi Palazzo,L,1,2.4,0,0,0,PREPAID,0,64.94,Paid Order
+20379,Aina Wong,0124244199,41100,Klang,Selangor,"11-15-16 The Promenade Condominium, Barat Daya",HOME,Embroidered Maxi Chic,,1,0.3,0,0,0,PREPAID,0,318.97,Paid Order
+20380,Ahmad Mohamed,0131292698,30010,Ipoh,Perak,"A48K Langat Jaya Condo, Jalan Dato Alias",OFFICE,Embroidered Maxi Chic,XL,1,1.6,0,0,0,PREPAID,0,135.91,Paid Order
+20381,Tan Chandran,0177013037,31350,Kinta,Perak,"171, Lorong 22E8A, Taman Desa Ilmu",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,M,1,2.3,0,0,0,PREPAID,0,267.63,Paid Order
+20382,Wong Rahman,0142980479,70100,Seremban,Negeri Sembilan,"No. 135, Lang Damai 3, Desa Lang Damai",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,0.7,0,0,0,PREPAID,0,195.09,Paid Order
+20383,Kirendeep Kaur,0199500562,94300,Kota Samarahan,Sarawak,"No. 103, Jalan Mangga, Off Jalan Dato Dollah",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,2.2,0,0,0,COD,145.76,145.76,COD collect on delivery
+20384,Nurul Ismail,0164584218,75300,Melaka,Melaka,"A94K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,2.9,0,0,0,COD,282.57,282.57,COD collect on delivery
+20385,Raj Yusof,0111212961,70100,Seremban,Negeri Sembilan,"No. 231-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,1.3,0,0,0,PREPAID,0,243.14,Paid Order
+20386,Emily Raj,0184414170,50450,Kuala Lumpur,Kuala Lumpur,"A205K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,L,1,2.2,0,0,0,PREPAID,0,65.08,Paid Order
+20387,Aina Chandran,0162826735,47810,Petaling Jaya,Selangor,"No. 101-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,2.2,0,0,0,PREPAID,0,122.00,Paid Order
+20388,Farah Hassan,0194029203,47810,Petaling Jaya,Selangor,"No. 21-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,L,1,1.6,0,0,0,COD,278.98,278.98,COD collect on delivery
+20389,Raj Gunasengaran,0191261387,41100,Klang,Selangor,"Lot 92, Persiaran Mahsuri 1, Bandar Baru",HOME,Embroidered Maxi Chic,XL,1,1.1,0,0,0,COD,73.43,73.43,COD collect on delivery
+20390,Siti Mohamed,0171980909,94300,Kota Samarahan,Sarawak,"7, Lorong 22E8A, Taman Desa Ilmu",HOME,Pure Chiffon Bandhani Gown,S,1,0.5,0,0,0,COD,49.83,49.83,COD collect on delivery
+20391,Kirendeep Gunasengaran,0124623466,10050,George Town,Penang,"No 206, Jalan Ara 4, Taman Rinting",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,0.8,0,0,0,PREPAID,0,165.24,Paid Order
+20392,Anne Sinnasamy,0123425631,40170,Shah Alam,Selangor,"No. 104, Lang Damai 3, Desa Lang Damai",HOME,Embroidered Maxi Chic,,1,0.4,0,0,0,PREPAID,0,169.95,Paid Order
+20393,Lim Abdullah,0136003612,50450,Kuala Lumpur,Kuala Lumpur,"No. 130, Jalan Mangga, Off Jalan Dato Dollah",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,S,1,1.4,0,0,0,PREPAID,0,241.08,Paid Order
+20394,Nalini Sabapathie,0155130477,43200,Cheras,Selangor,"No. 162-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,L,1,2.0,0,0,0,PREPAID,0,116.11,Paid Order
+20395,Lim Ng,0193233709,88000,Kota Kinabalu,Sabah,"No. 201-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,2.5,0,0,0,COD,122.91,122.91,COD collect on delivery
+20396,Chong Yusof,0154902428,43000,Kajang,Selangor,"No 236, Jalan Ara 4, Taman Rinting",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,M,1,0.6,0,0,0,PREPAID,0,138.04,Paid Order
+20397,Ahmad Chandran,0177003156,25200,Kuantan,Pahang,"A20K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,,1,1.8,0,0,0,COD,198.14,198.14,COD collect on delivery
+20398,Lim Sinnasamy,0148477558,43000,Kajang,Selangor,"A53K Langat Jaya Condo, Jalan Dato Alias",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,M,1,2.6,0,0,0,PREPAID,0,62.92,Paid Order
+20399,Anne Kaur,0194866797,40170,Shah Alam,Selangor,"A25K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,S,1,2.1,0,0,0,PREPAID,0,227.38,Paid Order
+20400,Tan Kaur,0198083154,40170,Shah Alam,Selangor,"161, Lorong 22E8A, Taman Desa Ilmu",OFFICE,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,,1,2.8,0,0,0,PREPAID,0,160.63,Paid Order
+20401,Elizabeth Lim,0199091202,31350,Kinta,Perak,"50, Lorong 22E8A, Taman Desa Ilmu",HOME,Pearl Hand Embellished 3 Piece Suit,S,1,0.4,0,0,0,COD,292.91,292.91,COD collect on delivery
+20402,Wong Wong,0118168490,50450,Kuala Lumpur,Kuala Lumpur,"Lot 50, Persiaran Mahsuri 1, Bandar Baru",HOME,Pearl Hand Embellished 3 Piece Suit,L,1,0.6,0,0,0,PREPAID,0,183.46,Paid Order
+20403,Anne Hassan,0129909815,50450,Kuala Lumpur,Kuala Lumpur,"No. 203-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Chiffon Georgette Party Set with Farshi Palazzo,XL,1,1.7,0,0,0,PREPAID,0,301.74,Paid Order
+20404,Nurul Duim,0138469330,10050,George Town,Penang,"A140K Langat Jaya Condo, Jalan Dato Alias",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XL,1,1.3,0,0,0,COD,188.45,188.45,COD collect on delivery
+20405,Nalini Duim,0139714410,94300,Kota Samarahan,Sarawak,"No 91, Jalan Ara 4, Taman Rinting",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XL,1,2.8,0,0,0,PREPAID,0,52.51,Paid Order
+20406,Hafiz Ng,0195633330,81750,Masai,Johor,"228, Lorong 22E8A, Taman Desa Ilmu",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,S,1,2.5,0,0,0,PREPAID,0,160.53,Paid Order
+20407,Suresh Ng,0193369302,40170,Shah Alam,Selangor,"No. 21-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,S,1,1.5,0,0,0,PREPAID,0,120.42,Paid Order
+20408,Nurul Subramaniam,0155697347,11950,Bayan Lepas,Penang,"A149K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,XL,1,1.7,0,0,0,COD,143.30,143.30,COD collect on delivery
+20409,Kavitha Balakrishnan,0169866084,50450,Kuala Lumpur,Kuala Lumpur,"Lot 50, Persiaran Mahsuri 1, Bandar Baru",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,,1,1.9,0,0,0,PREPAID,0,228.50,Paid Order
+20410,Hafiz Wong,0196188855,10050,George Town,Penang,"Lot 199, Persiaran Mahsuri 1, Bandar Baru",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,0.4,0,0,0,PREPAID,0,289.22,Paid Order
+20411,Kirendeep Sinnasamy,0127897843,94300,Kota Samarahan,Sarawak,"No. 97-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Pure Chiffon Bandhani Gown,XL,1,2.0,0,0,0,PREPAID,0,271.16,Paid Order
+20412,Hafiz Raj,0111229201,25200,Kuantan,Pahang,"51-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,1.8,0,0,0,PREPAID,0,210.04,Paid Order
+20413,Ahmad Sinnasamy,0116916905,94300,Kota Samarahan,Sarawak,"42, Lorong 22E8A, Taman Desa Ilmu",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,S,1,0.9,0,0,0,COD,258.41,258.41,COD collect on delivery
+20414,Chong Ismail,0123440497,81750,Masai,Johor,"A96K Langat Jaya Condo, Jalan Dato Alias",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,S,1,2.6,0,0,0,COD,85.65,85.65,COD collect on delivery
+20415,Hafiz Sinnasamy,0165316203,25200,Kuantan,Pahang,"No. 115, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,L,1,2.5,0,0,0,COD,261.87,261.87,COD collect on delivery
+20416,Nurul Ng,0149861589,75300,Melaka,Melaka,"No. 29, Jalan Mangga, Off Jalan Dato Dollah",HOME,Chiffon Georgette Party Set with Farshi Palazzo,XL,1,1.1,0,0,0,COD,92.26,92.26,COD collect on delivery
+20417,Zulkifli Rahman,0199061297,43200,Cheras,Selangor,"No. 153, Jalan Mangga, Off Jalan Dato Dollah",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,M,1,1.6,0,0,0,PREPAID,0,304.89,Paid Order
+20418,Menaga Tan,0141316743,10050,George Town,Penang,"No 129, Jalan Ara 4, Taman Rinting",HOME,Pearl Hand Embellished 3 Piece Suit,,1,2.5,0,0,0,PREPAID,0,60.59,Paid Order
+20419,Aina Wong,0178451674,25200,Kuantan,Pahang,"117, Lorong 22E8A, Taman Desa Ilmu",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,S,1,1.5,0,0,0,PREPAID,0,255.26,Paid Order
+20420,Hafiz Wong,0112409312,11950,Bayan Lepas,Penang,"No 49, Jalan Ara 4, Taman Rinting",HOME,Pearl Hand Embellished 3 Piece Suit,S,1,2.6,0,0,0,PREPAID,0,309.65,Paid Order
+20421,Chong Kaur,0129734928,10050,George Town,Penang,"No 39, Jalan Ara 4, Taman Rinting",HOME,Embroidered Maxi Chic,XXL,1,2.9,0,0,0,PREPAID,0,298.78,Paid Order
+20422,Raj Selvi,0188797622,11900,Bayan Lepas,Penang,"No. 42, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pure Chiffon Bandhani Gown,M,1,0.5,0,0,0,COD,47.63,47.63,COD collect on delivery
+20423,Kavitha Chandran,0167676057,43200,Cheras,Selangor,"No. 129-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,2.9,0,0,0,PREPAID,0,247.15,Paid Order
+20424,Elizabeth Gunasengaran,0199048785,11900,Bayan Lepas,Penang,"32-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,0.4,0,0,0,COD,76.64,76.64,COD collect on delivery
+20425,Anne Gunasengaran,0184018226,81750,Masai,Johor,"A115K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,L,1,0.6,0,0,0,COD,120.87,120.87,COD collect on delivery
+20426,Farah Ng,0133222054,25200,Kuantan,Pahang,"No. 166-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,M,1,0.4,0,0,0,COD,275.36,275.36,COD collect on delivery
+20427,Chong Ismail,0157113185,41100,Klang,Selangor,"7, Lorong 22E8A, Taman Desa Ilmu",HOME,Embroidered Maxi Chic,XL,1,2.0,0,0,0,COD,235.36,235.36,COD collect on delivery
+20428,Zulkifli Chandran,0129172638,81750,Masai,Johor,"A11K Langat Jaya Condo, Jalan Dato Alias",HOME,Embroidered Maxi Chic,XXL,1,0.5,0,0,0,PREPAID,0,247.76,Paid Order
+20429,Suresh Tan,0111543164,40170,Shah Alam,Selangor,"A144K Langat Jaya Condo, Jalan Dato Alias",HOME,Pearl Hand Embellished 3 Piece Suit,XXL,1,1.3,0,0,0,PREPAID,0,299.10,Paid Order
+20430,Ahmad Yusof,0165137118,41100,Klang,Selangor,"48, Lorong 22E8A, Taman Desa Ilmu",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,1.2,0,0,0,PREPAID,0,242.71,Paid Order
+20431,Menaga Selvi,0189961581,40170,Shah Alam,Selangor,"A13K Langat Jaya Condo, Jalan Dato Alias",HOME,Chiffon Georgette Party Set with Farshi Palazzo,M,1,0.9,0,0,0,PREPAID,0,138.70,Paid Order
+20432,Muhammad Balakrishnan,0194490367,40170,Shah Alam,Selangor,"No. 139, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pearl Hand Embellished 3 Piece Suit,S,1,0.4,0,0,0,PREPAID,0,54.57,Paid Order
+20433,Menaga Abdullah,0185953337,43000,Kajang,Selangor,"190, Lorong 22E8A, Taman Desa Ilmu",HOME,Embroidered Maxi Chic,L,1,2.9,0,0,0,PREPAID,0,170.20,Paid Order
+20434,Anne Rahman,0176993380,31350,Kinta,Perak,"No. 189, Jalan Mangga, Off Jalan Dato Dollah",OFFICE,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,XXL,1,0.7,0,0,0,PREPAID,0,197.15,Paid Order
+20435,Aina Mohamed,0119193733,80100,Johor Bahru,Johor,"35, Lorong 22E8A, Taman Desa Ilmu",HOME,Pearl Hand Embellished 3 Piece Suit,,1,0.3,0,0,0,PREPAID,0,73.42,Paid Order
+20436,Zulkifli Selvi,0135340702,81750,Masai,Johor,"No. 9, Lang Damai 3, Desa Lang Damai",HOME,Pearl Hand Embellished 3 Piece Suit,XXL,1,1.6,0,0,0,COD,259.01,259.01,COD collect on delivery
+20437,Elizabeth Tan,0138300823,47810,Petaling Jaya,Selangor,"No. 232, Lang Damai 3, Desa Lang Damai",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XL,1,1.5,0,0,0,PREPAID,0,57.56,Paid Order
+20438,Chong Ismail,0178629129,41100,Klang,Selangor,"163, Lorong 22E8A, Taman Desa Ilmu",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,1.9,0,0,0,COD,124.21,124.21,COD collect on delivery
+20439,Lim Rahman,0117192728,31350,Kinta,Perak,"No. 116, Lang Damai 3, Desa Lang Damai",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,0.5,0,0,0,PREPAID,0,284.39,Paid Order
+20440,Ahmad Subramaniam,0123145661,81750,Masai,Johor,"No 81, Jalan Ara 4, Taman Rinting",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XXL,1,2.1,0,0,0,COD,164.99,164.99,COD collect on delivery
+20441,Aina Ng,0176480681,40170,Shah Alam,Selangor,"58, Lorong 22E8A, Taman Desa Ilmu",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,L,1,3.0,0,0,0,PREPAID,0,101.81,Paid Order
+20442,Suresh Duim,0163845041,30010,Ipoh,Perak,"Lot 170, Persiaran Mahsuri 1, Bandar Baru",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,M,1,2.2,0,0,0,PREPAID,0,291.92,Paid Order
+20443,Chong Sinnasamy,0186626248,10050,George Town,Penang,"Lot 108, Persiaran Mahsuri 1, Bandar Baru",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,,1,1.3,0,0,0,COD,222.97,222.97,COD collect on delivery
+20444,Chong Selvi,0148927738,11950,Bayan Lepas,Penang,"No. 82, Lang Damai 3, Desa Lang Damai",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,1.3,0,0,0,PREPAID,0,309.94,Paid Order
+20445,Kavitha Balakrishnan,0118374226,31350,Kinta,Perak,"Lot 108, Persiaran Mahsuri 1, Bandar Baru",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XL,1,2.2,0,0,0,PREPAID,0,129.71,Paid Order
+20446,Menaga Raj,0118261545,11950,Bayan Lepas,Penang,"No 7, Jalan Ara 4, Taman Rinting",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,2.6,0,0,0,PREPAID,0,303.31,Paid Order
+20447,Wanie Ng,0157437901,11950,Bayan Lepas,Penang,"Lot 177, Persiaran Mahsuri 1, Bandar Baru",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XL,1,1.2,0,0,0,PREPAID,0,78.91,Paid Order
+20448,Hafiz Ng,0124009883,70100,Seremban,Negeri Sembilan,"Lot 79, Persiaran Mahsuri 1, Bandar Baru",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,S,1,0.4,0,0,0,COD,175.47,175.47,COD collect on delivery
+20449,Menaga Tan,0193115139,31350,Kinta,Perak,"177-15-16 The Promenade Condominium, Barat Daya",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,S,1,0.6,0,0,0,COD,150.86,150.86,COD collect on delivery
+20450,Chong Raj,0136977356,43000,Kajang,Selangor,"No. 79-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,M,1,0.5,0,0,0,COD,130.00,130.00,COD collect on delivery
+20451,Hafiz Lim,0131156215,43200,Cheras,Selangor,"No. 126, Jalan Mangga, Off Jalan Dato Dollah",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,L,1,1.9,0,0,0,PREPAID,0,136.63,Paid Order
+20452,Ahmad Mohamed,0189256264,11950,Bayan Lepas,Penang,"229-15-16 The Promenade Condominium, Barat Daya",HOME,Embroidered Maxi Chic,XXL,1,1.8,0,0,0,COD,92.73,92.73,COD collect on delivery
+20453,Priya Kaur,0122639367,41100,Klang,Selangor,"No 55, Jalan Ara 4, Taman Rinting",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,3.0,0,0,0,PREPAID,0,64.60,Paid Order
+20454,Suresh Ng,0183120228,88000,Kota Kinabalu,Sabah,"No. 28-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,,1,0.6,0,0,0,PREPAID,0,98.77,Paid Order
+20455,Hafiz Yusof,0119495120,81750,Masai,Johor,"No. 199, Lang Damai 3, Desa Lang Damai",OFFICE,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,2.5,0,0,0,COD,64.04,64.04,COD collect on delivery
+20456,Lim Tan,0157604899,25200,Kuantan,Pahang,"25, Lorong 22E8A, Taman Desa Ilmu",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,S,1,3.0,0,0,0,COD,198.89,198.89,COD collect on delivery
+20457,Raj Abdullah,0199494429,88000,Kota Kinabalu,Sabah,"A203K Langat Jaya Condo, Jalan Dato Alias",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,1.5,0,0,0,COD,290.71,290.71,COD collect on delivery
+20458,Lim Duim,0165714613,31350,Kinta,Perak,"No. 57, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,S,1,2.3,0,0,0,COD,254.49,254.49,COD collect on delivery
+20459,Siti Subramaniam,0196613885,10050,George Town,Penang,"A21K Langat Jaya Condo, Jalan Dato Alias",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,XL,1,2.7,0,0,0,PREPAID,0,173.98,Paid Order
+20460,Kirendeep Lim,0125280615,47810,Petaling Jaya,Selangor,"111-15-16 The Promenade Condominium, Barat Daya",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,2.2,0,0,0,PREPAID,0,107.75,Paid Order
+20461,Priya Abdullah,0184098111,70100,Seremban,Negeri Sembilan,"No. 24, Jalan Mangga, Off Jalan Dato Dollah",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,M,1,2.4,0,0,0,PREPAID,0,107.93,Paid Order
+20462,Raj Balakrishnan,0133574792,47810,Petaling Jaya,Selangor,"No. 51, Lang Damai 3, Desa Lang Damai",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,S,1,1.2,0,0,0,COD,307.14,307.14,COD collect on delivery
+20463,Farah Abdullah,0163715702,40170,Shah Alam,Selangor,"190, Lorong 22E8A, Taman Desa Ilmu",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,XL,1,0.9,0,0,0,PREPAID,0,194.98,Paid Order
+20464,Elizabeth Balakrishnan,0184038389,88000,Kota Kinabalu,Sabah,"No. 85, Lang Damai 3, Desa Lang Damai",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,M,1,1.2,0,0,0,PREPAID,0,196.02,Paid Order
+20465,Emily Mohamed,0145761723,80100,Johor Bahru,Johor,"No. 110, Jalan Mangga, Off Jalan Dato Dollah",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XL,1,2.1,0,0,0,COD,163.59,163.59,COD collect on delivery
+20466,Anne Chandran,0142625835,70100,Seremban,Negeri Sembilan,"No 8, Jalan Ara 4, Taman Rinting",OFFICE,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,0.7,0,0,0,PREPAID,0,147.71,Paid Order
+20467,Anne Abdullah,0151558694,40170,Shah Alam,Selangor,"No. 177-1, Jalan PJU 5/21, The Strand, Kota Damansara",OFFICE,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,L,1,1.9,0,0,0,COD,317.22,317.22,COD collect on delivery
+20468,Aina Duim,0179727793,11950,Bayan Lepas,Penang,"No. 40, Lang Damai 3, Desa Lang Damai",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,,1,1.8,0,0,0,PREPAID,0,259.56,Paid Order
+20469,Zulkifli Yusof,0147767575,50450,Kuala Lumpur,Kuala Lumpur,"A149K Langat Jaya Condo, Jalan Dato Alias",HOME,Designer Anarkali Kurta Pant and Dupatta 3Pcs Set For Women,XXL,1,0.6,0,0,0,PREPAID,0,207.08,Paid Order
+20470,Farah Chandran,0195184232,11900,Bayan Lepas,Penang,"No. 59, Lang Damai 3, Desa Lang Damai",OFFICE,Embroidered Maxi Chic,S,1,1.3,0,0,0,COD,215.38,215.38,COD collect on delivery
+20471,Siti Subramaniam,0153398195,50450,Kuala Lumpur,Kuala Lumpur,"No 47, Jalan Ara 4, Taman Rinting",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,M,1,1.5,0,0,0,COD,106.45,106.45,COD collect on delivery
+20472,Emily Mohamed,0119968986,47810,Petaling Jaya,Selangor,"Lot 48, Persiaran Mahsuri 1, Bandar Baru",HOME,Embroidered Maxi Chic,,1,1.6,0,0,0,COD,45.79,45.79,COD collect on delivery
+20473,Chong Yusof,0163738899,94300,Kota Samarahan,Sarawak,"No. 68-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Chiffon Georgette Party Set with Farshi Palazzo,S,1,1.3,0,0,0,PREPAID,0,229.58,Paid Order
+20474,Wong Rahman,0153287541,88000,Kota Kinabalu,Sabah,"No. 115, Jalan Mangga, Off Jalan Dato Dollah",OFFICE,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,S,1,2.4,0,0,0,PREPAID,0,270.38,Paid Order
+20475,Wanie Selvi,0178791244,40170,Shah Alam,Selangor,"No 236, Jalan Ara 4, Taman Rinting",HOME,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,0.3,0,0,0,COD,287.18,287.18,COD collect on delivery
+20476,Elizabeth Balakrishnan,0149682259,50450,Kuala Lumpur,Kuala Lumpur,"No 218, Jalan Ara 4, Taman Rinting",OFFICE,Chiffon Georgette Party Set with Farshi Palazzo,,1,2.1,0,0,0,COD,220.07,220.07,COD collect on delivery
+20477,Menaga Ismail,0164557781,47810,Petaling Jaya,Selangor,"238-15-16 The Promenade Condominium, Barat Daya",HOME,Embroidered Maxi Chic,S,1,0.9,0,0,0,COD,277.49,277.49,COD collect on delivery
+20478,Zulkifli Yusof,0134618380,40170,Shah Alam,Selangor,"No 32, Jalan Ara 4, Taman Rinting",HOME,Pearl Hand Embellished 3 Piece Suit,XL,1,2.0,0,0,0,PREPAID,0,146.77,Paid Order
+20479,Aina Sinnasamy,0154560057,40170,Shah Alam,Selangor,"A170K Langat Jaya Condo, Jalan Dato Alias",HOME,Pure Chiffon Bandhani Gown,L,1,2.0,0,0,0,PREPAID,0,67.95,Paid Order
+20480,Suresh Rahman,0175982127,81750,Masai,Johor,"Lot 137, Persiaran Mahsuri 1, Bandar Baru",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,M,1,1.8,0,0,0,PREPAID,0,175.71,Paid Order
+20481,Menaga Lim,0128441946,94300,Kota Samarahan,Sarawak,"A87K Langat Jaya Condo, Jalan Dato Alias",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,S,1,0.7,0,0,0,COD,64.59,64.59,COD collect on delivery
+20482,Hafiz Mohamed,0155488294,40170,Shah Alam,Selangor,"144, Lorong 22E8A, Taman Desa Ilmu",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,,1,2.8,0,0,0,PREPAID,0,60.59,Paid Order
+20483,Anne Gunasengaran,0192781665,75300,Melaka,Melaka,"No. 131-1, Jalan PJU 5/21, The Strand, Kota Damansara",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XL,1,1.0,0,0,0,PREPAID,0,318.67,Paid Order
+20484,Hafiz Wong,0171631650,50450,Kuala Lumpur,Kuala Lumpur,"17, Lorong 22E8A, Taman Desa Ilmu",HOME,Plazzo And Duppata Set Fully Stitched Ready to Wear,S,1,2.3,0,0,0,COD,63.16,63.16,COD collect on delivery
+20485,Ahmad Yusof,0165351717,94300,Kota Samarahan,Sarawak,"No. 230, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pure Chiffon Bandhani Gown,L,1,0.8,0,0,0,PREPAID,0,163.57,Paid Order
+20486,Hafiz Kaur,0189553005,75300,Melaka,Melaka,"139, Lorong 22E8A, Taman Desa Ilmu",HOME,Embroidered Maxi Chic,,1,1.2,0,0,0,COD,67.27,67.27,COD collect on delivery
+20487,Nurul Yusof,0185561839,80100,Johor Bahru,Johor,"No 91, Jalan Ara 4, Taman Rinting",HOME,Pure Chiffon Bandhani Gown,XXL,1,1.0,0,0,0,COD,268.14,268.14,COD collect on delivery
+20488,Siti Raj,0197756948,25200,Kuantan,Pahang,"208, Lorong 22E8A, Taman Desa Ilmu",HOME,Embroidered Maxi Chic,S,1,2.4,0,0,0,COD,76.21,76.21,COD collect on delivery
+20489,Zulkifli Chandran,0158251249,75300,Melaka,Melaka,"A234K Langat Jaya Condo, Jalan Dato Alias",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,2.2,0,0,0,PREPAID,0,160.54,Paid Order
+20490,Hafiz Rahman,0129382495,11950,Bayan Lepas,Penang,"No. 181, Lang Damai 3, Desa Lang Damai",OFFICE,Plazzo And Duppata Set Fully Stitched Ready to Wear,M,1,1.1,0,0,0,COD,286.06,286.06,COD collect on delivery
+20491,Wong Ng,0188737905,75300,Melaka,Melaka,"Lot 178, Persiaran Mahsuri 1, Bandar Baru",HOME,Heavy Pure Viscose Dola Silk with Embroidery Work - 3-piece suit,XXL,1,2.1,0,0,0,PREPAID,0,238.36,Paid Order
+20492,Muhammad Raj,0139561992,88000,Kota Kinabalu,Sabah,"No 155, Jalan Ara 4, Taman Rinting",HOME,Flowy A-Line Kurti Palazzo 2Pcs Set For Women 002,S,1,2.8,0,0,0,COD,63.00,63.00,COD collect on delivery
+20493,Farah Abdullah,0122926570,11950,Bayan Lepas,Penang,"No 232, Jalan Ara 4, Taman Rinting",OFFICE,Heavy Embroidery Gharara 3Pcs Suit Collection For Women,M,1,0.4,0,0,0,PREPAID,0,159.28,Paid Order
+20494,Ahmad Rahman,0175032238,81750,Masai,Johor,"No. 25, Lang Damai 3, Desa Lang Damai",OFFICE,Pure Chiffon Bandhani Gown,S,1,2.4,0,0,0,COD,282.24,282.24,COD collect on delivery
+20495,Kavitha Duim,0116135875,43200,Cheras,Selangor,"No. 96, Jalan Mangga, Off Jalan Dato Dollah",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,XXL,1,0.5,0,0,0,PREPAID,0,145.19,Paid Order
+20496,Nalini Tan,0184269722,80100,Johor Bahru,Johor,"No. 180, Jalan Mangga, Off Jalan Dato Dollah",HOME,Pearl Hand Embellished 3 Piece Suit,L,1,0.4,0,0,0,PREPAID,0,138.79,Paid Order
+20497,Aina Selvi,0114164927,47810,Petaling Jaya,Selangor,"No 221, Jalan Ara 4, Taman Rinting",OFFICE,Plazzo And Duppata Set Fully Stitched Ready to Wear,XL,1,1.6,0,0,0,PREPAID,0,256.96,Paid Order
+20498,Hafiz Hassan,0135925930,81750,Masai,Johor,"90, Lorong 22E8A, Taman Desa Ilmu",HOME,Embroidered Maxi Chic,S,1,2.5,0,0,0,COD,302.61,302.61,COD collect on delivery
+20499,Raj Subramaniam,0179966144,43000,Kajang,Selangor,"19, Lorong 22E8A, Taman Desa Ilmu",HOME,Rayon Embroidered Kurti with Plazzo 2 Pcs Dress,S,1,1.0,0,0,0,PREPAID,0,291.94,Paid Order

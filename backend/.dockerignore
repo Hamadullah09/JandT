@@ -1,0 +1,9 @@
+# Docker matches these at the context root only unless prefixed with **/
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+.pytest-tmp/
+.venv/
+venv/
+.env
+tests/golden/*.pdf

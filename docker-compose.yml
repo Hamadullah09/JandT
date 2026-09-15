@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: jt_db
+    environment:
+      POSTGRES_USER: jt
+      POSTGRES_PASSWORD: jt
+      POSTGRES_DB: jt
+    ports:
+      - "5432:5432"
+    volumes:
+      - jt_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jt -d jt"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build:
+      context: ./backend
+    container_name: jt_api
+    environment:
+      JT_DATABASE_URL: postgresql+asyncpg://jt:jt@db:5432/jt
+      JT_OUTPUT_ROOT: /data/waybills
+      JT_CORS_ORIGINS: '["http://localhost:3000","http://127.0.0.1:3000"]'
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./waybills:/data/waybills
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  web:
+    build:
+      context: ./frontend
+    container_name: jt_web
+    environment:
+      NEXT_PUBLIC_API_BASE: http://localhost:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+volumes:
+  jt_pgdata:

@@ -1,0 +1,17 @@
+# Normalise text to LF in the repository.
+* text=auto
+
+# These are executed inside Linux containers. If Git for Windows checks them
+# out with CRLF, the shebang becomes "#!/usr/bin/env bash\r" and the container
+# dies with "bad interpreter" - so pin them to LF everywhere.
+*.sh        text eol=lf
+Dockerfile  text eol=lf
+entrypoint.sh text eol=lf
+
+# Binary artefacts - never diffed, never line-ending converted.
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.ttf   binary
+*.ico   binary

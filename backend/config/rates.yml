@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------------
+# Freight rate card  (zone x weight).  Drives "Total Shipping Fee" in the UI.
+# Never printed on the waybill.  Edit freely - it is read at process start and
+# cached; restart the API after changing.
+#
+# Model: first_kg covers everything up to and including 1.00 kg, then every
+# started extra kilogram costs extra_kg.
+# ---------------------------------------------------------------------------
+currency: MYR
+
+zones:
+  SAME CITY:
+    first_kg: 5.30
+    extra_kg: 1.50
+  WEST:
+    first_kg: 7.50
+    extra_kg: 2.00
+  EAST:
+    first_kg: 11.00
+    extra_kg: 5.50
+
+# Fallback used when a zone is somehow unknown - never crash on pricing.
+default_zone: WEST
+
+surcharges:
+  # COD handling fee = max(cod_min, cod_amount * cod_percent / 100)
+  cod_percent: 2.0
+  cod_min: 1.00
+  # Documents ship at a flat rate regardless of weight (null = disabled).
+  document_flat: 4.50
