@@ -25,6 +25,7 @@ from datetime import date, datetime
 from decimal import Decimal
 
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -186,6 +187,10 @@ class Order(Base):
     goods_name: Mapped[str | None] = mapped_column(sa.Text)
     item_variant: Mapped[str | None] = mapped_column(sa.String(32))
     quantity: Mapped[int] = mapped_column(sa.Integer, nullable=False, server_default="1")
+    # [{"name", "variant", "quantity"(, "image")}] - see app/core/items.py
+    items: Mapped[list[dict] | None] = mapped_column(JSONB)
+    # PICK_UP / DROP_OFF from the Normal Order page; NULL when never chosen
+    service_mode: Mapped[str | None] = mapped_column(sa.String(16))
     actual_weight: Mapped[Decimal] = mapped_column(sa.Numeric(8, 2), nullable=False)
     length_cm: Mapped[Decimal] = mapped_column(
         sa.Numeric(8, 2), nullable=False, server_default="0"

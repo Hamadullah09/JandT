@@ -5,7 +5,14 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    computed_field,
+    field_validator,
+    model_validator,
+)
 
 
 class SenderProfileOut(BaseModel):
@@ -33,8 +40,21 @@ class SenderProfileIn(BaseModel):
     default_service: str | None = Field(default=None, max_length=24)
 
 
+class OrderItemIn(BaseModel):
+    """One line of a parcel's contents."""
+
+    goods_name: str = Field(min_length=1, max_length=255)
+    item_variant: str = Field(default="", max_length=32)
+    quantity: int = Field(default=1, ge=1)
+
+
 class NormalOrderIn(BaseModel):
-    """The Normal Order form.  The sender is never supplied by the client."""
+    """The Normal Order form.  The sender is never supplied by the client.
+
+    ``items`` lists every item in the parcel.  When it is empty, the order is
+    the single item in ``goods_name`` / ``item_variant`` / ``quantity``, as
+    before items existed.
+    """
 
     receiver_name: str = Field(min_length=1, max_length=60)
     receiver_phone: str = Field(min_length=3, max_length=32)
@@ -46,8 +66,10 @@ class NormalOrderIn(BaseModel):
 
     goods_type: Literal["PARCEL", "DOCUMENT"] = "PARCEL"
     goods_name: str = Field(min_length=1, max_length=255)
-    item_variant: str = ""
+    # orders.item_variant is VARCHAR(32): longer failed the insert with a 500
+    item_variant: str = Field(default="", max_length=32)
     quantity: int = Field(default=1, ge=1)
+    items: list[OrderItemIn] = Field(default_factory=list)
     actual_weight: Decimal = Field(gt=0, le=30)
     length_cm: Decimal = Field(default=Decimal("0"), ge=0)
     width_cm: Decimal = Field(default=Decimal("0"), ge=0)
@@ -55,12 +77,33 @@ class NormalOrderIn(BaseModel):
     #: Optional manual override; otherwise max(actual, volumetric) rounded up.
     chargeable_weight: Decimal | None = Field(default=None, gt=0)
 
-    customer_order_no: str = ""
+    # Required: order numbers are how orders are found, deleted and re-posted,
+    # and how a duplicate is caught.  VARCHAR(64), like a CSV's order_no.
+    customer_order_no: str = Field(max_length=64)
     cod_amount: Decimal = Field(default=Decimal("0"), ge=0)
     order_value: Decimal = Field(default=Decimal("0"), ge=0)
     order_payment_type: Literal["PREPAID", "COD"] = "PREPAID"
+    #: how the parcel reaches J&T: a courier collects it, or it is dropped off
+    service_mode: Literal["PICK_UP", "DROP_OFF"] = "PICK_UP"
     remark: str = ""
     output_dir: str | None = None
+
+    @field_validator("customer_order_no")
+    @classmethod
+    def _order_no_required(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Customer Order Number is required")
+        return v
+
+    @model_validator(mode="after")
+    def _cod_needs_an_amount(self) -> "NormalOrderIn":
+        """A COD parcel with nothing to collect is a mistake, not a prepaid one."""
+        if self.order_payment_type == "COD" and self.cod_amount <= 0:
+            raise ValueError("COD Amount must be more than 0 when COD Value is Yes")
+        if self.order_payment_type == "PREPAID":
+            self.cod_amount = Decimal("0")
+        return self
 
 
 class OrderOut(BaseModel):
@@ -80,6 +123,8 @@ class OrderOut(BaseModel):
     goods_name: str | None
     item_variant: str | None
     quantity: int
+    items: list[dict[str, Any]] | None = None
+    service_mode: str | None = None
     actual_weight: Decimal
     volumetric_weight: Decimal
     chargeable_weight: Decimal
@@ -127,13 +172,26 @@ class QuoteIn(BaseModel):
     height_cm: Decimal = Decimal("0")
     chargeable_weight: Decimal | None = None
     cod_amount: Decimal = Decimal("0")
+    item_value: Decimal = Decimal("0")
 
 
 class QuoteOut(BaseModel):
     volumetric_weight: Decimal
     chargeable_weight: Decimal
     service_scope: str
+    #: shipping + COD fee before tax - what orders.freight_fee stores
     freight_fee: Decimal
+    # the Chargeable Information section, see app/core/pricing.py FeeBreakdown
+    base_shipping_fee: Decimal
+    base_price_tax: Decimal
+    discounted_shipping_fee: Decimal
+    discounted_tax: Decimal
+    cod_fee: Decimal
+    cod_tax: Decimal
+    cod_handling_fee: Decimal
+    insurance_fee: Decimal | None = None
+    total_sst: Decimal
+    total_shipping_fee: Decimal
 
 
 class OrderPage(BaseModel):

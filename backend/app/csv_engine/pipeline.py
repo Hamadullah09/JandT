@@ -7,6 +7,7 @@
     5. PERSIST          one executemany INSERT + one read-back
     6. RENDER           ProcessPoolExecutor over render_waybill
     7. FINALISE         manifest + error CSVs, mark the batch done
+    8. NOTIFY           queue WhatsApp group messages     (notify.whatsapp)
 
 Steps 3-5 issue a fixed, small number of statements regardless of row count -
 no per-row SELECT, no per-row INSERT, no N+1.  Work is processed in chunks of
@@ -17,6 +18,8 @@ from __future__ import annotations
 
 import asyncio
 import csv
+import json
+import logging
 import time
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -29,13 +32,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.core import sortation as S
+from app.core.items import items_of, order_columns
 from app.core.naming import unique_path, waybill_filename
 from app.core.pricing import freight_fee
 from app.core.tracking import allocate as allocate_tracking
 from app.core.weights import chargeable_weight, volumetric_weight
 from app.db.models import ImportBatch, Order, PostcodeZone, SenderProfile
+from app.notify.whatsapp import queue_created_rows
 from app.waybill.batch import merge_pdfs, render_many
 from app.waybill.dto import OrderDTO
+from app.waybill.packing import PackingOrder, write_packing_pdfs
+
+log = logging.getLogger(__name__)
 
 STAGE_PARSING = "parsing"
 STAGE_CREATING = "creating"
@@ -88,6 +96,10 @@ class BatchSummary:
     errors_path: str | None = None
     merged_path: str | None = None
     rows: list[PipelineRow] = field(default_factory=list)
+    whatsapp_queued: int = 0
+    whatsapp_warnings: list[str] = field(default_factory=list)
+    packing_dir: str | None = None
+    packing_files: list[Any] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -182,6 +194,16 @@ async def enrich(
         scope = S.service_scope(sender_state, state)
         cod = _dec(data.get("cod_amount"))
 
+        # a merged multi-row order brings its item list; a single row is one item
+        items = items_of(data)
+        if not data.get("items") and items and str(data.get("image") or "").strip():
+            items[0]["image"] = str(data["image"]).strip()
+        goods = (
+            order_columns(items)
+            if items
+            else {"goods_name": "", "item_variant": "", "quantity": int(data.get("quantity") or 1)}
+        )
+
         row.enriched = {
             "row_no": row.row_no,
             "customer_order_no": row.order_no,
@@ -198,9 +220,10 @@ async def enrich(
             "receiver_address": data["receiver_address"],
             "address_type": data.get("address_type") or "HOME",
             "goods_type": "PARCEL",
-            "goods_name": data.get("goods_name") or "",
-            "item_variant": data.get("item_variant") or None,
-            "quantity": int(data.get("quantity") or 1),
+            "goods_name": goods["goods_name"],
+            "item_variant": goods["item_variant"] or None,
+            "quantity": goods["quantity"],
+            "items": items,
             "actual_weight": actual,
             "length_cm": length,
             "width_cm": width,
@@ -219,6 +242,8 @@ async def enrich(
             "order_value": _dec(data.get("order_value")),
             "freight_fee": freight_fee(scope, chargeable, cod_amount=cod),
             "remark": data.get("remark") or None,
+            # only the Normal Order page asks; a CSV import leaves it unknown
+            "service_mode": data.get("service_mode") or None,
             "order_date": today,
             "status": "created",
         }
@@ -253,15 +278,18 @@ _INSERT_COLUMNS: tuple[str, ...] = (
     "chargeable_weight",
     "service_type", "service_scope", "sortation_code", "route_code",
     "payment_type", "order_payment_type", "cod_amount", "order_value",
-    "freight_fee", "remark", "order_date", "status",
+    "freight_fee", "remark", "order_date", "status", "items", "service_mode",
 )
+
+#: text() binds carry no type, so JSON goes in as text and is cast here
+_CAST = {"items": "CAST(:items AS jsonb)"}
 
 _INSERT_SQL = text(
     "INSERT INTO orders ({cols}) VALUES ({binds}) "
     "ON CONFLICT (customer_order_no) WHERE customer_order_no IS NOT NULL "
     "DO NOTHING".format(
         cols=", ".join(_INSERT_COLUMNS),
-        binds=", ".join(f":{c}" for c in _INSERT_COLUMNS),
+        binds=", ".join(_CAST.get(c, f":{c}") for c in _INSERT_COLUMNS),
     )
 )
 
@@ -291,7 +319,9 @@ async def persist(
     for row, number in zip(pending, tracking):
         row.tracking_no = number
         source = {**row.enriched, "batch_id": batch_id, "tracking_no": number}
-        values.append({column: source.get(column) for column in _INSERT_COLUMNS})
+        value = {column: source.get(column) for column in _INSERT_COLUMNS}
+        value["items"] = json.dumps(source["items"]) if source.get("items") else None
+        values.append(value)
 
     await session.execute(_INSERT_SQL, values)
 
@@ -497,6 +527,29 @@ async def run_pipeline(
     if (settings.merge_pdf if merge is None else merge) and all_paths:
         merged = merge_pdfs(all_paths, output_dir / f"merged_{batch.id}.pdf")
 
+    # one PDF per product, for printing and packing
+    packing_dir = output_dir / "packing" / f"batch-{batch.id}"
+    packing_files = []
+    created_rows = [r for r in rows if r.status == "created" and r.waybill_path]
+    if created_rows:
+        try:
+            packing_files = write_packing_pdfs(
+                [
+                    PackingOrder(
+                        order_no=r.order_no,
+                        tracking_no=r.tracking_no or "",
+                        items=r.enriched.get("items") or [],
+                        waybill_path=r.waybill_path,
+                        sequence=position,
+                    )
+                    for position, r in enumerate(created_rows)
+                ],
+                packing_dir,
+            )
+        except Exception:                           # noqa: BLE001
+            # the orders and their labels already exist; never fail the batch
+            log.exception("packing PDFs for batch %s could not be written", batch.id)
+
     created = sum(1 for r in rows if r.status == "created")
     duplicates = sum(1 for r in rows if r.status == "duplicate")
     failed = sum(1 for r in rows if r.status == "error")
@@ -513,6 +566,12 @@ async def run_pipeline(
     batch.duration_ms = duration_ms
     await session.commit()
 
+    # 8. NOTIFY - after the commit, so a job never names an order that could
+    # still roll back.  Only a file write; it cannot fail the batch.
+    notified = queue_created_rows(rows)
+    for warning in notified.warnings:
+        log.warning("whatsapp: %s", warning)
+
     return BatchSummary(
         batch_id=batch.id,
         total=len(rows),
@@ -525,6 +584,10 @@ async def run_pipeline(
         errors_path=str(errors) if errors else None,
         merged_path=str(merged) if merged else None,
         rows=rows,
+        whatsapp_queued=notified.queued,
+        whatsapp_warnings=notified.warnings,
+        packing_dir=str(packing_dir) if packing_files else None,
+        packing_files=packing_files,
     )
 
 
@@ -550,6 +613,7 @@ def build_dto(row: PipelineRow) -> OrderDTO:
         address_type=e["address_type"],
         goods_name=e["goods_name"],
         item_variant=e["item_variant"] or "",
+        items=e.get("items") or [],
         chargeable_weight=float(e["chargeable_weight"]),
         service_type=e["service_type"],
         service_scope=e["service_scope"],
@@ -607,4 +671,7 @@ async def create_single(
     row.waybill_path = str(destination)
     await record_waybills(session, [row])
     await session.commit()
+
+    for warning in queue_created_rows([row]).warnings:
+        log.warning("whatsapp: %s", warning)
     return row

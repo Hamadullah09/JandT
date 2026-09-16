@@ -151,7 +151,9 @@ export function Segmented<T extends string>({
             className={`h-control flex-1 rounded border text-base transition-colors ${
               active
                 ? 'border-jt-red bg-white font-medium text-jt-red'
-                : 'border-line bg-white text-text-primary hover:border-jt-red hover:text-jt-red'
+                : // hover colours the text only: a red border too made a merely
+                  // hovered option look selected
+                  'border-line bg-white text-text-primary hover:text-jt-red'
             }`}
           >
             {option}

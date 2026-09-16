@@ -31,6 +31,9 @@ MAX_WEIGHT_KG = Decimal("30")
 MAX_NAME = 60
 MAX_ADDRESS = 200
 MIN_ADDRESS = 5
+#: orders.item_variant is VARCHAR(32).  Unchecked, one long size/colour made
+#: the bulk INSERT fail for its whole chunk instead of rejecting one row.
+MAX_VARIANT = 32
 
 CANONICAL: tuple[str, ...] = (
     "order_no",
@@ -158,6 +161,15 @@ ALIASES: dict[str, str] = {
     "remarks": "remark",
     "note": "remark",
     "notes": "remark",
+    # product photo for the WhatsApp group message.  Deliberately NOT in
+    # CANONICAL: it is an optional extra, not part of the production template.
+    "image": "image",
+    "imagepath": "image",
+    "imagefile": "image",
+    "photo": "image",
+    "picture": "image",
+    "productimage": "image",
+    "productphoto": "image",
 }
 # every canonical name is trivially its own alias
 ALIASES.update({normalise_header(c): c for c in CANONICAL})
@@ -258,6 +270,7 @@ class BulkRow(BaseModel):
     cod_amount: Decimal = Decimal("0")
     order_value: Decimal = Decimal("0")
     remark: str = ""
+    image: str = ""
 
     # -- required strings -------------------------------------------------
     @field_validator("order_no")
@@ -380,10 +393,19 @@ class BulkRow(BaseModel):
         return value
 
     @field_validator("receiver_city", "receiver_state", "item_variant", "remark",
-                     mode="before")
+                     "image", mode="before")
     @classmethod
     def _optional_text(cls, v: Any) -> str:
         return "" if _blank(v) else str(v).strip()
+
+    @field_validator("item_variant")
+    @classmethod
+    def _variant_length(cls, v: str) -> str:
+        if len(v) > MAX_VARIANT:
+            raise ValueError(
+                f"item_variant must be {MAX_VARIANT} characters or fewer (got {len(v)})"
+            )
+        return v
 
     # -- cross-field ------------------------------------------------------
     @model_validator(mode="after")

@@ -25,9 +25,15 @@ export default function QuickOrderPage() {
   const set = (patch: Partial<typeof form>) => setForm({ ...form, ...patch });
 
   async function submit() {
+    setResult(null);
+    // said here, because the server's answer would only be "One or more fields
+    // are invalid."
+    if (!form.orderNo.trim()) {
+      setError('Enter the Customer Order Number - every order needs one.');
+      return;
+    }
     setBusy(true);
     setError(null);
-    setResult(null);
     try {
       setResult(
         await api.createOrder({
@@ -121,10 +127,11 @@ export default function QuickOrderPage() {
               onChange={(e) => set({ weight: e.target.value })}
             />
           </Field>
-          <Field label="Customer Order Number">
+          <Field label="Customer Order Number" required>
             <TextInput
               value={form.orderNo}
               placeholder="Please Enter"
+              maxLength={64}
               onChange={(e) => set({ orderNo: e.target.value })}
             />
           </Field>

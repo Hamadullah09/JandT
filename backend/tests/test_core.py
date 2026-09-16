@@ -154,7 +154,26 @@ class TestWeights:
 
 
 # ----------------------------------------------------------------- pricing
+#: A fixed rate card, so these formula tests do not break whenever the real
+#: prices in config/rates.yml are edited (that file says "edit freely").
+TEST_RATES = {
+    "zones": {
+        "SAME CITY": {"first_kg": 5.30, "extra_kg": 1.50},
+        "WEST": {"first_kg": 7.50, "extra_kg": 2.00},
+        "EAST": {"first_kg": 11.00, "extra_kg": 5.50},
+    },
+    "default_zone": "WEST",
+    "surcharges": {"cod_percent": 2.0, "cod_min": 1.00, "document_flat": 4.50},
+}
+
+
 class TestPricing:
+    @pytest.fixture(autouse=True)
+    def fixed_rates(self, monkeypatch):
+        from app.core import pricing
+
+        monkeypatch.setattr(pricing, "get_rates", lambda: TEST_RATES)
+
     def test_first_kilogram(self):
         assert freight_fee("SAME CITY", Decimal("0.6")) == Decimal("5.30")
         assert freight_fee("SAME CITY", Decimal("1.0")) == Decimal("5.30")

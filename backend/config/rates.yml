@@ -5,12 +5,17 @@
 #
 # Model: first_kg covers everything up to and including 1.00 kg, then every
 # started extra kilogram costs extra_kg.
+#
+# Matched to the merchant's own J&T portal (screenshot, 2026-09-16): base
+# shipping fee 5.00 and COD fee 4.00 on a COD of 77.40.  Only those two figures
+# were visible - every other price here is still an estimate.  Change a
+# confirmed value only together with tests/test_charges.py, which pins it.
 # ---------------------------------------------------------------------------
 currency: MYR
 
 zones:
   SAME CITY:
-    first_kg: 5.30
+    first_kg: 5.00        # J&T portal, confirmed
     extra_kg: 1.50
   WEST:
     first_kg: 7.50
@@ -24,7 +29,16 @@ default_zone: WEST
 
 surcharges:
   # COD handling fee = max(cod_min, cod_amount * cod_percent / 100)
+  # cod_min: J&T portal, confirmed (4.00 on a COD of 77.40).  cod_percent is an
+  # estimate: it only matters above RM200, where 2% passes the 4.00 minimum.
   cod_percent: 2.0
-  cod_min: 1.00
+  cod_min: 4.00
   # Documents ship at a flat rate regardless of weight (null = disabled).
   document_flat: 4.50
+  # Service tax (SST) on the shipping fee, the COD fee and insurance, percent.
+  # 6% matches the J&T portal: tax 0.30 on a 5.00 fee, 0.24 on a 4.00 COD fee.
+  sst_percent: 6.0
+  # Insurance on the declared Item Value = max(insurance_min, value * percent).
+  # null = insurance not offered, and the Insurance Fee field stays blank.
+  insurance_percent: null
+  insurance_min: null

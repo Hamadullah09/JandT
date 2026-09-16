@@ -111,8 +111,13 @@ async def _run(args: argparse.Namespace) -> int:
     for warning in parsed.warnings:
         console.print(f"[yellow]warning:[/yellow] {warning}")
 
+    # rows sharing an order number are one order with several items
+    orders = (
+        f" ({parsed.total} orders)" if parsed.line_count and parsed.line_count != parsed.total else ""
+    )
     console.print(
-        f"[bold]{parsed.total}[/bold] rows read from [cyan]{args.csv.name}[/cyan] - "
+        f"[bold]{parsed.line_count or parsed.total}[/bold] rows read from "
+        f"[cyan]{args.csv.name}[/cyan]{orders} - "
         f"[green]{len(parsed.ok_rows)} valid[/green], "
         f"[red]{len(parsed.error_rows)} invalid[/red]"
     )
@@ -241,8 +246,28 @@ def _print_summary(console, Table, summary, elapsed: float, output_dir: Path) ->
         table.add_row("errors", summary.errors_path)
     if summary.merged_path:
         table.add_row("merged pdf", summary.merged_path)
+
+    from app.config import get_settings
+    from app.notify.whatsapp import service_status
+
+    if get_settings().whatsapp_enabled:
+        status = service_status()
+        colour = "green" if status.running and status.connected else "yellow"
+        table.add_row(
+            "whatsapp",
+            f"{summary.whatsapp_queued} queued - [{colour}]{status.describe()}[/{colour}]",
+        )
+    else:
+        table.add_row("whatsapp", "[dim]off (JT_WHATSAPP_ENABLED in .env)[/dim]")
+    if summary.packing_files:
+        table.add_row("packing", f"{summary.packing_dir}  (one PDF per item)")
     console.print()
     console.print(table)
+    for packed in summary.packing_files:
+        pieces = f"{packed.pieces} pcs" if packed.pieces != packed.orders else ""
+        console.print(f"  [cyan]{packed.path.name}[/cyan]  [dim]{pieces}[/dim]")
+    for warning in summary.whatsapp_warnings:
+        console.print(f"[yellow]whatsapp:[/yellow] {warning}")
 
 
 def _print_errors(console, Table, rows) -> None:

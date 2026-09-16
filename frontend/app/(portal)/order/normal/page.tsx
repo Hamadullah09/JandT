@@ -40,17 +40,64 @@ type Receiver = {
 /** A parcel added to the List, with the quote it was priced at. */
 type SavedParcel = { payload: NormalOrderIn; chargeable: number; fee: number };
 
+/** The parcel as a whole; what is inside it is the list of ItemLines. */
 type Item = {
   goodsType: 'PARCEL' | 'DOCUMENT';
-  goodsName: string;
-  variant: string;
-  quantity: number;
   actualWeight: string;
   length: string;
   width: string;
   height: string;
   chargeableOverride: string;
   customerOrderNo: string;
+  remark: string;
+};
+
+/** The Chargeable Information section. Values are the labels on screen. */
+type Charge = {
+  parcelType: 'Standard';
+  itemValue: string;
+  cod: 'Yes' | 'No';
+  codAmount: string;
+  service: 'PICK UP' | 'DROP OFF';
+};
+
+const EMPTY_CHARGE: Charge = {
+  parcelType: 'Standard',
+  itemValue: '',
+  cod: 'No',
+  codAmount: '',
+  service: 'PICK UP',
+};
+
+/** Figures priced by the server (POST /orders/quote); blank until priced. */
+type Quote = {
+  volumetric: string;
+  chargeable: string;
+  totalShipping: string;
+  totalSst: string;
+  insurance: string;
+  baseShipping: string;
+  baseTax: string;
+  discountedShipping: string;
+  discountedTax: string;
+  codFee: string;
+  codTax: string;
+  codHandling: string;
+};
+
+const EMPTY_QUOTE: Quote = {
+  volumetric: '0.00',
+  chargeable: '0.00',
+  totalShipping: '',
+  totalSst: '',
+  insurance: '',
+  baseShipping: '',
+  baseTax: '',
+  discountedShipping: '',
+  discountedTax: '',
+  codFee: '',
+  codTax: '',
+  codHandling: '',
 };
 
 const EMPTY_RECEIVER: Receiver = {
@@ -64,17 +111,49 @@ const EMPTY_RECEIVER: Receiver = {
   address: '',
 };
 
+/** One product in the parcel. A parcel can hold several. */
+type ItemLine = {
+  goodsName: string;
+  variant: string;
+  quantity: number;
+};
+
+const EMPTY_LINE: ItemLine = { goodsName: '', variant: '', quantity: 1 };
+
+/** orders.item_variant is VARCHAR(32); the API rejects anything longer. */
+const MAX_VARIANT = 32;
+/** orders.customer_order_no is VARCHAR(64); required on every order. */
+const MAX_ORDER_NO = 64;
+
+/**
+ * What the label's Parcel Information will say, e.g. "Maxi Chic x2, Gown".
+ * Mirrors describe() in backend/app/core/items.py: sizes are not printed
+ * there, so the same product in two sizes counts together as "x2".
+ */
+function describeLines(lines: ItemLine[]): string {
+  const merged = new Map<string, ItemLine>();
+  for (const line of lines) {
+    const name = line.goodsName.trim();
+    if (!name) continue;
+    const key = name.replace(/\s+/g, ' ').toLowerCase();
+    const known = merged.get(key);
+    if (known) known.quantity += line.quantity;
+    else merged.set(key, { goodsName: name, variant: '', quantity: line.quantity });
+  }
+  return [...merged.values()]
+    .map((l) => (l.quantity > 1 ? `${l.goodsName} x${l.quantity}` : l.goodsName))
+    .join(', ');
+}
+
 const EMPTY_ITEM: Item = {
   goodsType: 'PARCEL',
-  goodsName: '',
-  variant: '',
-  quantity: 1,
   actualWeight: '',
   length: '0',
   width: '0',
   height: '0',
   chargeableOverride: '',
   customerOrderNo: '',
+  remark: '',
 };
 
 /** Parse a pasted "name phone address, postcode city state" blob. */
@@ -122,8 +201,17 @@ export default function NormalOrderPage() {
 
   const [receiver, setReceiver] = useState<Receiver>(EMPTY_RECEIVER);
   const [item, setItem] = useState<Item>(EMPTY_ITEM);
+  const [lines, setLines] = useState<ItemLine[]>([{ ...EMPTY_LINE }]);
 
-  const [quote, setQuote] = useState({ volumetric: '0.00', chargeable: '0.00', fee: '0.00' });
+  const updateLine = (index: number, patch: Partial<ItemLine>) =>
+    setLines((prev) => prev.map((line, i) => (i === index ? { ...line, ...patch } : line)));
+  const addLine = () => setLines((prev) => [...prev, { ...EMPTY_LINE }]);
+  const removeLine = (index: number) =>
+    setLines((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev));
+  const labelText = describeLines(lines);
+
+  const [charge, setCharge] = useState<Charge>(EMPTY_CHARGE);
+  const [quote, setQuote] = useState<Quote>(EMPTY_QUOTE);
   const [list, setList] = useState<SavedParcel[]>([]);
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null);
@@ -145,7 +233,8 @@ export default function NormalOrderPage() {
   }, []);
 
   /* ------------------------------------------------ live totals (server) */
-  const quoteKey = `${receiver.postcode}|${receiver.state}|${item.goodsType}|${item.actualWeight}|${item.length}|${item.width}|${item.height}|${item.chargeableOverride}`;
+  const codAmount = charge.cod === 'Yes' ? charge.codAmount.trim() || '0' : '0';
+  const quoteKey = `${receiver.postcode}|${receiver.state}|${item.goodsType}|${item.actualWeight}|${item.length}|${item.width}|${item.height}|${item.chargeableOverride}|${codAmount}|${charge.itemValue}`;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -153,7 +242,7 @@ export default function NormalOrderPage() {
     timer.current = setTimeout(() => {
       const weight = Number(item.actualWeight);
       if (!Number.isFinite(weight) || weight <= 0) {
-        setQuote({ volumetric: '0.00', chargeable: '0.00', fee: '0.00' });
+        setQuote(EMPTY_QUOTE);
         return;
       }
       void fetch(`${process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000'}/api/v1/orders/quote`, {
@@ -168,7 +257,8 @@ export default function NormalOrderPage() {
           width_cm: item.width || '0',
           height_cm: item.height || '0',
           chargeable_weight: item.chargeableOverride || null,
-          cod_amount: '0',
+          cod_amount: codAmount,
+          item_value: charge.itemValue.trim() || '0',
         }),
       })
         .then((r) => (r.ok ? r.json() : null))
@@ -177,7 +267,16 @@ export default function NormalOrderPage() {
           setQuote({
             volumetric: data.volumetric_weight,
             chargeable: data.chargeable_weight,
-            fee: data.freight_fee,
+            totalShipping: data.total_shipping_fee,
+            totalSst: data.total_sst,
+            insurance: data.insurance_fee ?? '',
+            baseShipping: data.base_shipping_fee,
+            baseTax: data.base_price_tax,
+            discountedShipping: data.discounted_shipping_fee,
+            discountedTax: data.discounted_tax,
+            codFee: data.cod_fee,
+            codTax: data.cod_tax,
+            codHandling: data.cod_handling_fee,
           });
         })
         .catch(() => undefined);
@@ -189,6 +288,14 @@ export default function NormalOrderPage() {
   }, [quoteKey]);
 
   const toPayload = useCallback((): NormalOrderIn => {
+    const items = lines
+      .map((line) => ({
+        goods_name: line.goodsName.trim(),
+        item_variant: line.variant.trim(),
+        quantity: line.quantity,
+      }))
+      .filter((line) => line.goods_name !== '');
+    const first = items[0] ?? { goods_name: '', item_variant: '', quantity: 1 };
     return {
       receiver_name: receiver.name.trim(),
       receiver_phone: receiver.phone.trim(),
@@ -198,33 +305,61 @@ export default function NormalOrderPage() {
       receiver_state: receiver.state.trim(),
       address_type: receiver.addressType,
       goods_type: item.goodsType,
-      goods_name: item.goodsName.trim(),
-      item_variant: item.variant.trim(),
-      quantity: item.quantity,
+      // the single-item fields describe the first line; `items` carries them all
+      goods_name: first.goods_name,
+      item_variant: items.length === 1 ? first.item_variant : '',
+      quantity: items.reduce((total, line) => total + line.quantity, 0) || 1,
+      items,
       actual_weight: item.actualWeight,
       length_cm: item.length || '0',
       width_cm: item.width || '0',
       height_cm: item.height || '0',
       chargeable_weight: item.chargeableOverride || null,
       customer_order_no: item.customerOrderNo.trim(),
-      cod_amount: '0',
-      order_value: '0',
-      order_payment_type: 'PREPAID',
-      remark: '',
+      cod_amount: codAmount,
+      order_value: charge.itemValue.trim() || '0',
+      order_payment_type: charge.cod === 'Yes' ? 'COD' : 'PREPAID',
+      service_mode: charge.service === 'DROP OFF' ? 'DROP_OFF' : 'PICK_UP',
+      remark: item.remark.trim(),
     };
-  }, [receiver, item]);
+  }, [receiver, item, lines, charge, codAmount]);
 
-  const formFilled =
+  const receiverFilled =
     receiver.name.trim() !== '' &&
     receiver.phone.trim() !== '' &&
     /^\d{5}$/.test(receiver.postcode.trim()) &&
-    receiver.address.trim().length >= 5 &&
-    item.goodsName.trim() !== '' &&
-    Number(item.actualWeight) > 0;
+    receiver.address.trim().length >= 5;
+  const linesFilled = lines.every(
+    (line) => line.goodsName.trim() !== '' && line.variant.trim().length <= MAX_VARIANT,
+  );
+  // "Yes" with no amount would create a COD parcel that collects nothing
+  const codFilled = charge.cod === 'No' || Number(charge.codAmount) > 0;
+  const itemValueOk = charge.itemValue.trim() === '' || Number(charge.itemValue) >= 0;
+
+  // The first thing still missing, top to bottom as the form reads - so the
+  // message always names the field to fix.  null: ready to order.
+  const problem = !receiverFilled
+    ? 'Fill in the receiver details first.'
+    : !linesFilled
+      ? 'Every item line needs a Goods Name - fill it in, or remove the empty line.'
+      : !(Number(item.actualWeight) > 0)
+        ? 'Enter the Actual Weight.'
+        : item.customerOrderNo.trim() === ''
+          ? 'Enter the Customer Order Number - every order needs one.'
+          : !codFilled
+            ? 'COD Value is Yes - enter the COD Amount to collect, or choose No.'
+            : !itemValueOk
+              ? 'Item Value must be a number.'
+              : null;
+  const formFilled = problem === null;
+  const incompleteMessage = problem ?? '';
+
+  // shown under "Payment Method" - the sender account's billing, e.g. PAYMONTHLY
+  const paymentMethod = `PAY${(sender?.payment_type ?? 'MONTHLY').toUpperCase()}`;
 
   const totals = useMemo(() => {
     const draftWeight = formFilled ? Number(quote.chargeable) || 0 : 0;
-    const draftFee = formFilled ? Number(quote.fee) || 0 : 0;
+    const draftFee = formFilled ? Number(quote.totalShipping) || 0 : 0;
     const saved = list.reduce(
       (acc, parcel) => ({
         weight: acc.weight + parcel.chargeable,
@@ -244,6 +379,10 @@ export default function NormalOrderPage() {
   }
   function resetItem() {
     setItem(EMPTY_ITEM);
+    setLines([{ ...EMPTY_LINE }]);
+  }
+  function resetCharge() {
+    setCharge(EMPTY_CHARGE);
   }
 
   function applySmart(text: string) {
@@ -260,7 +399,7 @@ export default function NormalOrderPage() {
     const queue = list.map((parcel) => parcel.payload);
     if (formFilled) queue.push(toPayload());
     if (queue.length === 0) {
-      setBanner({ kind: 'err', text: 'Fill in the receiver and item details first.' });
+      setBanner({ kind: 'err', text: incompleteMessage });
       setBusy(false);
       return;
     }
@@ -280,6 +419,7 @@ export default function NormalOrderPage() {
       setList([]);
       if (!retain) resetReceiver();
       resetItem();
+      resetCharge();
     } catch (error) {
       const message =
         error instanceof ApiError ? error.message : 'The order could not be created.';
@@ -291,7 +431,7 @@ export default function NormalOrderPage() {
 
   function handleSave() {
     if (!formFilled) {
-      setBanner({ kind: 'err', text: 'Fill in the receiver and item details first.' });
+      setBanner({ kind: 'err', text: incompleteMessage });
       return;
     }
     setList((prev) => [
@@ -299,11 +439,12 @@ export default function NormalOrderPage() {
       {
         payload: toPayload(),
         chargeable: Number(quote.chargeable) || 0,
-        fee: Number(quote.fee) || 0,
+        fee: Number(quote.totalShipping) || 0,
       },
     ]);
     setBanner({ kind: 'ok', text: 'Parcel added to the list.' });
     resetItem();
+    resetCharge();
     if (!retain) resetReceiver();
   }
 
@@ -459,19 +600,70 @@ export default function NormalOrderPage() {
                 onChange={(goodsType) => setItem({ ...item, goodsType })}
               />
             </Field>
-            <Field label="Goods Name" required>
-              <TextInput
-                value={item.goodsName}
-                placeholder="Please Enter Item Name"
-                onChange={(e) => setItem({ ...item, goodsName: e.target.value })}
-              />
-            </Field>
-            <Field label="Quantity" required>
-              <Stepper
-                value={item.quantity}
-                onChange={(quantity) => setItem({ ...item, quantity })}
-              />
-            </Field>
+            {/* every product in this parcel, one line each */}
+            <div className="col-span-4">
+              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_150px_32px] gap-x-3">
+                <label className="el-label req">Goods Name:</label>
+                <label className="el-label">Size / Colour:</label>
+                <label className="el-label req">Quantity:</label>
+                <span />
+              </div>
+              <div className="space-y-2">
+                {lines.map((line, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_150px_32px] items-center gap-x-3"
+                  >
+                    <TextInput
+                      value={line.goodsName}
+                      placeholder={
+                        index === 0 ? 'Please Enter Item Name' : 'Another item in the same parcel'
+                      }
+                      aria-label={`Goods name, item ${index + 1}`}
+                      onChange={(e) => updateLine(index, { goodsName: e.target.value })}
+                    />
+                    <TextInput
+                      value={line.variant}
+                      placeholder="e.g. Purple / L"
+                      maxLength={MAX_VARIANT}
+                      aria-label={`Size or colour, item ${index + 1}`}
+                      onChange={(e) => updateLine(index, { variant: e.target.value })}
+                    />
+                    <Stepper
+                      value={line.quantity}
+                      onChange={(quantity) => updateLine(index, { quantity })}
+                    />
+                    {lines.length > 1 ? (
+                      <button
+                        type="button"
+                        aria-label={`Remove item ${index + 1}`}
+                        title="Remove this item"
+                        onClick={() => removeLine(index)}
+                        className="flex h-control items-center justify-center text-text-secondary hover:text-jt-red"
+                      >
+                        <TrashIcon />
+                      </button>
+                    ) : (
+                      <span />
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-4">
+                <button
+                  type="button"
+                  onClick={addLine}
+                  className="shrink-0 text-base text-jt-red hover:underline"
+                >
+                  + Add another item
+                </button>
+                {labelText && (
+                  <span className="min-w-0 truncate text-base text-text-secondary" title={labelText}>
+                    On the label: <span className="text-text-primary">{labelText}</span>
+                  </span>
+                )}
+              </div>
+            </div>
             <Field label="Actual Weight" required>
               <TextInput
                 value={item.actualWeight}
@@ -512,12 +704,110 @@ export default function NormalOrderPage() {
                 onChange={(e) => setItem({ ...item, chargeableOverride: e.target.value })}
               />
             </Field>
-            <Field label="Customer Order Number">
+            <Field label="Customer Order Number" required>
               <TextInput
                 value={item.customerOrderNo}
                 placeholder="Please Enter"
+                maxLength={MAX_ORDER_NO}
                 onChange={(e) => setItem({ ...item, customerOrderNo: e.target.value })}
               />
+            </Field>
+            <Field label="Remarks information" span={2}>
+              <TextInput
+                value={item.remark}
+                placeholder="Please Enter Remarks Information"
+                onChange={(e) => setItem({ ...item, remark: e.target.value })}
+              />
+            </Field>
+          </div>
+        </section>
+
+        {/* ------------------------------------------- chargeable ------- */}
+        <section className="el-card">
+          <div className="el-card-head">
+            <h2 className="el-card-title">Chargeable Information</h2>
+            <HeaderAction
+              icon={<TrashIcon />}
+              label="Clear the filled information"
+              onClick={resetCharge}
+            />
+          </div>
+          <div className="grid grid-cols-5 gap-x-5 gap-y-4 p-5">
+            <Field label="Parcel Type" required>
+              <SelectInput value={charge.parcelType} onChange={() => undefined}>
+                <option value="Standard">Standard</option>
+              </SelectInput>
+            </Field>
+            <Field label="Item Value">
+              <TextInput
+                value={charge.itemValue}
+                placeholder="Please Enter The Value Of The Item"
+                inputMode="decimal"
+                invalid={!itemValueOk}
+                onChange={(e) => setCharge({ ...charge, itemValue: e.target.value })}
+              />
+            </Field>
+            <Field label="Insurance Fee">
+              <TextInput disabled readOnly value={quote.insurance} />
+            </Field>
+            <Field label="Total SST">
+              <TextInput disabled readOnly value={quote.totalSst} />
+            </Field>
+            <Field label="Total Shipping Fee">
+              <TextInput disabled readOnly value={quote.totalShipping} />
+            </Field>
+
+            <Field label="COD Value">
+              <Segmented
+                options={['Yes', 'No'] as const}
+                value={charge.cod}
+                onChange={(cod) =>
+                  setCharge({ ...charge, cod, codAmount: cod === 'No' ? '' : charge.codAmount })
+                }
+              />
+            </Field>
+            <Field label="COD Amount" required={charge.cod === 'Yes'}>
+              <TextInput
+                value={charge.codAmount}
+                disabled={charge.cod === 'No'}
+                placeholder={charge.cod === 'Yes' ? 'Please Enter The COD Amount' : ''}
+                inputMode="decimal"
+                invalid={charge.cod === 'Yes' && charge.codAmount !== '' && !codFilled}
+                onChange={(e) => setCharge({ ...charge, codAmount: e.target.value })}
+              />
+            </Field>
+            <Field label="COD Fee">
+              <TextInput disabled readOnly value={charge.cod === 'Yes' ? quote.codFee : ''} />
+            </Field>
+            <Field label="COD Tax">
+              <TextInput disabled readOnly value={charge.cod === 'Yes' ? quote.codTax : ''} />
+            </Field>
+            <Field label="COD Total Handling Fee">
+              <TextInput disabled readOnly value={charge.cod === 'Yes' ? quote.codHandling : ''} />
+            </Field>
+
+            <Field label="Payment Method" required>
+              <Segmented options={[paymentMethod]} value={paymentMethod} onChange={() => undefined} />
+            </Field>
+            <Field label="Service Type" required>
+              <Segmented
+                options={['PICK UP', 'DROP OFF'] as const}
+                value={charge.service}
+                onChange={(service) => setCharge({ ...charge, service })}
+              />
+            </Field>
+            <Field label="Base Shipping Fee">
+              <TextInput disabled readOnly value={quote.baseShipping} />
+            </Field>
+            <Field label="Base Price Tax">
+              <TextInput disabled readOnly value={quote.baseTax} />
+            </Field>
+            <Field label="Discounted Shipping Fee">
+              <TextInput disabled readOnly value={quote.discountedShipping} />
+            </Field>
+
+            <Field label="Discounted Tax">
+              <TextInput disabled readOnly value={quote.discountedTax} />
             </Field>
           </div>
         </section>

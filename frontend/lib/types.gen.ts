@@ -90,15 +90,17 @@ export interface NormalOrderIn {
   goods_name: string;
   item_variant?: string;
   quantity?: number;
+  items?: OrderItemIn[];
   actual_weight: number | string;
   length_cm?: number | string;
   width_cm?: number | string;
   height_cm?: number | string;
   chargeable_weight?: number | string | null;
-  customer_order_no?: string;
+  customer_order_no: string;
   cod_amount?: number | string;
   order_value?: number | string;
   order_payment_type?: "PREPAID" | "COD";
+  service_mode?: "PICK_UP" | "DROP_OFF";
   remark?: string;
   output_dir?: string | null;
 }
@@ -110,6 +112,13 @@ export interface OrderCreatedOut {
   waybill_url: string;
   freight_fee: string | null;
   order: OrderOut;
+}
+
+/** One line of a parcel's contents. */
+export interface OrderItemIn {
+  goods_name: string;
+  item_variant?: string;
+  quantity?: number;
 }
 
 export interface OrderOut {
@@ -127,6 +136,8 @@ export interface OrderOut {
   goods_name: string | null;
   item_variant: string | null;
   quantity: number;
+  items?: Record<string, unknown>[] | null;
+  service_mode?: string | null;
   actual_weight: string;
   volumetric_weight: string;
   chargeable_weight: string;
@@ -178,6 +189,7 @@ export interface QuoteIn {
   height_cm?: number | string;
   chargeable_weight?: number | string | null;
   cod_amount?: number | string;
+  item_value?: number | string;
 }
 
 export interface QuoteOut {
@@ -185,6 +197,16 @@ export interface QuoteOut {
   chargeable_weight: string;
   service_scope: string;
   freight_fee: string;
+  base_shipping_fee: string;
+  base_price_tax: string;
+  discounted_shipping_fee: string;
+  discounted_tax: string;
+  cod_fee: string;
+  cod_tax: string;
+  cod_handling_fee: string;
+  insurance_fee?: string | null;
+  total_sst: string;
+  total_shipping_fee: string;
 }
 
 export interface RowError {

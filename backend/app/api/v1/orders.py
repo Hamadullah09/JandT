@@ -17,7 +17,7 @@ from app.api.schemas import (
     QuoteIn,
     QuoteOut,
 )
-from app.core.pricing import freight_fee
+from app.core.pricing import fee_breakdown, freight_fee
 from app.core.sortation import service_scope
 from app.core.weights import ceil_to_tenth, chargeable_weight, volumetric_weight
 from app.csv_engine.pipeline import create_single
@@ -41,6 +41,14 @@ def _payload(body: NormalOrderIn) -> dict:
         "goods_name": body.goods_name.strip(),
         "item_variant": body.item_variant.strip(),
         "quantity": body.quantity,
+        "items": [
+            {
+                "name": item.goods_name.strip(),
+                "variant": item.item_variant.strip(),
+                "quantity": item.quantity,
+            }
+            for item in body.items
+        ],
         "actual_weight": body.actual_weight,
         "length": body.length_cm,
         "width": body.width_cm,
@@ -48,6 +56,7 @@ def _payload(body: NormalOrderIn) -> dict:
         "payment_type": body.order_payment_type,
         "cod_amount": body.cod_amount,
         "order_value": body.order_value,
+        "service_mode": body.service_mode,
         "remark": body.remark.strip(),
     }
 
@@ -134,6 +143,13 @@ async def quote(
         )
     )
     scope = service_scope(sender.state, state) if state else "WEST"
+    breakdown = fee_breakdown(
+        scope,
+        chargeable,
+        goods_type=body.goods_type,
+        cod_amount=body.cod_amount,
+        item_value=body.item_value,
+    )
     return QuoteOut(
         volumetric_weight=volumetric,
         chargeable_weight=chargeable,
@@ -141,6 +157,7 @@ async def quote(
         freight_fee=freight_fee(
             scope, chargeable, goods_type=body.goods_type, cod_amount=body.cod_amount
         ),
+        **{name: getattr(breakdown, name) for name in breakdown.__dataclass_fields__},
     )
 
 

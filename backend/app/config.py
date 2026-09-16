@@ -52,6 +52,13 @@ class Settings(BaseSettings):
     max_upload_mb: int = 64
     rates_file: str = str(BACKEND_DIR / "config" / "rates.yml")
 
+    # ---- whatsapp group notifications -----------------------------------
+    # Off unless .env turns it on: otherwise every created order - including
+    # the ones the test suite creates - would be queued for the real group.
+    whatsapp_enabled: bool = False
+    whatsapp_outbox_dir: str = ""    # "" -> <repo>/whatsapp/outbox
+    whatsapp_images_dir: str = ""    # "" -> <repo>/images
+
     @field_validator("tracking_prefix")
     @classmethod
     def _prefix_digits(cls, v: str) -> str:
@@ -80,6 +87,20 @@ class Settings(BaseSettings):
         ``<repo>/waybills``.
         """
         return self.output_root_path or (REPO_DIR / "waybills")
+
+    @property
+    def whatsapp_outbox_path(self) -> Path:
+        """Where order jobs are queued for the WhatsApp service to send."""
+        if self.whatsapp_outbox_dir:
+            return Path(self.whatsapp_outbox_dir)
+        return REPO_DIR / "whatsapp" / "outbox"
+
+    @property
+    def whatsapp_images_path(self) -> Path:
+        """Product photos, looked up by file name or by product name."""
+        if self.whatsapp_images_dir:
+            return Path(self.whatsapp_images_dir)
+        return REPO_DIR / "images"
 
 
 @lru_cache(maxsize=1)
