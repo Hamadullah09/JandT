@@ -1,0 +1,1076 @@
+/*
+ * One stylesheet, no framework.
+ *
+ * The people using this are standing at a desk in a warehouse, often quickly,
+ * sometimes on a laptop with a smeared screen. So: large type, high contrast,
+ * generous hit targets, and colour used only where it means something. A status
+ * is coloured because the colour is the fastest way to read it; nothing else is.
+ *
+ * The colours, the typeface and the square corners are Inaaya Store's own, the
+ * same ones the courier portal is built from (its tailwind.config.ts). The two
+ * halves of the platform sit on one address behind one login, and somebody
+ * moving between them should not feel they have changed program.
+ */
+
+:root {
+  --ink: #303133;
+  --ink-soft: #606266;
+  --ink-faint: #909399;
+
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --line: #dcdfe6;
+  --line-light: #ebeef5;
+  --line-strong: #c0c4cc;
+
+  /* The shop's ink. Near-black, not blue: the brand is the wordmark, and
+     colour on these screens is reserved for what a status means. */
+  --brand: #030302;
+  --brand-strong: #2e2d2a;
+  --brand-tint: #f4f2ee;
+
+  /* Statuses, to the value, as the courier portal paints them - a parcel that
+     is in transit is the same amber on both sides of the platform. */
+  --ok: #3f8f1f;
+  --ok-tint: #f0f9eb;
+  --warn: #b86e00;
+  --warn-tint: #fdf6ec;
+  --bad: #c62828;
+  --bad-tint: #fdecea;
+  --info: #2b6fd6;
+  --info-tint: #ecf5ff;
+  --via: #7c3aad;
+  --via-tint: #f5eefa;
+
+  --radius: 2px;
+  --radius-sm: 2px;
+  --shadow: none;
+
+  --sidebar: 268px;
+  --topbar: 64px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -.01em; }
+h1 { font-size: 24px; }
+h2 { font-size: 19px; }
+h3 { font-size: 16px; }
+p { margin: 0 0 10px; }
+
+a { color: var(--brand); }
+
+/* "Inaaya" over spaced capitals: the shop's sign, and the courier portal's
+   masthead. A fine serif, with the same fallbacks the portal uses. */
+.wordmark {
+  font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: .01em;
+  line-height: 1;
+  display: block;
+}
+.wordmark-caption {
+  display: block;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .45em;
+  padding-left: .45em;
+  line-height: 1;
+}
+
+/* ------------------------------------------------------------------ shell */
+
+.shell { display: flex; min-height: 100%; }
+
+.sidebar {
+  width: var(--sidebar);
+  flex: 0 0 var(--sidebar);
+  background: var(--surface);
+  color: var(--ink);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  display: block;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--line-light);
+  text-align: center;
+  color: var(--brand);
+  text-decoration: none;
+  background: none;
+  border-left: 0; border-right: 0; border-top: 0;
+  width: 100%;
+  cursor: pointer;
+}
+.brand .wordmark { font-size: 38px; }
+.brand .wordmark-caption { font-size: 11px; margin-top: 9px; }
+.brand .brand-sub {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--ink-soft);
+}
+.sidebar .brand:hover:not(:disabled) { background: none; color: var(--brand); }
+
+.nav { padding: 6px 0 24px; overflow-y: auto; flex: 1; }
+.nav-group {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--ink-faint);
+  padding: 16px 20px 6px;
+  font-weight: 700;
+}
+.nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 15.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+.nav button.on {
+  background: var(--brand-tint);
+  color: var(--brand);
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+
+/* The icons carry the row, they do not compete with it: a shade lighter than
+   the label, full strength on the page you are on. */
+.nav svg { flex: none; color: var(--ink-faint); }
+.nav button:hover svg, .nav a.nav-link:hover svg { color: var(--brand); }
+.nav button.on svg { color: var(--brand); }
+
+/*
+ * Hover inside the sidebar, written with a `.sidebar` it does not appear to
+ * need.
+ *
+ * It needs it. The generic `button:hover:not(:disabled)` further down paints
+ * every button near-white for light panels, and it scores exactly the same
+ * specificity as `.nav button:hover` - one class, one pseudo-class, one
+ * element, both sides. On a tie the later rule wins, and the generic one is
+ * written two hundred lines below this. So the sidebar's own hover lost to it:
+ * the item went white while its text stayed light, and the row you were
+ * pointing at was the one you could not read.
+ *
+ * The extra `.sidebar` puts these above it and keeps them there. Any button
+ * added to the sidebar later is covered by the first rule without anybody
+ * having to know this.
+ */
+.sidebar button:hover:not(:disabled) {
+  background: var(--bg);
+  border-color: transparent;
+  color: var(--brand);
+}
+
+/* The one you are on keeps its colour when you point at it. */
+.sidebar .nav button.on:hover:not(:disabled) {
+  background: var(--brand-tint);
+  color: var(--brand);
+}
+.nav .pip {
+  margin-left: auto;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 20px;
+  padding: 1px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The courier module's pages: links out to the other half of the platform,
+   drawn like the rest of the menu so the sidebar reads as one application. */
+.nav a.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 8px 20px;
+  color: inherit;
+  text-decoration: none;
+  font-size: 15.5px;
+  font-weight: 500;
+}
+.nav a.nav-link:hover { background: var(--bg); color: var(--brand); }
+.nav a.nav-link .ext { margin-left: auto; font-size: 13px; color: var(--ink-faint); }
+
+/* A parcel's journey on the order page: the courier's scans, newest first. */
+.courier-number { font: 600 22px/1.2 ui-monospace, "Cascadia Mono", Consolas, monospace; letter-spacing: .04em; }
+.courier-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.courier-actions a.button {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong); background: var(--surface);
+  color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px;
+}
+.courier-actions a.button:hover { border-color: var(--brand); color: var(--brand); }
+.courier-actions a.button.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.courier-actions a.button.primary:hover { color: #fff; filter: brightness(1.08); }
+.form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0 14px; }
+
+/* ----------------------------------------------------------------- top bar */
+
+/*
+ * The bar across the top of every screen: where you are on the left, who you
+ * are on the right - the same two things in the same two places as the courier
+ * portal, so the platform has one chrome rather than two.
+ */
+.content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: var(--topbar);
+  padding: 0 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.topbar-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--brand);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account { position: relative; display: flex; align-items: center; gap: 12px; }
+
+/* The account itself is the button: pressing it opens the menu that holds the
+   other module, this one, the profile and the way out. */
+.account-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px 4px 4px;
+  border: 1px solid transparent;
+  background: none;
+  text-align: left;
+  min-height: 46px;
+}
+.account-button:hover:not(:disabled) { background: var(--bg); border-color: var(--line); color: var(--ink); }
+.account-button[aria-expanded="true"] { background: var(--bg); border-color: var(--line); }
+.account .avatar {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 999px;
+  background: #f3d7c8;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+}
+.account .name { line-height: 1.25; min-width: 0; }
+.account .name b { display: block; font-size: 15px; font-weight: 600; max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account .name small { display: block; color: var(--ink-faint); font-size: 13px; }
+.account .chev { color: var(--ink-faint); font-size: 12px; }
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  width: 260px;
+  padding: 6px 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(3, 3, 2, .14);
+}
+.account-menu-head {
+  padding: 8px 16px 10px;
+  border-bottom: 1px solid var(--line-light);
+  margin-bottom: 6px;
+}
+.account-menu-head b { display: block; font-size: 15px; font-weight: 600; }
+.account-menu-head small { color: var(--ink-faint); font-size: 13px; }
+.account-menu a,
+.account-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  text-decoration: none;
+  min-height: 0;
+}
+.account-menu a:hover,
+.account-menu button:hover:not(:disabled) { background: var(--bg); color: var(--brand); }
+.account-menu .ext { margin-left: auto; font-size: 13px; color: var(--ink-faint); }
+
+/* The menu button, on screens too narrow for the menu to stand beside the page. */
+.burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  min-height: 42px;
+  padding: 0;
+  font-size: 19px;
+  line-height: 1;
+}
+
+/* Covers the page while the menu is open, and closes it when tapped. */
+.scrim { display: none; }
+
+.main { flex: 1; min-width: 0; padding: 22px 24px 60px; }
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.page-head .grow { flex: 1; min-width: 200px; }
+.page-head p { color: var(--ink-soft); margin: 4px 0 0; font-size: 14px; }
+
+/* ----------------------------------------------------------------- panels */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+.panel > header {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.panel > header h3 { flex: 1; min-width: 120px; }
+.panel > header .hint { color: var(--ink-faint); font-size: 13px; font-weight: 400; }
+.panel .body { padding: 16px; }
+.panel .body.tight { padding: 0; }
+
+.grid { display: grid; gap: 18px; }
+.grid.two { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+.grid.three { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+/* ------------------------------------------------------------------ stats */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+.stat .label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--ink-faint);
+  font-weight: 650;
+}
+.stat .value {
+  font-size: 26px;
+  font-weight: 680;
+  margin-top: 4px;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+/* A long amount keeps the line's height, so the notes under it still line up. */
+.stat .value.long { font-size: 21px; line-height: 39px; }
+.stat .value.longer { font-size: 18px; line-height: 39px; }
+.stat .note { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+.stat.clickable { cursor: pointer; }
+.stat.clickable:hover { border-color: var(--line-strong); }
+.stat.accent { border-left: 3px solid var(--brand); }
+.stat.warn { border-left: 3px solid var(--warn); }
+.stat.bad { border-left: 3px solid var(--bad); }
+.stat.ok { border-left: 3px solid var(--ok); }
+
+/* ------------------------------------------------------------------ pager */
+
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+}
+.pager > :first-child { margin-right: auto; }
+
+/* « ‹ 1 2 3 › » - one joined row of square buttons, the page you are on filled. */
+.pager .pages { display: flex; }
+.pager .pages button {
+  min-width: 34px;
+  height: 32px;
+  padding: 0 9px;
+  margin-left: -1px;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: #fff;
+  color: var(--brand);
+  font-size: 14px;
+  font-weight: 500;
+}
+.pager .pages button:first-child { margin-left: 0; border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+.pager .pages button:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.pager .pages button.on { position: relative; background: var(--brand); border-color: var(--brand); color: #fff; }
+.pager .pages button:disabled { background: #fff; color: var(--ink-faint); opacity: 1; }
+.pager .pages button:hover:not(:disabled):not(.on) { background: var(--brand-tint); }
+
+/* The tags of one set on Find a garment, opened out under its row. */
+tr.set-pieces > td { background: var(--bg); padding-top: 6px; padding-bottom: 10px; }
+.set-pieces .piece { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-top: 1px dashed var(--line); }
+.set-pieces .piece:first-of-type { border-top: 0; }
+.set-pieces .piece .mono { flex: 1; }
+.panel .body:not(.tight) > .pager { padding: 12px 0 0; }
+/* Under a grid of cards there is no panel edge to rule off. */
+.product-cards + .pager { border-top: 0; padding: 14px 2px 0; }
+
+/* ----------------------------------------------------------------- tables */
+
+.table-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th {
+  text-align: left;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--ink-faint);
+  font-weight: 650;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: #fafafa;
+  white-space: nowrap;
+}
+td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr.pick { cursor: pointer; }
+tbody tr.pick:hover { background: var(--brand-tint); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.tight { width: 1%; white-space: nowrap; }
+
+.mono {
+  font-family: "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  letter-spacing: -.01em;
+}
+/* An order number, a tag or a tracking number is one thing and is read as one:
+   the table scrolls sideways sooner rather than breaking it over two lines. */
+td .strong.mono, th .strong.mono { white-space: nowrap; }
+.muted { color: var(--ink-soft); }
+.faint { color: var(--ink-faint); }
+.small { font-size: 13px; }
+.strong { font-weight: 650; }
+.nowrap { white-space: nowrap; }
+
+/* ------------------------------------------------------------------ pills */
+
+.pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.pill.grey { background: #f4f4f5; color: var(--ink-soft); }
+.pill.ok { background: var(--ok-tint); color: var(--ok); }
+.pill.warn { background: var(--warn-tint); color: var(--warn); }
+.pill.bad { background: var(--bad-tint); color: var(--bad); }
+.pill.info { background: var(--info-tint); color: var(--info); }
+.pill.via { background: var(--via-tint); color: var(--via); }
+.pill.brand { background: var(--brand-tint); color: var(--brand); }
+
+.swatch {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, .18);
+  vertical-align: -2px;
+  margin-right: 6px;
+  flex: 0 0 auto;
+}
+
+/* ----------------------------------------------------------------- forms */
+
+label.field { display: block; margin-bottom: 12px; }
+label.field > span {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+}
+label.field > .help { font-weight: 400; color: var(--ink-faint); font-size: 12px; margin: 4px 0 0; }
+
+/*
+ * Every field that takes typing, whether or not anybody wrote a type on it.
+ *
+ * This used to list the types - input[type="text"], input[type="number"] and
+ * so on - and an attribute selector only matches an attribute that is actually
+ * written. `<input value=... />` behaves as a text box but has no type
+ * attribute, so it matched nothing and fell through to the browser's own
+ * rendering: a hard square rectangle with a black border, sat next to the
+ * rounded ones. Twenty of the thirty-five fields in this dashboard were like
+ * that, across eleven pages, which is why it looked careless rather than
+ * broken.
+ *
+ * So it is now written the other way round: style every input, and exclude the
+ * handful that must keep their native look. A field added later is styled
+ * because it exists, not because somebody remembered.
+ */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+select, textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font: inherit;
+  color: var(--ink);
+  /* Safari draws its own inset shadow and corner radius on top of ours. */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* The one exception: a select still needs its arrow. */
+select {
+  -webkit-appearance: auto;
+  appearance: auto;
+}
+
+textarea { min-height: 72px; resize: vertical; }
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-tint);
+}
+input:hover:not(:disabled), select:hover:not(:disabled), textarea:hover:not(:disabled) {
+  border-color: var(--line-strong);
+}
+
+/* Checkboxes and radios are exempt above, so they keep the platform focus
+   ring rather than losing it to the rule that clears outlines. */
+input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+input::placeholder, textarea::placeholder { color: var(--ink-faint); }
+
+input:disabled, select:disabled, textarea:disabled {
+  background: var(--bg);
+  color: var(--ink-faint);
+  border-color: var(--line);
+}
+
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.row > * { margin-bottom: 0; }
+.row.filters label.field { flex: 1; min-width: 150px; }
+.row.gap-sm { gap: 8px; }
+
+/* Square, quiet by default, ink-black when it is the thing to press - the
+   courier portal's buttons, to the same measurements. */
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 9px 16px;
+  min-height: 40px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: border-color .12s, background-color .12s, color .12s;
+}
+button:hover:not(:disabled) { background: #fff; border-color: var(--brand); color: var(--brand); }
+button:disabled { opacity: .55; cursor: not-allowed; }
+button.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+button.primary:hover:not(:disabled) { background: var(--brand-strong); border-color: var(--brand-strong); color: #fff; }
+button.danger { background: var(--bad); border-color: var(--bad); color: #fff; font-weight: 600; }
+button.danger:hover:not(:disabled) { background: #a81f1f; border-color: #a81f1f; color: #fff; }
+button.go { background: var(--ok); border-color: var(--ok); color: #fff; font-weight: 600; }
+button.go:hover:not(:disabled) { background: #337818; border-color: #337818; color: #fff; }
+button.link {
+  background: none; border: 0; color: var(--brand); padding: 4px 2px; font-weight: 600;
+  min-height: 0; text-decoration: underline; text-underline-offset: 3px;
+}
+button.link:hover:not(:disabled) { background: none; text-decoration: underline; }
+button.link.bad { color: var(--bad); }
+button.sm { padding: 5px 12px; font-size: 13px; min-height: 32px; }
+button.block { width: 100%; }
+
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* A two-way toggle inside a table cell. Without this the pair wraps onto two
+   lines in a narrow column, which stops reading as one control and starts
+   reading as two unrelated buttons. */
+.tabs.inline { flex-wrap: nowrap; gap: 2px; }
+.tabs.inline button { padding: 4px 9px; font-size: 12.5px; min-height: 28px; border-color: var(--line); }
+.tabs button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 6px 14px;
+  min-height: 36px;
+}
+.tabs button.on { background: var(--brand-tint); color: var(--brand); border-color: var(--line); font-weight: 600; }
+
+/* Tabs get their own hover.
+   The generic button:hover paints every button near-white with a grey border,
+   which is right for a real button and wrong here: a tab is deliberately
+   borderless on a transparent background, so the shared rule made it turn into
+   a white box under the cursor and stop reading as a tab at all. */
+.tabs button:hover:not(:disabled) {
+  background: var(--brand-tint);
+  border-color: transparent;
+  color: var(--brand);
+}
+.tabs button.on:hover:not(:disabled) { border-color: var(--line); }
+.tabs.inline button:hover:not(:disabled) { border-color: var(--line); }
+
+/* --------------------------------------------------------------- notices */
+
+.notice {
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  font-size: 14px;
+  border: 1px solid;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.notice.error { background: var(--bad-tint); border-color: #f0c4c1; color: #7f1a15; }
+.notice.ok { background: var(--ok-tint); border-color: #bfe2cf; color: #0e4e30; }
+.notice.warn { background: var(--warn-tint); border-color: #f0dcb4; color: #6e4500; }
+.notice.info { background: var(--info-tint); border-color: #c3dcea; color: #1a3f55; }
+.notice b { font-weight: 700; }
+
+.empty {
+  padding: 42px 20px;
+  text-align: center;
+  color: var(--ink-faint);
+}
+.empty b { display: block; color: var(--ink-soft); font-size: 15px; margin-bottom: 4px; }
+
+.loading { padding: 30px; text-align: center; color: var(--ink-faint); }
+
+/* ---------------------------------------------------------------- scanner */
+
+/* The tag box. Deliberately the biggest thing on any screen that has one:
+   it is where a hand-held reader types, and it must never need hunting for. */
+.scanbox {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+.scanbox input {
+  flex: 1;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 19px;
+  padding: 13px 15px;
+  letter-spacing: .04em;
+  border-width: 2px;
+}
+.scanbox button { padding-left: 22px; padding-right: 22px; font-size: 15px; }
+
+.scanlog { max-height: 320px; overflow-y: auto; }
+.scanlog .line {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.scanlog .line:first-child { animation: flash .5s ease-out; }
+
+/* A tag code is 24 characters and a rejection message can be a sentence. Left
+   alone the pair push the row wider than the panel and put a horizontal
+   scrollbar under a list that is meant to be glanced at, so the code is capped
+   and the message is allowed to break anywhere. */
+.scanlog .line .mono {
+  flex: 0 0 auto;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.scanlog .line .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.scanlog .line.ok { background: var(--ok-tint); }
+.scanlog .line.bad { background: var(--bad-tint); }
+.scanlog .line.warn { background: var(--warn-tint); }
+
+@keyframes flash {
+  from { background: #fff6cc; }
+}
+
+.countdown {
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+}
+.countdown.done { color: var(--ok); }
+
+.progress {
+  height: 7px;
+  background: var(--line-light);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.progress > div { height: 100%; background: var(--brand); border-radius: 20px; transition: width .2s; }
+.progress.done > div { background: var(--ok); }
+
+/* ----------------------------------------------------------------- login */
+
+/* The same welcome as the courier portal's: the shop's sign on a warm ground,
+   the form on white beside it. */
+.login-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 28px 20px;
+  background: var(--brand-tint);
+}
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 34px 30px 30px;
+}
+.login-card .mark { text-align: center; color: var(--brand); margin-bottom: 22px; }
+.login-card .mark .wordmark { font-size: 46px; }
+.login-card .mark .wordmark-caption { font-size: 12px; margin-top: 10px; }
+.login-card h1 { font-size: 20px; margin-bottom: 4px; text-align: center; }
+.login-card .sub { color: var(--ink-soft); font-size: 14px; margin-bottom: 22px; text-align: center; }
+
+/* --------------------------------------------------------------- details */
+
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 14px; }
+.kv dt { color: var(--ink-faint); font-size: 12.5px; font-weight: 650; padding-top: 1px; }
+.kv dd { margin: 0; }
+
+.timeline { list-style: none; margin: 0; padding: 0; }
+.timeline li {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { color: var(--ink-faint); font-size: 12.5px; white-space: nowrap; min-width: 122px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  padding: 4px 6px 4px 11px;
+  font-size: 13px;
+  background: #fff;
+}
+.chip button { border: 0; background: none; padding: 0 4px; color: var(--ink-faint); font-size: 15px; line-height: 1; }
+.chip button:hover { color: var(--bad); background: none; }
+.chip.on { border-color: var(--brand); background: var(--brand-tint); color: var(--brand); font-weight: 600; }
+
+/* Colour and size pickers: a wall of small toggles is faster to work through
+   than a multi-select, and it shows the colour rather than naming it. */
+.toggles { display: flex; flex-wrap: wrap; gap: 7px; }
+.toggles button {
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  padding: 7px 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+.toggles button.on { border-color: var(--brand); background: var(--brand-tint); color: var(--brand); }
+
+.bar-cell { display: flex; align-items: center; gap: 8px; }
+.bar { flex: 1; height: 6px; background: var(--line-light); border-radius: 20px; overflow: hidden; min-width: 40px; }
+.bar > div { height: 100%; background: var(--brand); }
+
+dialog.modal {
+  border: 0;
+  border-radius: 12px;
+  padding: 0;
+  width: min(560px, 94vw);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .3);
+}
+dialog.modal::backdrop { background: rgba(16, 20, 30, .5); }
+dialog.modal header {
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+}
+dialog.modal header h3 { flex: 1; }
+dialog.modal .body { padding: 18px; max-height: 70vh; overflow-y: auto; }
+dialog.modal footer {
+  padding: 13px 18px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  background: #fafafa;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+/*
+ * Below a laptop the menu is not worth a third of the screen, so it slides in
+ * over the page instead - the same drawer the courier portal uses, opened by
+ * the button in the top bar and closed by the page behind it, by Escape, or by
+ * going somewhere.
+ */
+@media (max-width: 1000px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 60;
+    width: min(300px, 86vw);
+    flex-basis: auto;
+    height: 100dvh;
+    transform: translateX(-100%);
+    transition: transform .18s ease-out;
+    box-shadow: 0 10px 40px rgba(3, 3, 2, .18);
+  }
+  .menu-open .sidebar { transform: none; }
+
+  .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(3, 3, 2, .45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease-out;
+    border: 0;
+    padding: 0;
+  }
+  .menu-open .scrim { opacity: 1; pointer-events: auto; }
+
+  .burger { display: inline-flex; }
+  .topbar { padding: 0 12px; gap: 10px; }
+  .main { padding: 16px 14px 48px; }
+
+  /* A closed drawer must not be reachable by tabbing through the page. */
+  .shell:not(.menu-open) .sidebar { visibility: hidden; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar, .scrim { transition: none; }
+}
+
+@media (max-width: 720px) {
+  .account .name { display: none; }
+  .stats { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .page-head { gap: 10px; }
+  h1 { font-size: 21px; }
+  .panel > header { padding: 12px 14px; }
+  .panel .body { padding: 14px; }
+  .scanbox { flex-wrap: wrap; }
+  .scanbox input { min-width: 100%; font-size: 17px; }
+  .scanbox button { flex: 1; }
+  dialog.modal { width: 100vw; max-width: 100vw; border-radius: 0; }
+  dialog.modal .body { max-height: 74vh; }
+  .row.filters label.field { min-width: 100%; }
+}
+
+/* A phone in the hand: nothing sideways but the tables that have to be. */
+@media (max-width: 520px) {
+  .main { padding: 14px 12px 44px; }
+  .topbar { height: 58px; }
+  .kv { grid-template-columns: 1fr; gap: 2px 0; }
+  .kv dt { padding-top: 8px; }
+  .timeline li { flex-direction: column; gap: 2px; }
+  .timeline .when { min-width: 0; }
+}
+
+/* ------------------------------------------------------------------ photos
+ *
+ * Garments are photographed standing up, so every frame is 3:4 portrait and
+ * the photo is cropped to fill it rather than letterboxed - a row of cards
+ * with different heights is harder to scan than one where they line up.
+ */
+
+.photo {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  color: var(--ink-faint);
+  font-size: 12px;
+  text-align: center;
+  max-width: 100%;
+}
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.product-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.product-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr);
+  gap: 14px;
+  padding: 12px;
+  align-items: start;
+}
+.product-card .photo { cursor: pointer; }
+.product-card h3 { font-size: 15px; line-height: 1.3; cursor: pointer; text-wrap: balance; }
+.product-card h3:hover { color: var(--brand); }
+.product-card .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 4px 0 2px; }
+
+.variant-rows { list-style: none; margin: 10px 0 0; padding: 0; }
+.variant-rows li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+}
+/* The colour name gives way - truncated with an ellipsis, full name on hover -
+ * so the size, the count and the Find button always stay on the card. */
+.variant-rows li .grow { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.variant-rows li > :not(.grow) { flex: none; }
+/* A size code is short in practice (S, XL, 38) but nothing stops one being long,
+ * so it is capped too - the Find button is the one thing that must never move. */
+.variant-rows li > .size { flex: 0 1 auto; min-width: 0; max-width: 6em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.variant-rows li .count { font-variant-numeric: tabular-nums; min-width: 2.2em; text-align: right; }
+.variant-rows li button { padding: 3px 11px; font-size: 13px; }
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 12px;
+}
+.gallery .tile .cover-tag { position: absolute; top: 6px; left: 6px; }
+.gallery .tile .actions { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; }
+
+/* ------------------------------------------------------------------ quantity grid */
+
+.qty-grid td, .qty-grid th { vertical-align: middle; }
+/* The cells are sized rather than the inputs: the global input rule fills its
+ * container and outranks a class selector, so the box follows its cell. */
+.qty-grid td.num, .qty-grid th.num { width: 104px; }
+.qty-grid td:first-child { white-space: nowrap; }
+/* Never narrower than a few digits: on a phone, four or five sizes would
+ * otherwise squeeze each box until the number in it is cut off. The grid
+ * scrolls sideways instead. */
+.qty-grid input[type=number] { text-align: right; font-variant-numeric: tabular-nums; min-width: 64px; }
+.qty-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  background: var(--brand-tint);
+  border-radius: var(--radius-sm);
+}
+.qty-total b { font-size: 22px; font-variant-numeric: tabular-nums; }
+
+.file-pick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.file-pick .names { color: var(--ink-soft); font-size: 13px; }
+
+@media (max-width: 520px) {
+  .product-cards { grid-template-columns: 1fr; }
+  .product-card { grid-template-columns: 88px minmax(0, 1fr); }
+}
+
+/* ------------------------------------------------------------------ search by photo */
+
+.photo-search-button { width: 100%; white-space: nowrap; }
+
+.photo-query { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.photo-query .photo { width: 96px; flex: none; }
+/* The picture searched with is shown whole - a screenshot cropped to fill the
+ * frame would hide what was actually sent. */
+.photo-query .photo img { object-fit: contain; }
+.photo-query .grow { flex: 1; min-width: 200px; }
+.photo-query h3 { margin: 0 0 6px; font-size: 16px; }
+.photo-query p { margin: 0 0 6px; }
+.photo-query-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }

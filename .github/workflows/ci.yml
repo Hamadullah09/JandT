@@ -1,0 +1,145 @@
+# Continuous integration for the whole platform.
+#
+#   warehouse   .NET build + the warehouse API suites against a real PostgreSQL
+#   courier     pytest (504 tests) against a real PostgreSQL
+#   portal      Next.js typecheck + production build
+#   platform    the full Docker Compose stack + cross-module end-to-end checks
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  POSTGRES_PASSWORD: ci-postgres
+  WAREHOUSE_DB_PASSWORD: ci-warehouse
+  COURIER_DB_PASSWORD: ci-courier
+  AUTH_JWT_SECRET: ci-signing-secret-that-is-at-least-32-characters
+
+jobs:
+  warehouse:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: inaaya
+          POSTGRES_USER: inaaya
+          POSTGRES_PASSWORD: ci-postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U inaaya -d inaaya" --health-interval 3s --health-retries 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: "10.0.x" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+
+      - name: Initialise the platform database
+        env: { PGHOST: localhost, PGUSER: inaaya, PGPASSWORD: ci-postgres, PGDATABASE: inaaya }
+        run: sh database/init/run.sh
+
+      - name: Build the dashboard
+        working-directory: apps/warehouse/dashboard
+        run: npm ci && npm run build
+
+      - name: Build the API
+        working-directory: apps/warehouse/server/Warehouse.Api
+        run: dotnet build -c Release
+
+      - name: Start the API
+        working-directory: apps/warehouse/server/Warehouse.Api
+        env:
+          ASPNETCORE_ENVIRONMENT: Production
+          ConnectionStrings__Postgres: Host=localhost;Database=inaaya;Username=warehouse_app;Password=ci-warehouse
+          Auth__Secret: ${{ env.AUTH_JWT_SECRET }}
+          Auth__LoginAttemptsPerMinute: "1000"
+        run: |
+          nohup dotnet run -c Release --no-build --urls http://127.0.0.1:5080 > api.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:5080/health/ready && break; sleep 2; done
+
+      - name: Warehouse suites
+        working-directory: apps/warehouse/server
+        run: |
+          node test/smoke.mjs http://127.0.0.1:5080
+          node test/features.mjs http://127.0.0.1:5080
+          node test/catalogue.mjs http://127.0.0.1:5080
+
+      - name: API log
+        if: failure()
+        run: cat apps/warehouse/server/Warehouse.Api/api.log
+
+  courier:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: inaaya_test
+          POSTGRES_USER: inaaya
+          POSTGRES_PASSWORD: ci-postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U inaaya -d inaaya_test" --health-interval 3s --health-retries 30
+    defaults:
+      run:
+        working-directory: apps/courier/backend
+    env:
+      JT_DATABASE_URL: postgresql+asyncpg://courier_app:ci-courier@localhost:5432/inaaya_test
+      JT_TEST_DATABASE_URL: postgresql+asyncpg://inaaya:ci-postgres@localhost:5432/inaaya_test
+      JT_AUTH_JWT_SECRET: ci-signing-secret-that-is-at-least-32-characters
+      JT_WHATSAPP_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip, cache-dependency-path: apps/courier/backend/requirements.txt }
+      - name: Initialise the platform database
+        working-directory: .
+        env: { PGHOST: localhost, PGUSER: inaaya, PGPASSWORD: ci-postgres, PGDATABASE: inaaya_test }
+        run: sh database/init/run.sh
+      - run: pip install -r requirements.txt
+      - run: alembic upgrade head && python -m app.db.seed
+      - run: pytest -q
+
+  portal:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/courier/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20", cache: npm, cache-dependency-path: apps/courier/frontend/package-lock.json }
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run build
+        env: { NEXT_PUBLIC_API_BASE: "" }
+
+  platform:
+    runs-on: ubuntu-latest
+    needs: [warehouse, courier, portal]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - name: Configure
+        run: |
+          cp .env.example .env
+          sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$POSTGRES_PASSWORD/" .env
+          sed -i "s/^WAREHOUSE_DB_PASSWORD=.*/WAREHOUSE_DB_PASSWORD=$WAREHOUSE_DB_PASSWORD/" .env
+          sed -i "s/^COURIER_DB_PASSWORD=.*/COURIER_DB_PASSWORD=$COURIER_DB_PASSWORD/" .env
+          sed -i "s/^AUTH_JWT_SECRET=.*/AUTH_JWT_SECRET=$AUTH_JWT_SECRET/" .env
+          mkdir -p apps/warehouse/server/Warehouse.Api/uploads apps/warehouse/server/Warehouse.Api/models
+      - name: Build and start the stack
+        run: docker compose up -d --build --wait --wait-timeout 600
+      - name: Cross-module end-to-end checks
+        run: node tests/e2e/platform.mjs http://localhost:5080
+      - name: Logs
+        if: failure()
+        run: docker compose logs --tail 300

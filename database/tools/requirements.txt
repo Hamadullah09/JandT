@@ -1,0 +1,9 @@
+# database/tools/migrate_legacy.py - the one-time import of the legacy data.
+# The courier side also imports the courier backend's own modules, so install
+# apps/courier/backend/requirements.txt as well.
+#
+# demo_data.py (invented customers, orders and parcels) needs psycopg only: it
+# talks to the platform through its own API, with nothing but the standard
+# library.
+psycopg[binary]>=3.2
+pymysql>=1.1

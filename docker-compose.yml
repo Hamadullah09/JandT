@@ -1,53 +1,203 @@
+# =============================================================================
+# Inaaya Commerce Platform
+#
+#   gateway (nginx, :5080) ──┬── /api/v1/*, /health/courier ──▶ courier-api   (FastAPI)
+#                            ├── /api/*, /uploads/*, /warehouse/ ─▶ warehouse-api (.NET 10)
+#                            └── everything else ──────────────▶ courier-web   (Next.js)
+#
+#   warehouse-api ─┐
+#   courier-api  ──┴──▶ postgres (ONE database: schemas core / warehouse / courier)
+#
+# Start:   docker compose up -d --build        (or double-click START.cmd)
+# Open:    http://localhost:5080
+#
+# Port 5080 is deliberate: the handhelds search the network for the warehouse
+# on 5080, so every device already in use finds the platform with no changes.
+# =============================================================================
+
+name: inaaya
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-restart: &restart
+  restart: unless-stopped
+
 services:
-  db:
+  # --------------------------------------------------------------- database
+  postgres:
+    <<: *restart
     image: postgres:16-alpine
-    container_name: jt_db
+    container_name: inaaya-postgres
     environment:
-      POSTGRES_USER: jt
-      POSTGRES_PASSWORD: jt
-      POSTGRES_DB: jt
+      POSTGRES_DB: ${POSTGRES_DB:-inaaya}
+      POSTGRES_USER: ${POSTGRES_USER:-inaaya}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C.UTF-8"
+    command: >
+      postgres
+      -c timezone=UTC
+      -c log_min_duration_statement=500
+      -c log_connections=off
+      -c shared_buffers=256MB
     ports:
-      - "5432:5432"
+      # Localhost only: nothing outside this machine talks to the database.
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5433}:5432"
     volumes:
-      - jt_pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U jt -d jt"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 3s
       timeout: 3s
-      retries: 30
+      retries: 40
+    logging: *logging
 
-  api:
-    build:
-      context: ./backend
-    container_name: jt_api
-    environment:
-      JT_DATABASE_URL: postgresql+asyncpg://jt:jt@db:5432/jt
-      JT_OUTPUT_ROOT: /data/waybills
-      JT_CORS_ORIGINS: '["http://localhost:3000","http://127.0.0.1:3000"]'
+  # Roles, schemas and the shared identity tables. Idempotent; runs every start.
+  db-init:
+    image: postgres:16-alpine
+    container_name: inaaya-db-init
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
-    ports:
-      - "8000:8000"
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:-inaaya}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB:-inaaya}
+      WAREHOUSE_DB_PASSWORD: ${WAREHOUSE_DB_PASSWORD:?Set WAREHOUSE_DB_PASSWORD in .env}
+      COURIER_DB_PASSWORD: ${COURIER_DB_PASSWORD:?Set COURIER_DB_PASSWORD in .env}
+      # Only used the very first time, when there are no accounts yet.
+      PLATFORM_ADMIN_PASSWORD: ${PLATFORM_ADMIN_PASSWORD:-admin123}
+      PLATFORM_MERCHANT_PASSWORD: ${PLATFORM_MERCHANT_PASSWORD:-linked123}
     volumes:
-      - ./waybills:/data/waybills
-    healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)\""]
-      interval: 5s
-      timeout: 5s
-      retries: 30
+      - ./database/init:/init:ro
+    entrypoint: ["sh", "/init/run.sh"]
+    restart: "no"
+    logging: *logging
 
-  web:
+  # ------------------------------------------------------------- warehouse
+  warehouse-api:
+    <<: *restart
     build:
-      context: ./frontend
-    container_name: jt_web
-    environment:
-      NEXT_PUBLIC_API_BASE: http://localhost:8000
+      context: ./apps/warehouse
+      dockerfile: Dockerfile
+    image: inaaya/warehouse-api:${APP_VERSION:-latest}
+    container_name: inaaya-warehouse-api
     depends_on:
-      api:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      TZ: ${APP_TIMEZONE:-Asia/Kuala_Lumpur}
+      ConnectionStrings__Postgres: >-
+        Host=postgres;Port=5432;Database=${POSTGRES_DB:-inaaya};Username=warehouse_app;Password=${WAREHOUSE_DB_PASSWORD};Search Path=warehouse,core,public;Maximum Pool Size=50
+      Auth__Secret: ${AUTH_JWT_SECRET:?Set AUTH_JWT_SECRET in .env}
+      Auth__CookieSecure: ${COOKIE_SECURE:-false}
+      Platform__TimeZone: ${APP_TIMEZONE:-Asia/Kuala_Lumpur}
+      Courier__BaseUrl: http://courier-api:8000
+      Courier__SyncSeconds: ${COURIER_SYNC_SECONDS:-20}
+      Uploads__Path: /data/uploads
+      PhotoSearch__ModelPath: /models/dinov2-small.onnx
+    volumes:
+      - ${WAREHOUSE_UPLOADS_DIR:-./apps/warehouse/server/Warehouse.Api/uploads}:/data/uploads
+      - ${WAREHOUSE_MODELS_DIR:-./apps/warehouse/server/Warehouse.Api/models}:/models:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health/ready >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      start_period: 40s
+      retries: 12
+    logging: *logging
+
+  # --------------------------------------------------------------- courier
+  courier-api:
+    <<: *restart
+    build:
+      context: ./apps/courier/backend
+    image: inaaya/courier-api:${APP_VERSION:-latest}
+    container_name: inaaya-courier-api
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      TZ: ${APP_TIMEZONE:-Asia/Kuala_Lumpur}
+      JT_ENVIRONMENT: production
+      JT_DATABASE_URL: postgresql+asyncpg://courier_app:${COURIER_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-inaaya}
+      JT_DB_SCHEMA: courier
+      JT_AUTH_JWT_SECRET: ${AUTH_JWT_SECRET}
+      JT_COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      JT_OUTPUT_ROOT: /data/waybills
+      JT_CORS_ORIGINS: '["${PUBLIC_BASE_URL:-http://localhost:5080}"]'
+      JT_TRACKING_PAGE_URL: ${PUBLIC_BASE_URL:-http://localhost:5080}/tracking/
+      JT_WHATSAPP_ENABLED: ${WHATSAPP_ENABLED:-false}
+      JT_WHATSAPP_OUTBOX_DIR: /data/whatsapp/outbox
+    volumes:
+      - waybills:/data/waybills
+      - whatsapp-outbox:/data/whatsapp
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health/ready').status==200 else 1)\""]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 12
+    logging: *logging
+
+  courier-web:
+    <<: *restart
+    build:
+      context: ./apps/courier/frontend
+      args:
+        # Empty: the browser calls the API on the same origin, through the gateway.
+        NEXT_PUBLIC_API_BASE: ""
+    image: inaaya/courier-web:${APP_VERSION:-latest}
+    container_name: inaaya-courier-web
+    depends_on:
+      courier-api:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/login >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 12
+    logging: *logging
+
+  # --------------------------------------------------------------- gateway
+  gateway:
+    <<: *restart
+    image: nginx:1.27-alpine
+    container_name: inaaya-gateway
+    depends_on:
+      warehouse-api:
+        condition: service_healthy
+      courier-api:
+        condition: service_healthy
+      courier-web:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "${GATEWAY_PORT:-5080}:80"
+    volumes:
+      - ./deploy/gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/gateway/health >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+    logging: *logging
 
 volumes:
-  jt_pgdata:
+  pgdata:
+    name: inaaya_pgdata
+  waybills:
+    name: inaaya_waybills
+  whatsapp-outbox:
+    name: inaaya_whatsapp_outbox

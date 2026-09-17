@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      The window behind Compose.
+
+      windowLightStatusBar is the one that matters: the bars are white now, and
+      without it Android keeps drawing the clock and the battery in white too,
+      on white. windowBackground is what shows for the moment between tapping
+      the icon and Compose drawing its first frame - left dark, that moment is a
+      black flash on every launch.
+    -->
+    <style name="Theme.Handheld" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">#F4F6FA</item>
+    </style>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The one folder the camera app may write into: the picture being searched
+     with, kept in the app's cache and replaced by the next one. -->
+<paths>
+    <cache-path name="search" path="search/" />
+</paths>

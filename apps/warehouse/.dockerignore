@@ -1,0 +1,13 @@
+# Build output and local state never go into the image build.
+**/bin/
+**/obj/
+**/node_modules/
+server/publish/
+server/Warehouse.Api/wwwroot/
+# Mounted at runtime, not baked in (see Dockerfile).
+server/Warehouse.Api/uploads/
+server/Warehouse.Api/models/
+# The Android app is built with Gradle, not in this image.
+handheld/
+**/*.user
+**/.vs/

@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Warehouse.Api</RootNamespace>
+
+    <!-- Out-of-process, and set here rather than by hand in web.config, because
+         `dotnet publish` regenerates web.config from this file every time and
+         silently puts the in-process default back.
+
+         Shared hosting runs several ASP.NET Core applications in one IIS
+         application pool, and a pool cannot mix the two hosting models:
+         whichever application starts second dies with HTTP 500.34 and the site
+         is simply down. This line is why that does not happen. -->
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Verifies passwords of accounts carried over from the MySQL warehouse;
+         new hashes are PBKDF2, the format the courier module writes too. -->
+    <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+    <PackageReference Include="Dapper" Version="2.1.79" />
+    <!-- PostgreSQL: the platform's single database. -->
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+    <!-- Search by photo: runs the DINOv2 model, and reads JPEG, PNG and WebP. -->
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.30.0" />
+    <PackageReference Include="SkiaSharp" Version="4.152.0" />
+    <!-- SkiaSharp's native library for the Linux container image. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.152.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\schema.sql" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The recognition model for search by photo (84 MB, not in source control -
+         scripts\get-photo-model.cmd downloads it). Copied beside the program so a
+         published copy finds it without being told where it is. -->
+    <None Include="models\*.onnx" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

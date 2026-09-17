@@ -1,0 +1,50 @@
+# Build output
+bin/
+obj/
+server/publish/
+server/Warehouse.Api/wwwroot/
+dashboard/dist/
+node_modules/
+handheld/build/
+handheld/app/build/
+handheld/.gradle/
+
+# The Android SDK path on this particular machine.
+handheld/local.properties
+
+# Chainway's reader SDK. It ships with the device, is on no Maven repository,
+# and is not ours to redistribute - so it is fetched by hand into app/libs and
+# never committed. app/libs/README.md says where it goes.
+handheld/app/libs/*.jar
+handheld/app/libs/*.aar
+
+# The dashboard is built into the API's wwwroot, so that folder is output
+# rather than source and is rebuilt by `npm run build` or by publish.ps1.
+
+# Local settings that carry secrets or machine-specific paths
+appsettings.Local.json
+appsettings.Production.json
+*.user
+
+# Editors
+.vs/
+.idea/
+.vscode/
+*.swp
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Database dumps
+*.sql.gz
+backups/
+
+# Product photos. Data, not source - and never under wwwroot, which the
+# dashboard build empties.
+server/Warehouse.Api/uploads/
+
+# The search-by-photo model: 84 MB, and downloaded rather than committed.
+# scripts/get-photo-model.cmd fetches it and checks it.
+server/Warehouse.Api/models/*.onnx

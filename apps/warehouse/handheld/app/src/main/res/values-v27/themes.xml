@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Dark icons in the navigation bar as well, which only arrived in API 27.
+      Kept out of the base file so nothing has to guess whether an older device
+      understands it; the three buttons stay white-on-grey there, which is the
+      look those devices have everywhere else anyway.
+    -->
+    <style name="Theme.Handheld" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowBackground">#F4F6FA</item>
+    </style>
+</resources>
