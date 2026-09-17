@@ -2,16 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useMe } from '@/components/auth/Session';
+import { InaayaLogo } from '@/components/brand/Logo';
 import {
-  AddressIcon,
   ChevronDown,
   ChevronUp,
+  DashboardIcon,
   HomeIcon,
   OrderIcon,
   SettingsIcon,
-  SupportIcon,
-  VipIcon,
-  WaybillIcon,
+  TruckIcon,
 } from '@/components/ui/icons';
 
 type Child = { label: string; href: string };
@@ -20,8 +21,13 @@ type Item = {
   href?: string;
   icon: (p: { className?: string }) => JSX.Element;
   children?: Child[];
+  adminOnly?: boolean;
 };
 
+/**
+ * Only pages that work are listed: menu entries with nothing behind them
+ * (Waybill, Address Management, VIP Centre...) only confused.
+ */
 const MENU: Item[] = [
   { label: 'Homepage', href: '/', icon: HomeIcon },
   {
@@ -29,85 +35,107 @@ const MENU: Item[] = [
     icon: OrderIcon,
     children: [
       { label: 'Normal order', href: '/order/normal' },
-      { label: 'Multiple-Pieces Shipment Order', href: '/order/multiple-pieces' },
-      { label: 'International Orders', href: '/order/international' },
-      { label: 'Order Management', href: '/order/management' },
-      { label: 'Quick Order', href: '/order/quick' },
       { label: 'Bulk Import Orders', href: '/order/bulk-import' },
+      { label: 'Quick Order', href: '/order/quick' },
+      { label: 'Order Management', href: '/order/management' },
     ],
   },
-  { label: 'Waybill', icon: WaybillIcon, children: [] },
-  { label: 'Address Management', icon: AddressIcon, children: [] },
-  { label: 'System Settings', icon: SettingsIcon, children: [{ label: 'Sender Profile', href: '/settings/sender' }] },
-  { label: 'Complaint and Feedback', icon: SupportIcon, children: [] },
-  { label: 'VIP Centre', icon: VipIcon, children: [] },
+  { label: 'Admin Portal', href: '/admin', icon: DashboardIcon, adminOnly: true },
+  { label: 'Track & Trace', href: '/tracking', icon: TruckIcon },
+  {
+    label: 'System Settings',
+    icon: SettingsIcon,
+    children: [{ label: 'Sender Profile', href: '/settings/sender' }],
+  },
 ];
 
-export function JtLogo() {
+export function BrandLogo() {
   return (
-    <div className="flex select-none items-end px-6 py-[18px]">
-      <span
-        className="text-[36px] font-black italic leading-none tracking-[-0.04em] text-jt-red"
-        style={{ fontFamily: 'Arial Black, Arial, sans-serif' }}
-      >
-        J&amp;T
-      </span>
-      <span className="ml-[3px] pb-[3px] text-[13px] font-bold tracking-[0.02em] text-jt-red">
-        EXPRESS
-      </span>
-    </div>
+    <Link href="/" className="flex flex-col items-center gap-2 border-b border-line-light px-6 pb-4 pt-5">
+      <InaayaLogo size="md" />
+      <span className="text-[12px] font-semibold uppercase tracking-[2px] text-text-regular">Order portal</span>
+    </Link>
   );
 }
 
+const inGroup = (item: Item, pathname: string) =>
+  (item.children ?? []).some((child) => pathname === child.href);
+
 export function Sidebar() {
   const pathname = usePathname();
-  const orderOpen = pathname.startsWith('/order');
+  const me = useMe();
+  const menu = MENU.filter((item) => !item.adminOnly || me?.role === 'admin');
+
+  // "Order" starts open - it is what the portal is for; any group holding the
+  // page on screen opens too.  Clicking a group's name opens or closes it.
+  const [open, setOpen] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(
+      MENU.filter((item) => item.children).map((item) => [
+        item.label,
+        item.label === 'Order' || inGroup(item, pathname),
+      ]),
+    ),
+  );
+  useEffect(() => {
+    const current = MENU.find((item) => inGroup(item, pathname));
+    if (current) setOpen((prev) => (prev[current.label] ? prev : { ...prev, [current.label]: true }));
+  }, [pathname]);
 
   return (
     <aside className="flex h-full w-sidebar shrink-0 flex-col overflow-y-auto border-r border-line bg-white thin-scroll">
-      <JtLogo />
+      <BrandLogo />
 
-      <nav className="pb-6">
-        {MENU.map((item) => {
-          const expandable = Array.isArray(item.children);
-          const expanded = item.label === 'Order' && orderOpen;
+      <nav className="pb-6" aria-label="Main menu">
+        {menu.map((item) => {
           const Icon = item.icon;
+          const row = 'flex h-[50px] w-full items-center px-6 text-[16px] text-text-primary';
 
-          const head = (
-            <div className="flex h-[44px] items-center px-6 text-base text-text-primary">
-              <Icon className="mr-3 shrink-0 text-text-primary" />
-              <span className="flex-1 truncate">{item.label}</span>
-              {expandable &&
-                (expanded ? (
+          if (item.href) {
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                aria-current={active ? 'page' : undefined}
+                className={`${row} ${active ? 'bg-brand-tint font-semibold text-brand' : 'hover:bg-surface-page'}`}
+              >
+                <Icon className="mr-3 h-5 w-5 shrink-0" />
+                <span className="truncate">{item.label}</span>
+              </Link>
+            );
+          }
+
+          const expanded = Boolean(open[item.label]);
+          return (
+            <div key={item.label}>
+              <button
+                type="button"
+                aria-expanded={expanded}
+                onClick={() => setOpen((prev) => ({ ...prev, [item.label]: !expanded }))}
+                className={`${row} text-left hover:bg-surface-page`}
+              >
+                <Icon className="mr-3 h-5 w-5 shrink-0" />
+                <span className="flex-1 truncate">{item.label}</span>
+                {expanded ? (
                   <ChevronUp className="text-text-secondary" />
                 ) : (
                   <ChevronDown className="text-text-secondary" />
-                ))}
-            </div>
-          );
+                )}
+              </button>
 
-          return (
-            <div key={item.label}>
-              {item.href ? (
-                <Link href={item.href} className="block hover:bg-surface-page">
-                  {head}
-                </Link>
-              ) : (
-                <div className="cursor-default hover:bg-surface-page">{head}</div>
-              )}
-
-              {expanded && item.children && (
+              {expanded && (
                 <div className="pb-1">
-                  {item.children.map((child) => {
+                  {(item.children ?? []).map((child) => {
                     const active = pathname === child.href;
                     return (
                       <Link
                         key={child.href}
                         href={child.href}
+                        aria-current={active ? 'page' : undefined}
                         className={
                           active
-                            ? 'mx-3 flex h-[44px] items-center rounded-lg bg-jt-red pl-[48px] pr-3 text-base font-bold text-white'
-                            : 'mx-3 flex h-[44px] items-center rounded-lg pl-[48px] pr-3 text-base text-text-primary hover:bg-surface-page'
+                            ? 'mx-3 flex h-[48px] items-center rounded-lg bg-brand pl-[48px] pr-3 text-[16px] font-bold text-white'
+                            : 'mx-3 flex h-[48px] items-center rounded-lg pl-[48px] pr-3 text-[16px] text-text-primary hover:bg-surface-page'
                         }
                       >
                         <span className="truncate">{child.label}</span>

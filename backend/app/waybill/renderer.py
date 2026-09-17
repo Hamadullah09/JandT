@@ -20,7 +20,15 @@ from reportlab.pdfgen import canvas as rl_canvas
 from app.core.masking import mask
 from app.waybill import layout as L
 from app.waybill.dto import OrderDTO
-from app.waybill.text import fit, pick_font, register_fonts, sanitise, width_of, wrap
+from app.waybill.text import (
+    fit,
+    fit_items,
+    pick_font,
+    register_fonts,
+    sanitise,
+    width_of,
+    wrap,
+)
 
 __all__ = ["render_waybill"]
 
@@ -44,6 +52,21 @@ def _draw(
     text = sanitise(value, chosen)
     if max_width is not None:
         text = fit(text, chosen, size, max_width)
+    c.setFont(chosen, size)
+    c.drawString(x, y, text)
+
+
+def _draw_items(
+    c: rl_canvas.Canvas, x: float, y: float, parts: list[str], max_width: float
+) -> None:
+    """Several items, or a quantity above one, on the Parcel Information line."""
+    if not parts:
+        return
+    chosen = pick_font(", ".join(parts), L.FONT)
+    text, size = fit_items(
+        [sanitise(part, chosen) for part in parts],
+        chosen, L.SIZE_BODY, L.SIZE_GOODS_MIN, max_width,
+    )
     c.setFont(chosen, size)
     c.drawString(x, y, text)
 
@@ -332,10 +355,16 @@ def _section_dispatcher(c: rl_canvas.Canvas, o: OrderDTO) -> None:
         c, L.B_PARCEL_LABEL_X, L.B_PARCEL_LABEL_Y, L.TXT_PARCEL_INFORMATION,
         L.FONT, L.SIZE_PARCEL_LABEL_B,
     )
-    _draw(
-        c, L.B_GOODS_X, L.B_GOODS_Y, o.goods_label_short,
-        L.FONT, L.SIZE_BODY, L.B_GOODS_MAX_W,
-    )
+    if o.goods_simple:
+        _draw(
+            c, L.B_GOODS_X, L.B_GOODS_Y, o.goods_label_short,
+            L.FONT, L.SIZE_BODY, L.B_GOODS_MAX_W,
+        )
+    else:
+        # like the reference short form, the dispatcher copy leaves variants out
+        _draw_items(
+            c, L.B_GOODS_X, L.B_GOODS_Y, o.goods_parts(variants=False), L.B_GOODS_MAX_W
+        )
 
     _vrule(c, L.B_SIG_DIVIDER_X, L.B_SIG_DIVIDER_TOP_Y, L.B_SIG_DIVIDER_BOTTOM_Y)
     _draw(c, L.B_SIGNATURE_X, L.B_SIGNATURE_Y, L.TXT_SIGNATURE, L.FONT, L.SIZE_SIGNATURE)
@@ -398,7 +427,12 @@ def _section_sender(c: rl_canvas.Canvas, o: OrderDTO) -> None:
         c, L.C_PARCEL_LABEL_X, L.C_PARCEL_LABEL_Y, L.TXT_PARCEL_INFORMATION,
         L.FONT, L.SIZE_PARCEL_LABEL_C,
     )
-    _draw(c, L.C_GOODS_X, L.C_GOODS_Y, o.goods_label, L.FONT, L.SIZE_BODY, L.C_GOODS_MAX_W)
+    if o.goods_simple:
+        _draw(c, L.C_GOODS_X, L.C_GOODS_Y, o.goods_label, L.FONT, L.SIZE_BODY, L.C_GOODS_MAX_W)
+    else:
+        _draw_items(
+            c, L.C_GOODS_X, L.C_GOODS_Y, o.goods_parts(variants=True), L.C_GOODS_MAX_W
+        )
 
     _rule(c, L.C_RULE_GUTTER_1_X1, L.C_RULE_GUTTER_1_Y, L.C_RULE_GUTTER_1_X2)
     _draw_centred(c, L.C_STACK_CELL, L.C_PAYMENT_Y, o.payment_type, L.FONT, L.SIZE_BODY)

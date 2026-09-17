@@ -51,6 +51,7 @@ SIZE_SIGNATURE = 8.0
 SIZE_PARCEL_LABEL_B = 7.0
 SIZE_PARCEL_LABEL_C = 5.0
 SIZE_REMARKS = 5.0
+SIZE_GOODS_MIN = 5.0          # an item list shrinks to this before "+N more"
 SIZE_WEIGHT_C = 8.0
 SIZE_LEGAL_B = 5.0
 SIZE_LEGAL_C = 4.0

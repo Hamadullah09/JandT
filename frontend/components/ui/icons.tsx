@@ -171,3 +171,122 @@ export const ArrowRight = (p: P) => (
     <path d="M4.5 12h14M13 6.5l5.5 5.5L13 17.5" />
   </svg>
 );
+
+export const DashboardIcon = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="3.5" y="3.5" width="7" height="8" rx="1.5" />
+    <rect x="13.5" y="3.5" width="7" height="5" rx="1.5" />
+    <rect x="13.5" y="11.5" width="7" height="9" rx="1.5" />
+    <rect x="3.5" y="14.5" width="7" height="6" rx="1.5" />
+  </svg>
+);
+
+export const TruckIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M2.5 6.5h11v10h-11zM13.5 10h4l3 3.5v3h-7" />
+    <circle cx="7" cy="18" r="1.8" />
+    <circle cx="17" cy="18" r="1.8" />
+  </svg>
+);
+
+export const PencilIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" />
+    <path d="m13.5 6.5 4 4" />
+  </svg>
+);
+
+export const DownloadIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 4v11M7 10.5l5 5 5-5" />
+    <path d="M4.5 19.5h15" />
+  </svg>
+);
+
+export const RefreshIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" />
+    <path d="M19.5 4.5v4.2h-4.2" />
+  </svg>
+);
+
+export const CloseIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M6 6l12 12M18 6 6 18" />
+  </svg>
+);
+
+export const LogoutIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M14 4.5H6.5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2H14" />
+    <path d="M10.5 12h9M16.5 8.5 20 12l-3.5 3.5" />
+  </svg>
+);
+
+export const UsersIcon = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="9" cy="8.5" r="3.2" />
+    <path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" />
+    <path d="M15.5 5.6a3 3 0 0 1 0 5.8M17.5 14.3c1.7.6 2.8 2.2 3 4.7" />
+  </svg>
+);
+
+export const ListIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M9 6.5h11M9 12h11M9 17.5h11" />
+    <circle cx="4.8" cy="6.5" r="1" />
+    <circle cx="4.8" cy="12" r="1" />
+    <circle cx="4.8" cy="17.5" r="1" />
+  </svg>
+);
+
+export const FileIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M13.5 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9l-5.5-5.5Z" />
+    <path d="M13.5 3.5V9H19M12 12v5M9.5 14.5h5" />
+  </svg>
+);
+
+export const BoxIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 3.5 20 7.5v9L12 20.5 4 16.5v-9Z" />
+    <path d="M4 7.5 12 11.5l8-4M12 11.5v9" />
+  </svg>
+);
+
+export const ScooterIcon = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="6" cy="17" r="2.5" />
+    <circle cx="18" cy="17" r="2.5" />
+    <path d="M8.5 17h6.5l2-7h-3M14 5.5h2.5L19 14.5" />
+  </svg>
+);
+
+export const CheckCircleIcon = (p: P) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="m8 12.2 2.8 2.8L16.2 9.5" />
+  </svg>
+);
+
+export const ReturnIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M9 7.5 4.5 12 9 16.5" />
+    <path d="M4.5 12h10a5 5 0 0 1 0 10h-2" />
+  </svg>
+);
+
+export const UploadIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 16V5M7 9.5l5-5 5 5" />
+    <path d="M4.5 19.5h15" />
+  </svg>
+);
+
+export const CalendarIcon = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="3.5" y="5" width="17" height="15.5" rx="2" />
+    <path d="M3.5 9.5h17M8 3v4M16 3v4" />
+    <path d="M7.5 13h2M11 13h2M14.5 13h2M7.5 16.5h2M11 16.5h2" />
+  </svg>
+);

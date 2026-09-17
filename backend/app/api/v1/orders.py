@@ -17,7 +17,9 @@ from app.api.schemas import (
     QuoteIn,
     QuoteOut,
 )
-from app.core.pricing import freight_fee
+from app.core import address
+from app.core.pricing import fee_breakdown, freight_fee
+from app.core.sources import normalise_source
 from app.core.sortation import service_scope
 from app.core.weights import ceil_to_tenth, chargeable_weight, volumetric_weight
 from app.csv_engine.pipeline import create_single
@@ -28,19 +30,34 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 
 
 def _payload(body: NormalOrderIn) -> dict:
-    """Map the form onto the keys :func:`enrich` expects."""
+    """Map the form onto the keys :func:`enrich` expects.
+
+    A blank city or state is filled in from the post-office list, which knows
+    47100 is Puchong - enrich's own fallback, postcode_zone, would say SUNGAI
+    BULOH.
+    """
+    place = address.check(body.receiver_postcode.strip())
     return {
         "order_no": body.customer_order_no.strip(),
         "receiver_name": body.receiver_name.strip(),
         "receiver_phone": body.receiver_phone.strip(),
         "receiver_postcode": body.receiver_postcode.strip(),
-        "receiver_city": body.receiver_city.strip(),
-        "receiver_state": body.receiver_state.strip(),
+        "receiver_city": body.receiver_city.strip() or place.city,
+        "receiver_state": body.receiver_state.strip() or place.state,
         "receiver_address": body.receiver_address.strip(),
         "address_type": body.address_type,
         "goods_name": body.goods_name.strip(),
         "item_variant": body.item_variant.strip(),
         "quantity": body.quantity,
+        "items": [
+            {
+                "name": item.goods_name.strip(),
+                "variant": item.item_variant.strip(),
+                "quantity": item.quantity,
+                "dropship": item.dropship,
+            }
+            for item in body.items
+        ],
         "actual_weight": body.actual_weight,
         "length": body.length_cm,
         "width": body.width_cm,
@@ -48,6 +65,8 @@ def _payload(body: NormalOrderIn) -> dict:
         "payment_type": body.order_payment_type,
         "cod_amount": body.cod_amount,
         "order_value": body.order_value,
+        "service_mode": body.service_mode,
+        "source": normalise_source(body.source),
         "remark": body.remark.strip(),
     }
 
@@ -57,6 +76,16 @@ async def create_order(
     body: NormalOrderIn, session: AsyncSession = Depends(get_session)
 ) -> OrderCreatedOut:
     """Create one order, render its waybill, return the carrier identifiers."""
+    place = address.check(body.receiver_postcode, body.receiver_state, body.receiver_city)
+    if not place.ok:
+        raise Problem(
+            status=422,
+            title="Zip code does not match",
+            detail=place.message,
+            row_errors=[
+                {"row_no": 0, "status": "error", "field": place.field, "message": place.message}
+            ],
+        )
     sender = await active_sender(session)
     output_dir = resolve_output_dir(body.output_dir)
 
@@ -134,6 +163,13 @@ async def quote(
         )
     )
     scope = service_scope(sender.state, state) if state else "WEST"
+    breakdown = fee_breakdown(
+        scope,
+        chargeable,
+        goods_type=body.goods_type,
+        cod_amount=body.cod_amount,
+        item_value=body.item_value,
+    )
     return QuoteOut(
         volumetric_weight=volumetric,
         chargeable_weight=chargeable,
@@ -141,6 +177,7 @@ async def quote(
         freight_fee=freight_fee(
             scope, chargeable, goods_type=body.goods_type, cod_amount=body.cod_amount
         ),
+        **{name: getattr(breakdown, name) for name in breakdown.__dataclass_fields__},
     )
 
 
@@ -170,7 +207,7 @@ async def list_orders(
 
     total = int(await session.scalar(count_stmt) or 0)
     rows = await session.scalars(
-        stmt.order_by(Order.id.desc()).offset((page - 1) * size).limit(size)
+        stmt.order_by(Order.created_at.desc(), Order.id.desc()).offset((page - 1) * size).limit(size)
     )
     return OrderPage(
         items=[OrderOut.model_validate(r) for r in rows],

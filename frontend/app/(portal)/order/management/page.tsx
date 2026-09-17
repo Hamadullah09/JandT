@@ -83,7 +83,7 @@ export default function OrderManagementPage() {
       </div>
 
       {error && (
-        <div className="mb-3 rounded border border-[#fbc4c4] bg-[#fef0f0] px-4 py-2.5 text-base text-jt-red">
+        <div className="mb-3 rounded border border-[#fbc4c4] bg-danger-tint px-4 py-2.5 text-base text-danger">
           {error}
         </div>
       )}
@@ -145,7 +145,7 @@ export default function OrderManagementPage() {
                   </td>
                   <td className="border-b border-r border-line-light px-3 py-2">
                     <a
-                      className="text-jt-red hover:underline"
+                      className="text-brand hover:underline"
                       href={api.waybillUrl(order.tracking_no)}
                       target="_blank"
                       rel="noreferrer"
@@ -174,7 +174,7 @@ export default function OrderManagementPage() {
           >
             <ChevronLeftSm />
           </button>
-          <span className="flex h-[22px] min-w-[22px] items-center justify-center rounded-sm bg-jt-red px-1.5 text-mini font-semibold text-white">
+          <span className="flex h-[22px] min-w-[22px] items-center justify-center rounded-sm bg-brand px-1.5 text-mini font-semibold text-white">
             {page}
           </span>
           <button

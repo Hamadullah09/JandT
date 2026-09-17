@@ -103,6 +103,36 @@ def fit(text: str, font: str, size: float, max_width: float) -> str:
     return f"{cut} {TRUNC_SUFFIX}" if cut else TRUNC_SUFFIX
 
 
+def fit_items(
+    parts: list[str], font: str, size: float, min_size: float, max_width: float
+) -> tuple[str, float]:
+    """Fit a comma-separated item list on one line: ``"Maxi Chic x2, Gown"``.
+
+    A label line has no room for a second row, so a long list first shrinks,
+    down to *min_size*.  If it still does not fit, it shows as many whole items
+    as it can followed by ``"+N more"``: a packer must never read a cut-off
+    list and believe it is complete.  Returns ``(text, font_size)``.
+    """
+    if not parts:
+        return "", size
+    joined = ", ".join(parts)
+    current = size
+    while current >= min_size:
+        if width_of(joined, font, current) <= max_width:
+            return joined, current
+        current = round(current - 0.25, 2)
+
+    for shown in range(len(parts) - 1, 0, -1):
+        text = f"{', '.join(parts[:shown])} +{len(parts) - shown} more"
+        if width_of(text, font, min_size) <= max_width:
+            return text, min_size
+
+    # not even the first item fits beside the count: shorten that item
+    more = f" +{len(parts) - 1} more" if len(parts) > 1 else ""
+    first = fit(parts[0], font, min_size, max_width - width_of(more, font, min_size))
+    return f"{first}{more}", min_size
+
+
 def wrap(
     text: str, font: str, size: float, max_width: float, max_lines: int
 ) -> list[str]:

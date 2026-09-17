@@ -22,7 +22,7 @@ export function OutOfScope({ title }: { title: string }) {
           This module is outside the scope of this build. The implemented order paths are{' '}
           {IMPLEMENTED.map((entry, index) => (
             <span key={entry.href}>
-              <Link className="text-jt-red hover:underline" href={entry.href}>
+              <Link className="text-brand hover:underline" href={entry.href}>
                 {entry.label}
               </Link>
               {index < IMPLEMENTED.length - 2

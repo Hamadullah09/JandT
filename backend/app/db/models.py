@@ -25,6 +25,7 @@ from datetime import date, datetime
 from decimal import Decimal
 
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -186,6 +187,12 @@ class Order(Base):
     goods_name: Mapped[str | None] = mapped_column(sa.Text)
     item_variant: Mapped[str | None] = mapped_column(sa.String(32))
     quantity: Mapped[int] = mapped_column(sa.Integer, nullable=False, server_default="1")
+    # [{"name", "variant", "quantity"(, "image")}] - see app/core/items.py
+    items: Mapped[list[dict] | None] = mapped_column(JSONB)
+    # PICK_UP / DROP_OFF from the Normal Order page; NULL when never chosen
+    service_mode: Mapped[str | None] = mapped_column(sa.String(16))
+    #: where the order came from: Website, Daraz, Amazon... (app/core/sources.py)
+    source: Mapped[str] = mapped_column(sa.String(32), nullable=False, server_default="Website")
     actual_weight: Mapped[Decimal] = mapped_column(sa.Numeric(8, 2), nullable=False)
     length_cm: Mapped[Decimal] = mapped_column(
         sa.Numeric(8, 2), nullable=False, server_default="0"
@@ -233,6 +240,13 @@ class Order(Base):
         sa.DateTime(timezone=True), server_default=sa.func.now(), index=True
     )
 
+    # --- track & trace (app/core/trace.py) --------------------------------
+    #: the status of the latest tracking event, CREATED until the first one
+    tracking_status: Mapped[str] = mapped_column(
+        sa.String(16), nullable=False, server_default="CREATED"
+    )
+    tracking_updated_at: Mapped[datetime | None] = mapped_column(sa.DateTime(timezone=True))
+
     __table_args__ = (
         # H5: a tracking number is never reused - enforced by the database.
         sa.Index("uq_orders_tracking_no", "tracking_no", unique=True),
@@ -252,4 +266,74 @@ class Order(Base):
             postgresql_where=sa.text("customer_order_no IS NOT NULL"),
         ),
         sa.Index("ix_orders_receiver_name", "receiver_name"),
+        sa.Index("ix_orders_tracking_status", "tracking_status"),
+        sa.Index("ix_orders_source", "source"),
     )
+
+
+class TrackingEvent(Base):
+    """One scan on a parcel's journey, as the tracking page lists it."""
+
+    __tablename__ = "tracking_event"
+
+    id: Mapped[int] = mapped_column(sa.BigInteger, primary_key=True, autoincrement=True)
+    order_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("orders.id", ondelete="CASCADE"), nullable=False
+    )
+    #: a key of app.core.trace.EVENT_TYPES, e.g. DEPARTURE
+    event_type: Mapped[str] = mapped_column(sa.String(16), nullable=False)
+    location: Mapped[str] = mapped_column(sa.String(128), nullable=False, server_default="")
+    description: Mapped[str] = mapped_column(sa.Text, nullable=False)
+    occurred_at: Mapped[datetime] = mapped_column(sa.DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        sa.DateTime(timezone=True), server_default=sa.func.now()
+    )
+
+    __table_args__ = (
+        sa.Index("ix_tracking_event_order", "order_id", "occurred_at"),
+    )
+
+
+class User(Base):
+    """Someone who can log in: the admin, the shop, and approved sign-ups."""
+
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(sa.BigInteger, primary_key=True, autoincrement=True)
+    #: stored lower case; every account has one
+    username: Mapped[str] = mapped_column(sa.String(32), nullable=False)
+    name: Mapped[str] = mapped_column(sa.String(128), nullable=False)
+    #: "+60 1XXXXXXXX", like orders.receiver_phone
+    phone: Mapped[str | None] = mapped_column(sa.String(32))
+    email: Mapped[str | None] = mapped_column(sa.String(254))
+    #: app.core.auth.hash_password - never the password itself
+    password_hash: Mapped[str] = mapped_column(sa.String(256), nullable=False)
+    #: admin or merchant
+    role: Mapped[str] = mapped_column(sa.String(16), nullable=False, server_default="merchant")
+    #: active, pending (signed up, not approved yet) or blocked
+    status: Mapped[str] = mapped_column(sa.String(16), nullable=False, server_default="pending")
+    created_at: Mapped[datetime] = mapped_column(
+        sa.DateTime(timezone=True), server_default=sa.func.now()
+    )
+    last_login_at: Mapped[datetime | None] = mapped_column(sa.DateTime(timezone=True))
+
+    __table_args__ = (
+        sa.Index("uq_users_username", "username", unique=True),
+        sa.Index("uq_users_phone", "phone", unique=True, postgresql_where=sa.text("phone IS NOT NULL")),
+        sa.Index("uq_users_email", "email", unique=True, postgresql_where=sa.text("email IS NOT NULL")),
+    )
+
+
+class UserSession(Base):
+    """A login.  The cookie holds a random token; only its SHA-256 is stored here."""
+
+    __tablename__ = "user_sessions"
+
+    token_hash: Mapped[str] = mapped_column(sa.String(64), primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        sa.DateTime(timezone=True), server_default=sa.func.now()
+    )
+    expires_at: Mapped[datetime] = mapped_column(sa.DateTime(timezone=True), nullable=False)

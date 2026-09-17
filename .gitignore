@@ -16,3 +16,19 @@ build/
 .pytest-tmp/
 tsconfig.tsbuildinfo
 docs/**/*.tmp
+input/
+# WhatsApp service.  The linked session IS the account login: anyone holding
+# it can use the WhatsApp number, so it must never be committed or shared.
+whatsapp/.auth/
+whatsapp/config.json
+whatsapp/heartbeat.json
+# Queued and sent order messages contain customer names, phones and addresses.
+whatsapp/outbox/
+whatsapp/sent/
+whatsapp/failed/
+# Product photos for the WhatsApp messages stay on this computer: they are the
+# shop's catalogue, and this repository is public.
+images/*
+!images/.gitkeep
+
+exports/

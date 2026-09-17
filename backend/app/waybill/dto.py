@@ -11,6 +11,8 @@ from datetime import date
 from decimal import Decimal
 from typing import Any
 
+from app.core.items import is_simple, item_parts, items_of
+
 
 def _s(value: Any) -> str:
     return "" if value is None else str(value)
@@ -35,6 +37,9 @@ class OrderDTO:
     address_type: str = "HOME"
     goods_name: str = ""
     item_variant: str = ""
+    # every item in the parcel, as app/core/items.py describes; empty means
+    # the single item in goods_name / item_variant
+    items: list[dict[str, Any]] = field(default_factory=list)
     chargeable_weight: float = 0.0
 
     service_type: str = "NORMAL"
@@ -59,6 +64,21 @@ class OrderDTO:
         if self.item_variant:
             return f"{self.goods_name} -  {self.item_variant}"
         return self.goods_name
+
+    @property
+    def goods_items(self) -> list[dict[str, Any]]:
+        return items_of(
+            {"items": self.items, "goods_name": self.goods_name, "item_variant": self.item_variant}
+        )
+
+    @property
+    def goods_simple(self) -> bool:
+        """One item, one piece: printed exactly like the J&T reference label."""
+        return is_simple(self.goods_items)
+
+    def goods_parts(self, *, variants: bool) -> list[str]:
+        """Entries for the comma-separated Parcel Information line."""
+        return item_parts(self.goods_items, variants=variants)
 
     @property
     def goods_label_short(self) -> str:
@@ -122,6 +142,14 @@ class OrderDTO:
             address_type=_s(order.address_type) or "HOME",
             goods_name=_s(order.goods_name),
             item_variant=_s(order.item_variant),
+            items=items_of(
+                {
+                    "items": getattr(order, "items", None),
+                    "goods_name": order.goods_name,
+                    "item_variant": order.item_variant,
+                    "quantity": getattr(order, "quantity", 1),
+                }
+            ),
             chargeable_weight=num(order.chargeable_weight),
             service_type=_s(order.service_type) or "NORMAL",
             service_scope=_s(order.service_scope),

@@ -33,7 +33,7 @@ export function Field({
           </span>
         )}
       </div>
-      {hint && <p className="mt-1 text-mini text-jt-red">{hint}</p>}
+      {hint && <p className="mt-1 text-mini text-danger">{hint}</p>}
     </div>
   );
 }
@@ -47,7 +47,7 @@ export function TextInput({
   return (
     <input
       {...rest}
-      className={`el-input ${invalid ? 'border-jt-red' : ''} ${className}`}
+      className={`el-input ${invalid ? 'border-danger' : ''} ${className}`}
     />
   );
 }
@@ -68,7 +68,7 @@ export function PhoneInput({
       </span>
       <input
         {...rest}
-        className={`el-input rounded-l-none ${invalid ? 'border-jt-red' : ''}`}
+        className={`el-input rounded-l-none ${invalid ? 'border-danger' : ''}`}
       />
     </div>
   );
@@ -106,7 +106,7 @@ export function Stepper({
         type="button"
         aria-label="Decrease quantity"
         onClick={() => step(-1)}
-        className="w-9 shrink-0 border-r border-line bg-[#f5f7fa] text-base text-text-regular hover:text-jt-red"
+        className="w-9 shrink-0 border-r border-line bg-[#f5f7fa] text-base text-text-regular hover:text-brand"
       >
         &minus;
       </button>
@@ -121,7 +121,7 @@ export function Stepper({
         type="button"
         aria-label="Increase quantity"
         onClick={() => step(1)}
-        className="w-9 shrink-0 border-l border-line bg-[#f5f7fa] text-base text-text-regular hover:text-jt-red"
+        className="w-9 shrink-0 border-l border-line bg-[#f5f7fa] text-base text-text-regular hover:text-brand"
       >
         +
       </button>
@@ -150,8 +150,10 @@ export function Segmented<T extends string>({
             onClick={() => onChange(option)}
             className={`h-control flex-1 rounded border text-base transition-colors ${
               active
-                ? 'border-jt-red bg-white font-medium text-jt-red'
-                : 'border-line bg-white text-text-primary hover:border-jt-red hover:text-jt-red'
+                ? 'border-brand bg-white font-medium text-brand'
+                : // hover colours the text only: a red border too made a merely
+                  // hovered option look selected
+                  'border-line bg-white text-text-primary hover:text-brand'
             }`}
           >
             {option}
@@ -199,7 +201,7 @@ export function HeaderAction({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-1.5 text-base text-text-regular hover:text-jt-red"
+      className="flex items-center gap-1.5 text-base text-text-regular hover:text-brand"
     >
       {icon}
       {label}

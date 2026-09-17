@@ -6,6 +6,7 @@ import json
 import logging
 from pathlib import Path
 from typing import AsyncIterator
+from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, File, Query, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
@@ -15,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import active_sender, resolve_output_dir
 from app.api.errors import Problem
 from app.api.schemas import (
+    PackingFileOut,
     BulkCommitIn,
     BulkCommitOut,
     BulkProgressOut,
@@ -265,6 +267,18 @@ async def commit(
         **summary.as_dict(),
         manifest_url=f"/api/v1/bulk/{batch_id}/manifest.csv",
         zip_url=f"/api/v1/waybills/batch/{batch_id}.zip",
+        whatsapp_queued=summary.whatsapp_queued,
+        whatsapp_to_dropship=summary.whatsapp_to_dropship,
+        packing_files=[
+            PackingFileOut(
+                title=packing.title,
+                orders=packing.orders,
+                pieces=packing.pieces,
+                url=f"/api/v1/bulk/{batch_id}/packing/{quote(packing.path.name)}",
+            )
+            for packing in summary.packing_files
+        ],
+        packing_left_out=summary.packing_left_out,
         row_errors=[
             {
                 "row_no": r.row_no or 0,
@@ -384,6 +398,20 @@ async def manifest(
     if not path.exists():
         raise Problem(status=404, title="No manifest", detail=str(path))
     return FileResponse(path, media_type="text/csv", filename=path.name)
+
+
+@router.get("/{batch_id}/packing/{file_name}")
+async def packing_pdf(
+    batch_id: int, file_name: str, session: AsyncSession = Depends(get_session)
+) -> FileResponse:
+    """A packing PDF of this batch - only a file inside its own packing folder."""
+    batch = await _load_batch(session, batch_id)
+    if not batch.output_dir or Path(file_name).name != file_name or not file_name.lower().endswith(".pdf"):
+        raise Problem(status=404, title="Packing PDF not found", detail=file_name)
+    path = Path(batch.output_dir) / "packing" / f"batch-{batch_id}" / file_name
+    if not path.is_file():
+        raise Problem(status=404, title="Packing PDF not found", detail=file_name)
+    return FileResponse(path, media_type="application/pdf", filename=file_name)
 
 
 @router.get("/{batch_id}/errors.csv")

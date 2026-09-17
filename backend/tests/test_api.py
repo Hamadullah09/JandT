@@ -33,7 +33,7 @@ ORDER = {
 
 
 @pytest.fixture
-async def client(session, tmp_out):
+async def client(session, tmp_out, logged_in_admin):
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as c:
         c.out_dir = str(tmp_out)          # type: ignore[attr-defined]

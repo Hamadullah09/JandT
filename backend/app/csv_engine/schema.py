@@ -26,11 +26,17 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.core.phone import PhoneError, normalise_my_mobile
+from app.core.sources import normalise_source
 
 MAX_WEIGHT_KG = Decimal("30")
 MAX_NAME = 60
 MAX_ADDRESS = 200
 MIN_ADDRESS = 5
+#: orders.item_variant is VARCHAR(32).  Unchecked, one long size/colour made
+#: the bulk INSERT fail for its whole chunk instead of rejecting one row.
+MAX_VARIANT = 32
+DROPSHIP_YES = frozenset({"yes", "y", "true", "1", "dropship"})
+DROPSHIP_NO = frozenset({"no", "n", "false", "0"})
 
 CANONICAL: tuple[str, ...] = (
     "order_no",
@@ -158,6 +164,27 @@ ALIASES: dict[str, str] = {
     "remarks": "remark",
     "note": "remark",
     "notes": "remark",
+    # product photo for the WhatsApp group message.  Deliberately NOT in
+    # CANONICAL: it is an optional extra, not part of the production template.
+    "image": "image",
+    "imagepath": "image",
+    "imagefile": "image",
+    "photo": "image",
+    "picture": "image",
+    "productimage": "image",
+    "productphoto": "image",
+    # where the order came from: Website, Daraz, Amazon... - optional like image
+    "source": "source",
+    "ordersource": "source",
+    "channel": "source",
+    "saleschannel": "source",
+    "platform": "source",
+    "marketplace": "source",
+    "store": "source",
+    # yes = the supplier holds this item.  An optional extra like image.
+    "dropship": "dropship",
+    "dropshipped": "dropship",
+    "dropshipping": "dropship",
 }
 # every canonical name is trivially its own alias
 ALIASES.update({normalise_header(c): c for c in CANONICAL})
@@ -258,6 +285,10 @@ class BulkRow(BaseModel):
     cod_amount: Decimal = Decimal("0")
     order_value: Decimal = Decimal("0")
     remark: str = ""
+    image: str = ""
+    dropship: bool = False
+    #: Website, Daraz, Amazon... blank or missing means Website - see app.core.sources
+    source: str = "Website"
 
     # -- required strings -------------------------------------------------
     @field_validator("order_no")
@@ -380,10 +411,42 @@ class BulkRow(BaseModel):
         return value
 
     @field_validator("receiver_city", "receiver_state", "item_variant", "remark",
-                     mode="before")
+                     "image", mode="before")
     @classmethod
     def _optional_text(cls, v: Any) -> str:
         return "" if _blank(v) else str(v).strip()
+
+    @field_validator("source", mode="before")
+    @classmethod
+    def _source(cls, v: Any) -> str:
+        """"daraz.pk" and "Daraz" are one source; blank is Website."""
+        return normalise_source(None if _blank(v) else str(v))
+
+    @field_validator("dropship", mode="before")
+    @classmethod
+    def _dropship(cls, v: Any) -> bool:
+        """yes/no, and the usual spellings of it.  Blank means no.
+
+        Anything else is an error rather than a guess: a typo like "yse"
+        silently read as "no" would send a supplier's order to the wrong group.
+        """
+        if _blank(v):
+            return False
+        text = str(v).strip().lower()
+        if text in DROPSHIP_YES:
+            return True
+        if text in DROPSHIP_NO:
+            return False
+        raise ValueError(f"dropship must be yes or no: {v!r}")
+
+    @field_validator("item_variant")
+    @classmethod
+    def _variant_length(cls, v: str) -> str:
+        if len(v) > MAX_VARIANT:
+            raise ValueError(
+                f"item_variant must be {MAX_VARIANT} characters or fewer (got {len(v)})"
+            )
+        return v
 
     # -- cross-field ------------------------------------------------------
     @model_validator(mode="after")

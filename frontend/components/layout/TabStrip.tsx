@@ -22,11 +22,11 @@ export function TabStrip() {
             href={tab.href}
             className="relative flex items-center text-base"
           >
-            <span className={active ? 'font-semibold text-jt-red' : 'text-text-primary'}>
+            <span className={active ? 'font-semibold text-brand' : 'text-text-primary'}>
               {tab.label}
             </span>
             {active && (
-              <span className="absolute bottom-0 left-1/2 h-[2px] w-[26px] -translate-x-1/2 bg-jt-red" />
+              <span className="absolute bottom-0 left-1/2 h-[2px] w-[26px] -translate-x-1/2 bg-brand" />
             )}
           </Link>
         );

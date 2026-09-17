@@ -1,18 +1,23 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * Design tokens transcribed from the supplied portal screenshots (spec 4.1).
- * Do not "improve" these values - the UI is judged against those images.
+ * Design tokens in Inaaya Store's style (inaayastore.com): near-black ink on
+ * white, Plus Jakarta Sans, square corners.  Red is kept for problems only.
+ * Sizes stay large on the merchant's request, so everyone can read the portal.
  */
 const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        jt: {
-          red: '#DA251C',
-          'red-soft': '#F08A85',
-          'red-nav': '#E3001B',
+        brand: {
+          DEFAULT: '#030302',
+          soft: '#5B5A56',
+          tint: '#F4F2EE',
+        },
+        danger: {
+          DEFAULT: '#C62828',
+          tint: '#FDECEA',
         },
         text: {
           primary: '#303133',
@@ -31,6 +36,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
+          'Plus Jakarta Sans',
           '-apple-system',
           'BlinkMacSystemFont',
           'Segoe UI',
@@ -39,19 +45,20 @@ const config: Config = {
           'Arial',
           'sans-serif',
         ],
+        serif: ['Cormorant Garamond', 'Georgia', 'Times New Roman', 'serif'],
       },
       fontSize: {
-        base: ['13px', '20px'],
-        title: ['14px', '22px'],
-        mini: ['11px', '16px'],
+        base: ['15px', '22px'],
+        title: ['17px', '24px'],
+        mini: ['13px', '18px'],
       },
       borderRadius: {
-        DEFAULT: '4px',
+        DEFAULT: '2px',
       },
       spacing: {
-        sidebar: '253px',
-        topbar: '56px',
-        control: '32px',
+        sidebar: '272px',
+        topbar: '64px',
+        control: '40px',
       },
     },
   },

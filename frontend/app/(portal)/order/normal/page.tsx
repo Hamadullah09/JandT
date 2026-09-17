@@ -19,7 +19,12 @@ import {
   TrashIcon,
 } from '@/components/ui/icons';
 import { ApiError, api } from '@/lib/api';
-import type { NormalOrderIn, OrderCreatedOut, SenderProfileOut } from '@/lib/types.gen';
+import type {
+  AddressCheckOut,
+  NormalOrderIn,
+  OrderCreatedOut,
+  SenderProfileOut,
+} from '@/lib/types.gen';
 
 const SMART_PLACEHOLDER =
   'Example: Ramli Roslan 0123456789 No. 2, Jalan Subang Jaya, Damansara Utama, 47400 Petaling J...';
@@ -40,17 +45,66 @@ type Receiver = {
 /** A parcel added to the List, with the quote it was priced at. */
 type SavedParcel = { payload: NormalOrderIn; chargeable: number; fee: number };
 
+/** The parcel as a whole; what is inside it is the list of ItemLines. */
 type Item = {
   goodsType: 'PARCEL' | 'DOCUMENT';
-  goodsName: string;
-  variant: string;
-  quantity: number;
   actualWeight: string;
   length: string;
   width: string;
   height: string;
   chargeableOverride: string;
   customerOrderNo: string;
+  remark: string;
+  /** where the order came from: Website, Daraz, Amazon... */
+  source: string;
+};
+
+/** The Chargeable Information section. Values are the labels on screen. */
+type Charge = {
+  parcelType: 'Standard';
+  itemValue: string;
+  cod: 'Yes' | 'No';
+  codAmount: string;
+  service: 'PICK UP' | 'DROP OFF';
+};
+
+const EMPTY_CHARGE: Charge = {
+  parcelType: 'Standard',
+  itemValue: '',
+  cod: 'No',
+  codAmount: '',
+  service: 'PICK UP',
+};
+
+/** Figures priced by the server (POST /orders/quote); blank until priced. */
+type Quote = {
+  volumetric: string;
+  chargeable: string;
+  totalShipping: string;
+  totalSst: string;
+  insurance: string;
+  baseShipping: string;
+  baseTax: string;
+  discountedShipping: string;
+  discountedTax: string;
+  codFee: string;
+  codTax: string;
+  codHandling: string;
+};
+
+const EMPTY_QUOTE: Quote = {
+  volumetric: '0.00',
+  chargeable: '0.00',
+  totalShipping: '',
+  totalSst: '',
+  insurance: '',
+  baseShipping: '',
+  baseTax: '',
+  discountedShipping: '',
+  discountedTax: '',
+  codFee: '',
+  codTax: '',
+  codHandling: '',
 };
 
 const EMPTY_RECEIVER: Receiver = {
@@ -64,54 +118,70 @@ const EMPTY_RECEIVER: Receiver = {
   address: '',
 };
 
+/** One product in the parcel. A parcel can hold several. */
+type ItemLine = {
+  goodsName: string;
+  variant: string;
+  quantity: number;
+  /** not in stock: the supplier sends it */
+  dropship: boolean;
+};
+
+const EMPTY_LINE: ItemLine = { goodsName: '', variant: '', quantity: 1, dropship: false };
+
+/**
+ * Where a drop-ship order's WhatsApp messages go, or null when no item is
+ * ticked. Mirrors supplier_ships() in backend/app/core/items.py: only a PAID
+ * order whose items are ALL drop-shipped goes to the supplier.
+ */
+function dropshipNote(lines: ItemLine[], cod: boolean): string | null {
+  const named = lines.filter((line) => line.goodsName.trim() !== '');
+  if (!named.some((line) => line.dropship)) return null;
+  if (!named.every((line) => line.dropship)) {
+    return 'Some items are in stock: this order stays in your main WhatsApp group and packing PDFs.';
+  }
+  if (cod) {
+    return 'Cash on delivery: this order stays in your main WhatsApp group and packing PDFs.';
+  }
+  return 'Paid drop-ship order: it goes to the drop-ship WhatsApp group and is left out of the packing PDFs.';
+}
+
+/** orders.item_variant is VARCHAR(32); the API rejects anything longer. */
+const MAX_VARIANT = 32;
+/** orders.customer_order_no is VARCHAR(64); required on every order. */
+const MAX_ORDER_NO = 64;
+
+/**
+ * What the label's Parcel Information will say, e.g. "Maxi Chic x2, Gown".
+ * Mirrors describe() in backend/app/core/items.py: sizes are not printed
+ * there, so the same product in two sizes counts together as "x2".
+ */
+function describeLines(lines: ItemLine[]): string {
+  const merged = new Map<string, ItemLine>();
+  for (const line of lines) {
+    const name = line.goodsName.trim();
+    if (!name) continue;
+    const key = name.replace(/\s+/g, ' ').toLowerCase();
+    const known = merged.get(key);
+    if (known) known.quantity += line.quantity;
+    else merged.set(key, { ...line, goodsName: name, variant: '' });
+  }
+  return [...merged.values()]
+    .map((l) => (l.quantity > 1 ? `${l.goodsName} x${l.quantity}` : l.goodsName))
+    .join(', ');
+}
+
 const EMPTY_ITEM: Item = {
   goodsType: 'PARCEL',
-  goodsName: '',
-  variant: '',
-  quantity: 1,
   actualWeight: '',
   length: '0',
   width: '0',
   height: '0',
   chargeableOverride: '',
   customerOrderNo: '',
+  remark: '',
+  source: 'Website',
 };
-
-/** Parse a pasted "name phone address, postcode city state" blob. */
-function parseSmart(text: string): Partial<Receiver> {
-  const out: Partial<Receiver> = {};
-  const trimmed = text.trim();
-  if (!trimmed) return out;
-
-  const phone = trimmed.match(/(?:\+?6?0)1\d[\d\s-]{6,12}/);
-  if (phone) out.phone = phone[0].replace(/[\s-]/g, '');
-
-  const postcode = trimmed.match(/\b\d{5}\b/);
-  if (postcode) out.postcode = postcode[0];
-
-  let head = trimmed;
-  if (phone) head = trimmed.slice(0, phone.index ?? 0);
-  const name = head.split(/[,\n]/)[0]?.trim();
-  if (name && name.length <= 60 && /^[A-Za-z][A-Za-z .'-]*$/.test(name)) {
-    out.name = name;
-  }
-
-  let rest = phone ? trimmed.slice((phone.index ?? 0) + phone[0].length) : trimmed;
-  rest = rest.replace(/^[\s,]+/, '');
-  if (postcode) {
-    const tail = rest.slice((rest.indexOf(postcode[0]) ?? 0) + 5).trim();
-    const words = tail.replace(/malaysia/i, '').trim().split(/\s+/).filter(Boolean);
-    if (words.length) {
-      out.city = words[0];
-      if (words.length > 1) out.state = words.slice(1).join(' ');
-    }
-    const before = rest.slice(0, rest.indexOf(postcode[0])).replace(/[\s,]+$/, '');
-    if (before) out.address = before;
-  } else if (rest) {
-    out.address = rest;
-  }
-  return out;
-}
 
 export default function NormalOrderPage() {
   const [sender, setSender] = useState<SenderProfileOut | null>(null);
@@ -121,9 +191,117 @@ export default function NormalOrderPage() {
   const [retain, setRetain] = useState(false);
 
   const [receiver, setReceiver] = useState<Receiver>(EMPTY_RECEIVER);
+  // the postcode against the state and city: fills blanks, catches a mismatch
+  const [addressCheck, setAddressCheck] = useState<AddressCheckOut | null>(null);
   const [item, setItem] = useState<Item>(EMPTY_ITEM);
+  const [lines, setLines] = useState<ItemLine[]>([{ ...EMPTY_LINE }]);
 
-  const [quote, setQuote] = useState({ volumetric: '0.00', chargeable: '0.00', fee: '0.00' });
+  /* ------------------------------ smart address filling (read by the API) */
+  useEffect(() => {
+    const text = receiver.smart.trim();
+    if (!text) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      api
+        .parseAddress(text, controller.signal)
+        .then((parsed) =>
+          setReceiver((prev) => {
+            if (prev.smart.trim() !== text) return prev;
+            // a pasted address replaces the whole address, even parts it lacks
+            const hasAddress = Boolean(parsed.postcode || parsed.address);
+            return {
+              ...prev,
+              name: parsed.name || prev.name,
+              phone: parsed.phone || prev.phone,
+              postcode: hasAddress ? parsed.postcode : prev.postcode,
+              city: hasAddress ? parsed.city : prev.city,
+              state: hasAddress ? parsed.state : prev.state,
+              address: hasAddress ? parsed.address : prev.address,
+            };
+          }),
+        )
+        .catch(() => undefined);
+    }, 400);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [receiver.smart]);
+
+  /* ------------------------- postcode check: fill state/city, or flag them */
+  useEffect(() => {
+    const postcode = receiver.postcode.trim();
+    if (!/^\d{5}$/.test(postcode)) {
+      setAddressCheck(null);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      api
+        .checkAddress({ postcode, state: receiver.state, city: receiver.city }, controller.signal)
+        .then((result) => {
+          setAddressCheck(result);
+          if (!result.known) return;
+          setReceiver((prev) =>
+            prev.postcode.trim() !== postcode
+              ? prev
+              : {
+                  ...prev,
+                  state: prev.state.trim() ? prev.state : (result.state ?? ''),
+                  city: prev.city.trim() ? prev.city : (result.city ?? ''),
+                },
+          );
+        })
+        .catch(() => undefined);
+    }, 300);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [receiver.postcode, receiver.state, receiver.city]);
+
+  // only the check of the postcode on screen counts, not one still on its way
+  const currentCheck =
+    addressCheck && addressCheck.postcode === receiver.postcode.trim() ? addressCheck : null;
+  const addressMismatch =
+    currentCheck && currentCheck.ok === false
+      ? (currentCheck.message ?? 'Zip code does not match.')
+      : null;
+  // a postcode that is not on the post-office list: shown, but not blocking
+  const addressNotice = currentCheck?.notice ?? null;
+  const postcodeSuggestions = currentCheck?.suggestions ?? [];
+
+  function applyPostcode(code: string) {
+    setReceiver((prev) => ({ ...prev, postcode: code }));
+  }
+
+  function fixAddress() {
+    if (!addressCheck) return;
+    if (addressCheck.field === 'receiver_state') {
+      setReceiver((prev) => ({ ...prev, state: addressCheck.state ?? prev.state }));
+    } else if (addressCheck.field === 'receiver_city') {
+      setReceiver((prev) => ({ ...prev, city: addressCheck.city ?? prev.city }));
+    }
+  }
+
+  const updateLine = (index: number, patch: Partial<ItemLine>) =>
+    setLines((prev) => prev.map((line, i) => (i === index ? { ...line, ...patch } : line)));
+  const addLine = () => setLines((prev) => [...prev, { ...EMPTY_LINE }]);
+  const removeLine = (index: number) =>
+    setLines((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev));
+  const labelText = describeLines(lines);
+
+  const [charge, setCharge] = useState<Charge>(EMPTY_CHARGE);
+  // Website, WhatsApp, Daraz, Amazon... for the Order Source list
+  const [sources, setSources] = useState<string[]>([]);
+  useEffect(() => {
+    api
+      .sources()
+      .then((list) => setSources(list.map((source) => source.name)))
+      .catch(() => setSources([]));
+  }, []);
+  const routeNote = dropshipNote(lines, charge.cod === 'Yes');
+  const [quote, setQuote] = useState<Quote>(EMPTY_QUOTE);
   const [list, setList] = useState<SavedParcel[]>([]);
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null);
@@ -145,7 +323,8 @@ export default function NormalOrderPage() {
   }, []);
 
   /* ------------------------------------------------ live totals (server) */
-  const quoteKey = `${receiver.postcode}|${receiver.state}|${item.goodsType}|${item.actualWeight}|${item.length}|${item.width}|${item.height}|${item.chargeableOverride}`;
+  const codAmount = charge.cod === 'Yes' ? charge.codAmount.trim() || '0' : '0';
+  const quoteKey = `${receiver.postcode}|${receiver.state}|${item.goodsType}|${item.actualWeight}|${item.length}|${item.width}|${item.height}|${item.chargeableOverride}|${codAmount}|${charge.itemValue}`;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -153,11 +332,12 @@ export default function NormalOrderPage() {
     timer.current = setTimeout(() => {
       const weight = Number(item.actualWeight);
       if (!Number.isFinite(weight) || weight <= 0) {
-        setQuote({ volumetric: '0.00', chargeable: '0.00', fee: '0.00' });
+        setQuote(EMPTY_QUOTE);
         return;
       }
       void fetch(`${process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000'}/api/v1/orders/quote`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           receiver_postcode: receiver.postcode,
@@ -168,7 +348,8 @@ export default function NormalOrderPage() {
           width_cm: item.width || '0',
           height_cm: item.height || '0',
           chargeable_weight: item.chargeableOverride || null,
-          cod_amount: '0',
+          cod_amount: codAmount,
+          item_value: charge.itemValue.trim() || '0',
         }),
       })
         .then((r) => (r.ok ? r.json() : null))
@@ -177,7 +358,16 @@ export default function NormalOrderPage() {
           setQuote({
             volumetric: data.volumetric_weight,
             chargeable: data.chargeable_weight,
-            fee: data.freight_fee,
+            totalShipping: data.total_shipping_fee,
+            totalSst: data.total_sst,
+            insurance: data.insurance_fee ?? '',
+            baseShipping: data.base_shipping_fee,
+            baseTax: data.base_price_tax,
+            discountedShipping: data.discounted_shipping_fee,
+            discountedTax: data.discounted_tax,
+            codFee: data.cod_fee,
+            codTax: data.cod_tax,
+            codHandling: data.cod_handling_fee,
           });
         })
         .catch(() => undefined);
@@ -189,6 +379,15 @@ export default function NormalOrderPage() {
   }, [quoteKey]);
 
   const toPayload = useCallback((): NormalOrderIn => {
+    const items = lines
+      .map((line) => ({
+        goods_name: line.goodsName.trim(),
+        item_variant: line.variant.trim(),
+        quantity: line.quantity,
+        dropship: line.dropship,
+      }))
+      .filter((line) => line.goods_name !== '');
+    const first = items[0] ?? { goods_name: '', item_variant: '', quantity: 1 };
     return {
       receiver_name: receiver.name.trim(),
       receiver_phone: receiver.phone.trim(),
@@ -198,33 +397,64 @@ export default function NormalOrderPage() {
       receiver_state: receiver.state.trim(),
       address_type: receiver.addressType,
       goods_type: item.goodsType,
-      goods_name: item.goodsName.trim(),
-      item_variant: item.variant.trim(),
-      quantity: item.quantity,
+      // the single-item fields describe the first line; `items` carries them all
+      goods_name: first.goods_name,
+      item_variant: items.length === 1 ? first.item_variant : '',
+      quantity: items.reduce((total, line) => total + line.quantity, 0) || 1,
+      items,
       actual_weight: item.actualWeight,
       length_cm: item.length || '0',
       width_cm: item.width || '0',
       height_cm: item.height || '0',
       chargeable_weight: item.chargeableOverride || null,
       customer_order_no: item.customerOrderNo.trim(),
-      cod_amount: '0',
-      order_value: '0',
-      order_payment_type: 'PREPAID',
-      remark: '',
+      cod_amount: codAmount,
+      order_value: charge.itemValue.trim() || '0',
+      order_payment_type: charge.cod === 'Yes' ? 'COD' : 'PREPAID',
+      service_mode: charge.service === 'DROP OFF' ? 'DROP_OFF' : 'PICK_UP',
+      source: item.source,
+      remark: item.remark.trim(),
     };
-  }, [receiver, item]);
+  }, [receiver, item, lines, charge, codAmount]);
 
-  const formFilled =
+  const receiverFilled =
     receiver.name.trim() !== '' &&
     receiver.phone.trim() !== '' &&
     /^\d{5}$/.test(receiver.postcode.trim()) &&
-    receiver.address.trim().length >= 5 &&
-    item.goodsName.trim() !== '' &&
-    Number(item.actualWeight) > 0;
+    receiver.address.trim().length >= 5;
+  const linesFilled = lines.every(
+    (line) => line.goodsName.trim() !== '' && line.variant.trim().length <= MAX_VARIANT,
+  );
+  // "Yes" with no amount would create a COD parcel that collects nothing
+  const codFilled = charge.cod === 'No' || Number(charge.codAmount) > 0;
+  const itemValueOk = charge.itemValue.trim() === '' || Number(charge.itemValue) >= 0;
+
+  // The first thing still missing, top to bottom as the form reads - so the
+  // message always names the field to fix.  null: ready to order.
+  const problem = !receiverFilled
+    ? 'Fill in the receiver details first.'
+    : addressMismatch
+      ? addressMismatch
+      : !linesFilled
+        ? 'Every item line needs a Goods Name - fill it in, or remove the empty line.'
+        : !(Number(item.actualWeight) > 0)
+          ? 'Enter the Actual Weight.'
+          : item.customerOrderNo.trim() === ''
+            ? 'Enter the Customer Order Number - every order needs one.'
+            : !codFilled
+              ? 'COD Value is Yes - enter the COD Amount to collect, or choose No.'
+              : !itemValueOk
+                ? 'Item Value must be a number.'
+                : null;
+  const formFilled = problem === null;
+  const incompleteMessage = problem ?? '';
+
+  // shown under "Payment Method" - the sender account's billing, e.g. PAYMONTHLY
+  const paymentMethod = `PAY${(sender?.payment_type ?? 'MONTHLY').toUpperCase()}`;
 
   const totals = useMemo(() => {
     const draftWeight = formFilled ? Number(quote.chargeable) || 0 : 0;
-    const draftFee = formFilled ? Number(quote.fee) || 0 : 0;
+    const draftFee = formFilled ? Number(quote.totalShipping) || 0 : 0;
     const saved = list.reduce(
       (acc, parcel) => ({
         weight: acc.weight + parcel.chargeable,
@@ -241,13 +471,18 @@ export default function NormalOrderPage() {
 
   function resetReceiver() {
     setReceiver(EMPTY_RECEIVER);
+    setAddressCheck(null);
   }
   function resetItem() {
     setItem(EMPTY_ITEM);
+    setLines([{ ...EMPTY_LINE }]);
+  }
+  function resetCharge() {
+    setCharge(EMPTY_CHARGE);
   }
 
   function applySmart(text: string) {
-    setReceiver((prev) => ({ ...prev, smart: text, ...parseSmart(text) }));
+    setReceiver((prev) => ({ ...prev, smart: text }));
   }
 
   async function submitOne(payload: NormalOrderIn): Promise<OrderCreatedOut> {
@@ -260,7 +495,7 @@ export default function NormalOrderPage() {
     const queue = list.map((parcel) => parcel.payload);
     if (formFilled) queue.push(toPayload());
     if (queue.length === 0) {
-      setBanner({ kind: 'err', text: 'Fill in the receiver and item details first.' });
+      setBanner({ kind: 'err', text: incompleteMessage });
       setBusy(false);
       return;
     }
@@ -280,6 +515,7 @@ export default function NormalOrderPage() {
       setList([]);
       if (!retain) resetReceiver();
       resetItem();
+      resetCharge();
     } catch (error) {
       const message =
         error instanceof ApiError ? error.message : 'The order could not be created.';
@@ -291,7 +527,7 @@ export default function NormalOrderPage() {
 
   function handleSave() {
     if (!formFilled) {
-      setBanner({ kind: 'err', text: 'Fill in the receiver and item details first.' });
+      setBanner({ kind: 'err', text: incompleteMessage });
       return;
     }
     setList((prev) => [
@@ -299,11 +535,12 @@ export default function NormalOrderPage() {
       {
         payload: toPayload(),
         chargeable: Number(quote.chargeable) || 0,
-        fee: Number(quote.fee) || 0,
+        fee: Number(quote.totalShipping) || 0,
       },
     ]);
     setBanner({ kind: 'ok', text: 'Parcel added to the list.' });
     resetItem();
+    resetCharge();
     if (!retain) resetReceiver();
   }
 
@@ -315,7 +552,7 @@ export default function NormalOrderPage() {
             className={`rounded border px-4 py-2.5 text-base ${
               banner.kind === 'ok'
                 ? 'border-[#c2e7b0] bg-[#f0f9eb] text-[#529b2e]'
-                : 'border-[#fbc4c4] bg-[#fef0f0] text-jt-red'
+                : 'border-[#fbc4c4] bg-danger-tint text-danger'
             }`}
           >
             {banner.text}
@@ -403,11 +640,16 @@ export default function NormalOrderPage() {
                 onChange={(e) => setReceiver({ ...receiver, phone: e.target.value })}
               />
             </Field>
-            <Field label="Receiver Postcode" required>
+            <Field
+              label="Receiver Postcode"
+              required
+              hint={addressMismatch ? 'Zip code does not match' : undefined}
+            >
               <TextInput
                 value={receiver.postcode}
                 placeholder="Please Enter Receiver Postcode"
                 maxLength={5}
+                invalid={Boolean(addressMismatch)}
                 onChange={(e) =>
                   setReceiver({ ...receiver, postcode: e.target.value.replace(/\D/g, '') })
                 }
@@ -416,8 +658,17 @@ export default function NormalOrderPage() {
             <Field label="State" required>
               <TextInput
                 value={receiver.state}
-                placeholder="Please Enter"
+                placeholder="Filled in from the postcode"
+                invalid={Boolean(addressMismatch) && addressCheck?.field === 'receiver_state'}
                 onChange={(e) => setReceiver({ ...receiver, state: e.target.value })}
+              />
+            </Field>
+            <Field label="City">
+              <TextInput
+                value={receiver.city}
+                placeholder="Filled in from the postcode"
+                invalid={Boolean(addressMismatch) && addressCheck?.field === 'receiver_city'}
+                onChange={(e) => setReceiver({ ...receiver, city: e.target.value })}
               />
             </Field>
             <Field label="Address type" required>
@@ -439,6 +690,52 @@ export default function NormalOrderPage() {
               />
             </Field>
           </div>
+          {currentCheck && (addressMismatch || addressNotice) && (
+            <div
+              role={addressMismatch ? 'alert' : 'status'}
+              className={`mx-5 mb-5 space-y-2 rounded border px-4 py-2.5 text-base ${
+                addressMismatch
+                  ? 'border-[#fbc4c4] bg-danger-tint text-danger'
+                  : 'border-[#f5dab1] bg-[#fdf6ec] text-[#b86e00]'
+              }`}
+            >
+              <p>{addressMismatch ?? addressNotice}</p>
+              {postcodeSuggestions.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-text-regular">
+                    Correct postcode for {currentCheck.suggestions_for}:
+                  </span>
+                  {postcodeSuggestions.map((code) => (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => applyPostcode(code)}
+                      title={`Use postcode ${code}`}
+                      className="rounded border border-brand bg-white px-2.5 py-[1px] font-semibold text-brand hover:bg-brand-tint"
+                    >
+                      {code}
+                    </button>
+                  ))}
+                  {(currentCheck.suggestions_total ?? 0) > postcodeSuggestions.length && (
+                    <span className="text-mini text-text-secondary">
+                      +{(currentCheck.suggestions_total ?? 0) - postcodeSuggestions.length} more
+                    </span>
+                  )}
+                </div>
+              )}
+              {addressMismatch && (
+                <button
+                  type="button"
+                  onClick={fixAddress}
+                  className="text-mini text-text-regular underline hover:text-brand"
+                >
+                  {postcodeSuggestions.length > 0 ? 'Or keep' : 'Keep'} {currentCheck.postcode} and change
+                  the {currentCheck.field === 'receiver_state' ? 'state' : 'city'} to{' '}
+                  {currentCheck.field === 'receiver_state' ? currentCheck.state : currentCheck.city}
+                </button>
+              )}
+            </div>
+          )}
         </section>
 
         {/* -------------------------------------------------- item ------- */}
@@ -459,19 +756,89 @@ export default function NormalOrderPage() {
                 onChange={(goodsType) => setItem({ ...item, goodsType })}
               />
             </Field>
-            <Field label="Goods Name" required>
-              <TextInput
-                value={item.goodsName}
-                placeholder="Please Enter Item Name"
-                onChange={(e) => setItem({ ...item, goodsName: e.target.value })}
-              />
-            </Field>
-            <Field label="Quantity" required>
-              <Stepper
-                value={item.quantity}
-                onChange={(quantity) => setItem({ ...item, quantity })}
-              />
-            </Field>
+            {/* every product in this parcel, one line each */}
+            <div className="col-span-4">
+              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_170px_124px_40px] gap-x-3">
+                <label className="el-label req">Goods Name:</label>
+                <label className="el-label">Size / Colour:</label>
+                <label className="el-label req">Quantity:</label>
+                <span />
+                <span />
+              </div>
+              <div className="space-y-2">
+                {lines.map((line, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_170px_124px_40px] items-center gap-x-3"
+                  >
+                    <TextInput
+                      value={line.goodsName}
+                      placeholder={
+                        index === 0 ? 'Please Enter Item Name' : 'Another item in the same parcel'
+                      }
+                      aria-label={`Goods name, item ${index + 1}`}
+                      onChange={(e) => updateLine(index, { goodsName: e.target.value })}
+                    />
+                    <TextInput
+                      value={line.variant}
+                      placeholder="e.g. Purple / L"
+                      maxLength={MAX_VARIANT}
+                      aria-label={`Size or colour, item ${index + 1}`}
+                      onChange={(e) => updateLine(index, { variant: e.target.value })}
+                    />
+                    <Stepper
+                      value={line.quantity}
+                      onChange={(quantity) => updateLine(index, { quantity })}
+                    />
+                    <label
+                      className="flex h-control cursor-pointer select-none items-center gap-2 whitespace-nowrap text-base text-text-primary"
+                      title="Not in stock - your supplier sends it"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={line.dropship}
+                        aria-label={`Drop-ship, item ${index + 1}`}
+                        onChange={(e) => updateLine(index, { dropship: e.target.checked })}
+                        className="h-[14px] w-[14px] rounded-sm border border-line"
+                      />
+                      Drop-ship
+                    </label>
+                    {lines.length > 1 ? (
+                      <button
+                        type="button"
+                        aria-label={`Remove item ${index + 1}`}
+                        title="Remove this item"
+                        onClick={() => removeLine(index)}
+                        className="flex h-control items-center justify-center text-text-secondary hover:text-brand"
+                      >
+                        <TrashIcon />
+                      </button>
+                    ) : (
+                      <span />
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-4">
+                <button
+                  type="button"
+                  onClick={addLine}
+                  className="shrink-0 text-base text-brand hover:underline"
+                >
+                  + Add another item
+                </button>
+                {labelText && (
+                  <span className="min-w-0 truncate text-base text-text-secondary" title={labelText}>
+                    On the label: <span className="text-text-primary">{labelText}</span>
+                  </span>
+                )}
+              </div>
+              {routeNote && (
+                <p className="mt-1 text-right text-base text-text-secondary" role="status">
+                  {routeNote}
+                </p>
+              )}
+            </div>
             <Field label="Actual Weight" required>
               <TextInput
                 value={item.actualWeight}
@@ -512,12 +879,123 @@ export default function NormalOrderPage() {
                 onChange={(e) => setItem({ ...item, chargeableOverride: e.target.value })}
               />
             </Field>
-            <Field label="Customer Order Number">
+            <Field label="Customer Order Number" required>
               <TextInput
                 value={item.customerOrderNo}
                 placeholder="Please Enter"
+                maxLength={MAX_ORDER_NO}
                 onChange={(e) => setItem({ ...item, customerOrderNo: e.target.value })}
               />
+            </Field>
+            <Field label="Order Source" required>
+              <SelectInput
+                value={item.source}
+                aria-label="Where the order came from"
+                onChange={(e) => setItem({ ...item, source: e.target.value })}
+              >
+                {(sources.length ? sources : ['Website']).map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </SelectInput>
+            </Field>
+            <Field label="Remarks information" span={2}>
+              <TextInput
+                value={item.remark}
+                placeholder="Please Enter Remarks Information"
+                onChange={(e) => setItem({ ...item, remark: e.target.value })}
+              />
+            </Field>
+          </div>
+        </section>
+
+        {/* ------------------------------------------- chargeable ------- */}
+        <section className="el-card">
+          <div className="el-card-head">
+            <h2 className="el-card-title">Chargeable Information</h2>
+            <HeaderAction
+              icon={<TrashIcon />}
+              label="Clear the filled information"
+              onClick={resetCharge}
+            />
+          </div>
+          <div className="grid grid-cols-5 gap-x-5 gap-y-4 p-5">
+            <Field label="Parcel Type" required>
+              <SelectInput value={charge.parcelType} onChange={() => undefined}>
+                <option value="Standard">Standard</option>
+              </SelectInput>
+            </Field>
+            <Field label="Item Value">
+              <TextInput
+                value={charge.itemValue}
+                placeholder="Please Enter The Value Of The Item"
+                inputMode="decimal"
+                invalid={!itemValueOk}
+                onChange={(e) => setCharge({ ...charge, itemValue: e.target.value })}
+              />
+            </Field>
+            <Field label="Insurance Fee">
+              <TextInput disabled readOnly value={quote.insurance} />
+            </Field>
+            <Field label="Total SST">
+              <TextInput disabled readOnly value={quote.totalSst} />
+            </Field>
+            <Field label="Total Shipping Fee">
+              <TextInput disabled readOnly value={quote.totalShipping} />
+            </Field>
+
+            <Field label="COD Value">
+              <Segmented
+                options={['Yes', 'No'] as const}
+                value={charge.cod}
+                onChange={(cod) =>
+                  setCharge({ ...charge, cod, codAmount: cod === 'No' ? '' : charge.codAmount })
+                }
+              />
+            </Field>
+            <Field label="COD Amount" required={charge.cod === 'Yes'}>
+              <TextInput
+                value={charge.codAmount}
+                disabled={charge.cod === 'No'}
+                placeholder={charge.cod === 'Yes' ? 'Please Enter The COD Amount' : ''}
+                inputMode="decimal"
+                invalid={charge.cod === 'Yes' && charge.codAmount !== '' && !codFilled}
+                onChange={(e) => setCharge({ ...charge, codAmount: e.target.value })}
+              />
+            </Field>
+            <Field label="COD Fee">
+              <TextInput disabled readOnly value={charge.cod === 'Yes' ? quote.codFee : ''} />
+            </Field>
+            <Field label="COD Tax">
+              <TextInput disabled readOnly value={charge.cod === 'Yes' ? quote.codTax : ''} />
+            </Field>
+            <Field label="COD Total Handling Fee">
+              <TextInput disabled readOnly value={charge.cod === 'Yes' ? quote.codHandling : ''} />
+            </Field>
+
+            <Field label="Payment Method" required>
+              <Segmented options={[paymentMethod]} value={paymentMethod} onChange={() => undefined} />
+            </Field>
+            <Field label="Service Type" required>
+              <Segmented
+                options={['PICK UP', 'DROP OFF'] as const}
+                value={charge.service}
+                onChange={(service) => setCharge({ ...charge, service })}
+              />
+            </Field>
+            <Field label="Base Shipping Fee">
+              <TextInput disabled readOnly value={quote.baseShipping} />
+            </Field>
+            <Field label="Base Price Tax">
+              <TextInput disabled readOnly value={quote.baseTax} />
+            </Field>
+            <Field label="Discounted Shipping Fee">
+              <TextInput disabled readOnly value={quote.discountedShipping} />
+            </Field>
+
+            <Field label="Discounted Tax">
+              <TextInput disabled readOnly value={quote.discountedTax} />
             </Field>
           </div>
         </section>
@@ -546,7 +1024,7 @@ export default function NormalOrderPage() {
                     <td className="border-b border-line-light px-3 py-2">{row.freight_fee}</td>
                     <td className="border-b border-line-light px-3 py-2">
                       <a
-                        className="text-jt-red hover:underline"
+                        className="text-brand hover:underline"
                         href={api.waybillUrl(row.tracking_no)}
                         target="_blank"
                         rel="noreferrer"
@@ -590,7 +1068,7 @@ export default function NormalOrderPage() {
           <button type="button" className="el-btn px-5">
             List <ArrowRight />
           </button>
-          <span className="absolute -right-1.5 -top-1.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-jt-red px-1 text-[10px] font-semibold text-white">
+          <span className="absolute -right-1.5 -top-1.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">
             {list.length}
           </span>
         </div>
