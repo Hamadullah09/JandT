@@ -32,6 +32,8 @@ ORDER_FIELDS = (
     "customer_order_no", "tracking_no", "receiver_name", "receiver_address",
     "receiver_postcode", "receiver_city", "receiver_state", "receiver_phone",
     "goods_name", "item_variant", "quantity", "items",
+    # decides the group: paid + all drop-shipped goes to the drop-ship group
+    "order_payment_type",
 )
 
 
@@ -134,7 +136,8 @@ async def _run(args: argparse.Namespace) -> int:
         await dispose_engine()
 
     result = queue_orders(entries)
-    print(f"\nQueued {result.queued} order(s).")
+    to_dropship = f" ({result.to_dropship} to the drop-ship group)" if result.to_dropship else ""
+    print(f"\nQueued {result.queued} order(s){to_dropship}.")
     for warning in result.warnings:
         print(f"  warning: {warning}")
     print(f"WhatsApp: {service_status().describe()}")

@@ -19,7 +19,12 @@ import {
   TrashIcon,
 } from '@/components/ui/icons';
 import { ApiError, api } from '@/lib/api';
-import type { NormalOrderIn, OrderCreatedOut, SenderProfileOut } from '@/lib/types.gen';
+import type {
+  AddressCheckOut,
+  NormalOrderIn,
+  OrderCreatedOut,
+  SenderProfileOut,
+} from '@/lib/types.gen';
 
 const SMART_PLACEHOLDER =
   'Example: Ramli Roslan 0123456789 No. 2, Jalan Subang Jaya, Damansara Utama, 47400 Petaling J...';
@@ -116,9 +121,28 @@ type ItemLine = {
   goodsName: string;
   variant: string;
   quantity: number;
+  /** not in stock: the supplier sends it */
+  dropship: boolean;
 };
 
-const EMPTY_LINE: ItemLine = { goodsName: '', variant: '', quantity: 1 };
+const EMPTY_LINE: ItemLine = { goodsName: '', variant: '', quantity: 1, dropship: false };
+
+/**
+ * Where a drop-ship order's WhatsApp messages go, or null when no item is
+ * ticked. Mirrors supplier_ships() in backend/app/core/items.py: only a PAID
+ * order whose items are ALL drop-shipped goes to the supplier.
+ */
+function dropshipNote(lines: ItemLine[], cod: boolean): string | null {
+  const named = lines.filter((line) => line.goodsName.trim() !== '');
+  if (!named.some((line) => line.dropship)) return null;
+  if (!named.every((line) => line.dropship)) {
+    return 'Some items are in stock: this order stays in your main WhatsApp group and packing PDFs.';
+  }
+  if (cod) {
+    return 'Cash on delivery: this order stays in your main WhatsApp group and packing PDFs.';
+  }
+  return 'Paid drop-ship order: it goes to the drop-ship WhatsApp group and is left out of the packing PDFs.';
+}
 
 /** orders.item_variant is VARCHAR(32); the API rejects anything longer. */
 const MAX_VARIANT = 32;
@@ -138,7 +162,7 @@ function describeLines(lines: ItemLine[]): string {
     const key = name.replace(/\s+/g, ' ').toLowerCase();
     const known = merged.get(key);
     if (known) known.quantity += line.quantity;
-    else merged.set(key, { goodsName: name, variant: '', quantity: line.quantity });
+    else merged.set(key, { ...line, goodsName: name, variant: '' });
   }
   return [...merged.values()]
     .map((l) => (l.quantity > 1 ? `${l.goodsName} x${l.quantity}` : l.goodsName))
@@ -156,42 +180,6 @@ const EMPTY_ITEM: Item = {
   remark: '',
 };
 
-/** Parse a pasted "name phone address, postcode city state" blob. */
-function parseSmart(text: string): Partial<Receiver> {
-  const out: Partial<Receiver> = {};
-  const trimmed = text.trim();
-  if (!trimmed) return out;
-
-  const phone = trimmed.match(/(?:\+?6?0)1\d[\d\s-]{6,12}/);
-  if (phone) out.phone = phone[0].replace(/[\s-]/g, '');
-
-  const postcode = trimmed.match(/\b\d{5}\b/);
-  if (postcode) out.postcode = postcode[0];
-
-  let head = trimmed;
-  if (phone) head = trimmed.slice(0, phone.index ?? 0);
-  const name = head.split(/[,\n]/)[0]?.trim();
-  if (name && name.length <= 60 && /^[A-Za-z][A-Za-z .'-]*$/.test(name)) {
-    out.name = name;
-  }
-
-  let rest = phone ? trimmed.slice((phone.index ?? 0) + phone[0].length) : trimmed;
-  rest = rest.replace(/^[\s,]+/, '');
-  if (postcode) {
-    const tail = rest.slice((rest.indexOf(postcode[0]) ?? 0) + 5).trim();
-    const words = tail.replace(/malaysia/i, '').trim().split(/\s+/).filter(Boolean);
-    if (words.length) {
-      out.city = words[0];
-      if (words.length > 1) out.state = words.slice(1).join(' ');
-    }
-    const before = rest.slice(0, rest.indexOf(postcode[0])).replace(/[\s,]+$/, '');
-    if (before) out.address = before;
-  } else if (rest) {
-    out.address = rest;
-  }
-  return out;
-}
-
 export default function NormalOrderPage() {
   const [sender, setSender] = useState<SenderProfileOut | null>(null);
   const [senderAddress, setSenderAddress] = useState('');
@@ -200,8 +188,98 @@ export default function NormalOrderPage() {
   const [retain, setRetain] = useState(false);
 
   const [receiver, setReceiver] = useState<Receiver>(EMPTY_RECEIVER);
+  // the postcode against the state and city: fills blanks, catches a mismatch
+  const [addressCheck, setAddressCheck] = useState<AddressCheckOut | null>(null);
   const [item, setItem] = useState<Item>(EMPTY_ITEM);
   const [lines, setLines] = useState<ItemLine[]>([{ ...EMPTY_LINE }]);
+
+  /* ------------------------------ smart address filling (read by the API) */
+  useEffect(() => {
+    const text = receiver.smart.trim();
+    if (!text) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      api
+        .parseAddress(text, controller.signal)
+        .then((parsed) =>
+          setReceiver((prev) => {
+            if (prev.smart.trim() !== text) return prev;
+            // a pasted address replaces the whole address, even parts it lacks
+            const hasAddress = Boolean(parsed.postcode || parsed.address);
+            return {
+              ...prev,
+              name: parsed.name || prev.name,
+              phone: parsed.phone || prev.phone,
+              postcode: hasAddress ? parsed.postcode : prev.postcode,
+              city: hasAddress ? parsed.city : prev.city,
+              state: hasAddress ? parsed.state : prev.state,
+              address: hasAddress ? parsed.address : prev.address,
+            };
+          }),
+        )
+        .catch(() => undefined);
+    }, 400);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [receiver.smart]);
+
+  /* ------------------------- postcode check: fill state/city, or flag them */
+  useEffect(() => {
+    const postcode = receiver.postcode.trim();
+    if (!/^\d{5}$/.test(postcode)) {
+      setAddressCheck(null);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      api
+        .checkAddress({ postcode, state: receiver.state, city: receiver.city }, controller.signal)
+        .then((result) => {
+          setAddressCheck(result);
+          if (!result.known) return;
+          setReceiver((prev) =>
+            prev.postcode.trim() !== postcode
+              ? prev
+              : {
+                  ...prev,
+                  state: prev.state.trim() ? prev.state : (result.state ?? ''),
+                  city: prev.city.trim() ? prev.city : (result.city ?? ''),
+                },
+          );
+        })
+        .catch(() => undefined);
+    }, 300);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [receiver.postcode, receiver.state, receiver.city]);
+
+  // only the check of the postcode on screen counts, not one still on its way
+  const currentCheck =
+    addressCheck && addressCheck.postcode === receiver.postcode.trim() ? addressCheck : null;
+  const addressMismatch =
+    currentCheck && currentCheck.ok === false
+      ? (currentCheck.message ?? 'Zip code does not match.')
+      : null;
+  // a postcode that is not on the post-office list: shown, but not blocking
+  const addressNotice = currentCheck?.notice ?? null;
+  const postcodeSuggestions = currentCheck?.suggestions ?? [];
+
+  function applyPostcode(code: string) {
+    setReceiver((prev) => ({ ...prev, postcode: code }));
+  }
+
+  function fixAddress() {
+    if (!addressCheck) return;
+    if (addressCheck.field === 'receiver_state') {
+      setReceiver((prev) => ({ ...prev, state: addressCheck.state ?? prev.state }));
+    } else if (addressCheck.field === 'receiver_city') {
+      setReceiver((prev) => ({ ...prev, city: addressCheck.city ?? prev.city }));
+    }
+  }
 
   const updateLine = (index: number, patch: Partial<ItemLine>) =>
     setLines((prev) => prev.map((line, i) => (i === index ? { ...line, ...patch } : line)));
@@ -211,6 +289,7 @@ export default function NormalOrderPage() {
   const labelText = describeLines(lines);
 
   const [charge, setCharge] = useState<Charge>(EMPTY_CHARGE);
+  const routeNote = dropshipNote(lines, charge.cod === 'Yes');
   const [quote, setQuote] = useState<Quote>(EMPTY_QUOTE);
   const [list, setList] = useState<SavedParcel[]>([]);
   const [busy, setBusy] = useState(false);
@@ -247,6 +326,7 @@ export default function NormalOrderPage() {
       }
       void fetch(`${process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000'}/api/v1/orders/quote`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           receiver_postcode: receiver.postcode,
@@ -293,6 +373,7 @@ export default function NormalOrderPage() {
         goods_name: line.goodsName.trim(),
         item_variant: line.variant.trim(),
         quantity: line.quantity,
+        dropship: line.dropship,
       }))
       .filter((line) => line.goods_name !== '');
     const first = items[0] ?? { goods_name: '', item_variant: '', quantity: 1 };
@@ -340,17 +421,19 @@ export default function NormalOrderPage() {
   // message always names the field to fix.  null: ready to order.
   const problem = !receiverFilled
     ? 'Fill in the receiver details first.'
-    : !linesFilled
-      ? 'Every item line needs a Goods Name - fill it in, or remove the empty line.'
-      : !(Number(item.actualWeight) > 0)
-        ? 'Enter the Actual Weight.'
-        : item.customerOrderNo.trim() === ''
-          ? 'Enter the Customer Order Number - every order needs one.'
-          : !codFilled
-            ? 'COD Value is Yes - enter the COD Amount to collect, or choose No.'
-            : !itemValueOk
-              ? 'Item Value must be a number.'
-              : null;
+    : addressMismatch
+      ? addressMismatch
+      : !linesFilled
+        ? 'Every item line needs a Goods Name - fill it in, or remove the empty line.'
+        : !(Number(item.actualWeight) > 0)
+          ? 'Enter the Actual Weight.'
+          : item.customerOrderNo.trim() === ''
+            ? 'Enter the Customer Order Number - every order needs one.'
+            : !codFilled
+              ? 'COD Value is Yes - enter the COD Amount to collect, or choose No.'
+              : !itemValueOk
+                ? 'Item Value must be a number.'
+                : null;
   const formFilled = problem === null;
   const incompleteMessage = problem ?? '';
 
@@ -376,6 +459,7 @@ export default function NormalOrderPage() {
 
   function resetReceiver() {
     setReceiver(EMPTY_RECEIVER);
+    setAddressCheck(null);
   }
   function resetItem() {
     setItem(EMPTY_ITEM);
@@ -386,7 +470,7 @@ export default function NormalOrderPage() {
   }
 
   function applySmart(text: string) {
-    setReceiver((prev) => ({ ...prev, smart: text, ...parseSmart(text) }));
+    setReceiver((prev) => ({ ...prev, smart: text }));
   }
 
   async function submitOne(payload: NormalOrderIn): Promise<OrderCreatedOut> {
@@ -544,11 +628,16 @@ export default function NormalOrderPage() {
                 onChange={(e) => setReceiver({ ...receiver, phone: e.target.value })}
               />
             </Field>
-            <Field label="Receiver Postcode" required>
+            <Field
+              label="Receiver Postcode"
+              required
+              hint={addressMismatch ? 'Zip code does not match' : undefined}
+            >
               <TextInput
                 value={receiver.postcode}
                 placeholder="Please Enter Receiver Postcode"
                 maxLength={5}
+                invalid={Boolean(addressMismatch)}
                 onChange={(e) =>
                   setReceiver({ ...receiver, postcode: e.target.value.replace(/\D/g, '') })
                 }
@@ -557,8 +646,17 @@ export default function NormalOrderPage() {
             <Field label="State" required>
               <TextInput
                 value={receiver.state}
-                placeholder="Please Enter"
+                placeholder="Filled in from the postcode"
+                invalid={Boolean(addressMismatch) && addressCheck?.field === 'receiver_state'}
                 onChange={(e) => setReceiver({ ...receiver, state: e.target.value })}
+              />
+            </Field>
+            <Field label="City">
+              <TextInput
+                value={receiver.city}
+                placeholder="Filled in from the postcode"
+                invalid={Boolean(addressMismatch) && addressCheck?.field === 'receiver_city'}
+                onChange={(e) => setReceiver({ ...receiver, city: e.target.value })}
               />
             </Field>
             <Field label="Address type" required>
@@ -580,6 +678,52 @@ export default function NormalOrderPage() {
               />
             </Field>
           </div>
+          {currentCheck && (addressMismatch || addressNotice) && (
+            <div
+              role={addressMismatch ? 'alert' : 'status'}
+              className={`mx-5 mb-5 space-y-2 rounded border px-4 py-2.5 text-base ${
+                addressMismatch
+                  ? 'border-[#fbc4c4] bg-[#fef0f0] text-jt-red'
+                  : 'border-[#f5dab1] bg-[#fdf6ec] text-[#b86e00]'
+              }`}
+            >
+              <p>{addressMismatch ?? addressNotice}</p>
+              {postcodeSuggestions.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-text-regular">
+                    Correct postcode for {currentCheck.suggestions_for}:
+                  </span>
+                  {postcodeSuggestions.map((code) => (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => applyPostcode(code)}
+                      title={`Use postcode ${code}`}
+                      className="rounded border border-jt-red bg-white px-2.5 py-[1px] font-semibold text-jt-red hover:bg-[#fde2e1]"
+                    >
+                      {code}
+                    </button>
+                  ))}
+                  {(currentCheck.suggestions_total ?? 0) > postcodeSuggestions.length && (
+                    <span className="text-mini text-text-secondary">
+                      +{(currentCheck.suggestions_total ?? 0) - postcodeSuggestions.length} more
+                    </span>
+                  )}
+                </div>
+              )}
+              {addressMismatch && (
+                <button
+                  type="button"
+                  onClick={fixAddress}
+                  className="text-mini text-text-regular underline hover:text-jt-red"
+                >
+                  {postcodeSuggestions.length > 0 ? 'Or keep' : 'Keep'} {currentCheck.postcode} and change
+                  the {currentCheck.field === 'receiver_state' ? 'state' : 'city'} to{' '}
+                  {currentCheck.field === 'receiver_state' ? currentCheck.state : currentCheck.city}
+                </button>
+              )}
+            </div>
+          )}
         </section>
 
         {/* -------------------------------------------------- item ------- */}
@@ -602,17 +746,18 @@ export default function NormalOrderPage() {
             </Field>
             {/* every product in this parcel, one line each */}
             <div className="col-span-4">
-              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_150px_32px] gap-x-3">
+              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_150px_96px_32px] gap-x-3">
                 <label className="el-label req">Goods Name:</label>
                 <label className="el-label">Size / Colour:</label>
                 <label className="el-label req">Quantity:</label>
+                <span />
                 <span />
               </div>
               <div className="space-y-2">
                 {lines.map((line, index) => (
                   <div
                     key={index}
-                    className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_150px_32px] items-center gap-x-3"
+                    className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_150px_96px_32px] items-center gap-x-3"
                   >
                     <TextInput
                       value={line.goodsName}
@@ -633,6 +778,19 @@ export default function NormalOrderPage() {
                       value={line.quantity}
                       onChange={(quantity) => updateLine(index, { quantity })}
                     />
+                    <label
+                      className="flex h-control cursor-pointer select-none items-center gap-2 whitespace-nowrap text-base text-text-primary"
+                      title="Not in stock - your supplier sends it"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={line.dropship}
+                        aria-label={`Drop-ship, item ${index + 1}`}
+                        onChange={(e) => updateLine(index, { dropship: e.target.checked })}
+                        className="h-[14px] w-[14px] rounded-sm border border-line"
+                      />
+                      Drop-ship
+                    </label>
                     {lines.length > 1 ? (
                       <button
                         type="button"
@@ -663,6 +821,11 @@ export default function NormalOrderPage() {
                   </span>
                 )}
               </div>
+              {routeNote && (
+                <p className="mt-1 text-right text-base text-text-secondary" role="status">
+                  {routeNote}
+                </p>
+              )}
             </div>
             <Field label="Actual Weight" required>
               <TextInput

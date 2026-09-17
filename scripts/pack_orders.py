@@ -67,7 +67,7 @@ async def _run(args: argparse.Namespace) -> int:
     from sqlalchemy import func, select
 
     from app.config import get_settings
-    from app.core.items import items_of
+    from app.core.items import items_of, supplier_ships
     from app.core.naming import unique_path, waybill_filename
     from app.db.models import Order
     from app.db.session import dispose_engine, get_sessionmaker
@@ -125,28 +125,29 @@ async def _run(args: argparse.Namespace) -> int:
                 return path
 
             folder = args.out or settings.default_output_dir / "packing" / day.isoformat()
-            files = write_packing_pdfs(
-                [
+            packing = []
+            for position, o in enumerate(orders):
+                items = items_of(
+                    {
+                        "items": o.items,
+                        "goods_name": o.goods_name,
+                        "item_variant": o.item_variant,
+                        "quantity": o.quantity,
+                    }
+                )
+                packing.append(
                     PackingOrder(
                         order_no=o.customer_order_no or "",
                         tracking_no=o.tracking_no,
-                        items=items_of(
-                            {
-                                "items": o.items,
-                                "goods_name": o.goods_name,
-                                "item_variant": o.item_variant,
-                                "quantity": o.quantity,
-                            }
-                        ),
+                        items=items,
                         waybill_path=o.waybill_path,
                         sequence=position,
+                        supplier_ships=supplier_ships(items, o.order_payment_type),
                         source=o,
                     )
-                    for position, o in enumerate(orders)
-                ],
-                folder,
-                render_missing=render_missing,
-            )
+                )
+            left_out = sum(p.supplier_ships for p in packing)
+            files = write_packing_pdfs(packing, folder, render_missing=render_missing)
             await session.commit()
     finally:
         await dispose_engine()
@@ -155,6 +156,8 @@ async def _run(args: argparse.Namespace) -> int:
     for packed in files:
         pieces = f"   ({packed.pieces} pcs)" if packed.pieces != packed.orders else ""
         print(f"  {packed.path.name}{pieces}")
+    if left_out:
+        print(f"\n  {left_out} paid drop-ship order(s) left out - your supplier ships them.")
     if rendered:
         print(f"\n  {len(rendered)} missing label(s) were rendered again first.")
 

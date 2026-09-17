@@ -32,7 +32,7 @@ from pathlib import Path
 from typing import Any
 
 from app.config import get_settings
-from app.core.items import items_of
+from app.core.items import items_of, supplier_ships
 
 log = logging.getLogger(__name__)
 
@@ -43,11 +43,16 @@ COUNTRY = "Malaysia"
 # without one while it waits out a retry, so allow comfortably more.
 HEARTBEAT_STALE_SECONDS = 90
 
+#: which WhatsApp group a job is posted to (see route_for)
+ROUTE_MAIN = "main"
+ROUTE_DROPSHIP = "dropship"
+
 
 @dataclass(slots=True)
 class QueueResult:
     queued: int = 0
     warnings: list[str] = field(default_factory=list)
+    to_dropship: int = 0            # of queued: bound for the drop-ship group
 
 
 @dataclass(slots=True)
@@ -57,6 +62,9 @@ class ServiceStatus:
     group: str | None
     pending: int
     state: str | None = None
+    dropship_group: str | None = None
+    #: paid drop-ship orders the service holds back: no drop-ship group chosen
+    held: int = 0
 
     @property
     def restricted(self) -> bool:
@@ -73,7 +81,14 @@ class ServiceStatus:
             )
         if not self.connected:
             return f"service running, but WhatsApp is not connected - {waiting}"
-        return f'service running, posting to "{self.group}" - {waiting}'
+        dropship = f', drop-ship to "{self.dropship_group}"' if self.dropship_group else ""
+        text = f'service running, posting to "{self.group}"{dropship} - {waiting}'
+        if self.held:
+            text += (
+                f". {self.held} paid drop-ship order(s) can't go out: no drop-ship group"
+                ' chosen - close jt-whatsapp and run "jt-whatsapp --pick-group" to choose it'
+            )
+        return text
 
 
 def pending_jobs(outbox: Path) -> int:
@@ -104,6 +119,8 @@ def service_status(now: datetime | None = None) -> ServiceStatus:
         group=beat.get("group"),
         pending=pending,
         state=beat.get("state"),
+        dropship_group=beat.get("dropship_group"),
+        held=int(beat.get("held") or 0),
     )
 
 
@@ -213,6 +230,16 @@ def build_messages(
 # ---------------------------------------------------------------------------
 # jobs
 # ---------------------------------------------------------------------------
+def route_for(order: Mapping[str, Any]) -> str:
+    """The drop-ship group gets PAID orders whose items are ALL drop-shipped.
+
+    Everything else - cash on delivery, in stock, or a mix - stays in the main
+    group, as the merchant asked.
+    """
+    items = items_of(order)
+    return ROUTE_DROPSHIP if supplier_ships(items, order.get("order_payment_type")) else ROUTE_MAIN
+
+
 def build_job(
     order: Mapping[str, Any],
     *,
@@ -248,6 +275,7 @@ def build_job(
         "order_no": order.get("customer_order_no"),
         "tracking_no": order.get("tracking_no"),
         "messages": build_messages(order, photo, pdf),
+        "route": route_for(order),
         # The service records progress here so a retry resumes after the last
         # message that went through, instead of posting duplicates.
         "sent": 0,
@@ -300,6 +328,7 @@ def queue_orders(entries: Iterable[tuple[Mapping[str, Any], str | None, str | No
             )
             continue
         result.queued += 1
+        result.to_dropship += job["route"] == ROUTE_DROPSHIP
         result.warnings.extend(warnings)
     return result
 

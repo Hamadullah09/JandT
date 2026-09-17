@@ -2,14 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useMe } from '@/components/auth/Session';
 import {
   AddressIcon,
   ChevronDown,
   ChevronUp,
+  DashboardIcon,
   HomeIcon,
   OrderIcon,
   SettingsIcon,
   SupportIcon,
+  TruckIcon,
   VipIcon,
   WaybillIcon,
 } from '@/components/ui/icons';
@@ -36,6 +39,8 @@ const MENU: Item[] = [
       { label: 'Bulk Import Orders', href: '/order/bulk-import' },
     ],
   },
+  { label: 'Admin Portal', href: '/admin', icon: DashboardIcon },
+  { label: 'Track & Trace', href: '/tracking', icon: TruckIcon },
   { label: 'Waybill', icon: WaybillIcon, children: [] },
   { label: 'Address Management', icon: AddressIcon, children: [] },
   { label: 'System Settings', icon: SettingsIcon, children: [{ label: 'Sender Profile', href: '/settings/sender' }] },
@@ -62,13 +67,16 @@ export function JtLogo() {
 export function Sidebar() {
   const pathname = usePathname();
   const orderOpen = pathname.startsWith('/order');
+  const me = useMe();
+  // the Admin Portal link is for the admin only
+  const menu = MENU.filter((item) => item.href !== '/admin' || me?.role === 'admin');
 
   return (
     <aside className="flex h-full w-sidebar shrink-0 flex-col overflow-y-auto border-r border-line bg-white thin-scroll">
       <JtLogo />
 
       <nav className="pb-6">
-        {MENU.map((item) => {
+        {menu.map((item) => {
           const expandable = Array.isArray(item.children);
           const expanded = item.label === 'Order' && orderOpen;
           const Icon = item.icon;

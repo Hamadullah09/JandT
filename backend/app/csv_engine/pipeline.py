@@ -31,8 +31,9 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
+from app.core import address
 from app.core import sortation as S
-from app.core.items import items_of, order_columns
+from app.core.items import items_of, order_columns, supplier_ships
 from app.core.naming import unique_path, waybill_filename
 from app.core.pricing import freight_fee
 from app.core.tracking import allocate as allocate_tracking
@@ -97,9 +98,12 @@ class BatchSummary:
     merged_path: str | None = None
     rows: list[PipelineRow] = field(default_factory=list)
     whatsapp_queued: int = 0
+    whatsapp_to_dropship: int = 0
     whatsapp_warnings: list[str] = field(default_factory=list)
     packing_dir: str | None = None
     packing_files: list[Any] = field(default_factory=list)
+    #: paid all-drop-ship orders, left out of the packing PDFs
+    packing_left_out: int = 0
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -183,7 +187,12 @@ async def enrich(
             continue
 
         state = str(data.get("receiver_state") or "") or zone.state
-        city = str(data.get("receiver_city") or "") or zone.city
+        # the post-office town first: postcode_zone's cities are approximate
+        city = (
+            str(data.get("receiver_city") or "")
+            or address.check(postcode).city
+            or zone.city
+        )
 
         actual = _dec(data.get("actual_weight"))
         length, width, height = (
@@ -196,8 +205,11 @@ async def enrich(
 
         # a merged multi-row order brings its item list; a single row is one item
         items = items_of(data)
-        if not data.get("items") and items and str(data.get("image") or "").strip():
-            items[0]["image"] = str(data["image"]).strip()
+        if not data.get("items") and items:
+            if str(data.get("image") or "").strip():
+                items[0]["image"] = str(data["image"]).strip()
+            if data.get("dropship") is True:
+                items[0]["dropship"] = True
         goods = (
             order_columns(items)
             if items
@@ -541,6 +553,9 @@ async def run_pipeline(
                         items=r.enriched.get("items") or [],
                         waybill_path=r.waybill_path,
                         sequence=position,
+                        supplier_ships=supplier_ships(
+                            r.enriched.get("items") or [], r.enriched.get("order_payment_type")
+                        ),
                     )
                     for position, r in enumerate(created_rows)
                 ],
@@ -585,9 +600,14 @@ async def run_pipeline(
         merged_path=str(merged) if merged else None,
         rows=rows,
         whatsapp_queued=notified.queued,
+        whatsapp_to_dropship=notified.to_dropship,
         whatsapp_warnings=notified.warnings,
         packing_dir=str(packing_dir) if packing_files else None,
         packing_files=packing_files,
+        packing_left_out=sum(
+            supplier_ships(r.enriched.get("items") or [], r.enriched.get("order_payment_type"))
+            for r in created_rows
+        ),
     )
 
 

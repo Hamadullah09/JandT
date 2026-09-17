@@ -34,6 +34,8 @@ class PackingOrder:
     waybill_path: str | None
     #: position in creation order, used as the tie-break inside a file
     sequence: int = 0
+    #: the supplier sends this parcel (paid + all drop-shipped): not ours to pack
+    supplier_ships: bool = False
     #: the ORM order, when a missing label has to be rendered again
     source: Any = field(default=None, repr=False)
 
@@ -79,7 +81,11 @@ def write_packing_pdfs(
 
     *render_missing* is asked for a label whose PDF is gone from disk; without
     it, such an order is left out rather than failing the whole file.
+
+    Orders the supplier ships are left out entirely: printing their labels here
+    could get the same order shipped twice.
     """
+    orders = [order for order in orders if not order.supplier_ships]
     folder.mkdir(parents=True, exist_ok=True)
     for old in folder.glob("*.pdf"):
         if _OURS.search(old.name):

@@ -34,9 +34,13 @@ def normalise_items(raw: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     Accepts ``name``/``variant`` or the CSV's ``goods_name``/``item_variant``.
     Names are kept as typed (only trimmed); lines without a name are dropped;
     a missing quantity counts as one.  Two lines for the same product in the
-    same variant become one line with the quantities added up.
+    same variant become one line with the quantities added up - unless one is
+    drop-shipped and the other is not: those are fulfilled by different people.
+
+    ``dropship`` and ``image`` are stored only when set, so items saved before
+    either existed look exactly the same.
     """
-    merged: dict[tuple[str, str], dict[str, Any]] = {}
+    merged: dict[tuple[str, str, bool], dict[str, Any]] = {}
     for item in raw:
         name = str(item.get("name") or item.get("goods_name") or "").strip()
         if not name:
@@ -44,8 +48,9 @@ def normalise_items(raw: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         variant = str(item.get("variant") or item.get("item_variant") or "").strip()
         quantity = int(item.get("quantity") or 1)
         image = str(item.get("image") or "").strip()
+        dropship = bool(item.get("dropship"))
 
-        key = (_same(name), _same(variant))
+        key = (_same(name), _same(variant), dropship)
         if key in merged:
             merged[key]["quantity"] += quantity
             if image and not merged[key].get("image"):
@@ -54,8 +59,26 @@ def normalise_items(raw: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         entry: dict[str, Any] = {"name": name, "variant": variant, "quantity": quantity}
         if image:
             entry["image"] = image
+        if dropship:
+            entry["dropship"] = True
         merged[key] = entry
     return list(merged.values())
+
+
+def all_dropship(items: list[Mapping[str, Any]]) -> bool:
+    """Every item is drop-shipped (and there is at least one)."""
+    return bool(items) and all(item.get("dropship") for item in items)
+
+
+def supplier_ships(items: list[Mapping[str, Any]], payment_type: str | None) -> bool:
+    """The supplier sends this parcel, not the shop.
+
+    Only a PAID order whose items are ALL drop-shipped.  Cash on delivery stays
+    with the shop, and so does a parcel mixing drop-shipped and in-stock items.
+    Such an order goes to the drop-ship WhatsApp group and is left out of the
+    packing PDFs.
+    """
+    return all_dropship(items) and str(payment_type or "PREPAID").upper() != "COD"
 
 
 def items_of(order: Mapping[str, Any]) -> list[dict[str, Any]]:

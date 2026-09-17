@@ -34,6 +34,8 @@ MIN_ADDRESS = 5
 #: orders.item_variant is VARCHAR(32).  Unchecked, one long size/colour made
 #: the bulk INSERT fail for its whole chunk instead of rejecting one row.
 MAX_VARIANT = 32
+DROPSHIP_YES = frozenset({"yes", "y", "true", "1", "dropship"})
+DROPSHIP_NO = frozenset({"no", "n", "false", "0"})
 
 CANONICAL: tuple[str, ...] = (
     "order_no",
@@ -170,6 +172,10 @@ ALIASES: dict[str, str] = {
     "picture": "image",
     "productimage": "image",
     "productphoto": "image",
+    # yes = the supplier holds this item.  An optional extra like image.
+    "dropship": "dropship",
+    "dropshipped": "dropship",
+    "dropshipping": "dropship",
 }
 # every canonical name is trivially its own alias
 ALIASES.update({normalise_header(c): c for c in CANONICAL})
@@ -271,6 +277,7 @@ class BulkRow(BaseModel):
     order_value: Decimal = Decimal("0")
     remark: str = ""
     image: str = ""
+    dropship: bool = False
 
     # -- required strings -------------------------------------------------
     @field_validator("order_no")
@@ -397,6 +404,23 @@ class BulkRow(BaseModel):
     @classmethod
     def _optional_text(cls, v: Any) -> str:
         return "" if _blank(v) else str(v).strip()
+
+    @field_validator("dropship", mode="before")
+    @classmethod
+    def _dropship(cls, v: Any) -> bool:
+        """yes/no, and the usual spellings of it.  Blank means no.
+
+        Anything else is an error rather than a guess: a typo like "yse"
+        silently read as "no" would send a supplier's order to the wrong group.
+        """
+        if _blank(v):
+            return False
+        text = str(v).strip().lower()
+        if text in DROPSHIP_YES:
+            return True
+        if text in DROPSHIP_NO:
+            return False
+        raise ValueError(f"dropship must be yes or no: {v!r}")
 
     @field_validator("item_variant")
     @classmethod

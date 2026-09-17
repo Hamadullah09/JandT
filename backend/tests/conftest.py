@@ -143,3 +143,19 @@ async def sender(session):
     if profile is None:
         pytest.skip("no sender profile seeded - run `python -m app.db.seed`")
     return profile
+
+
+@pytest.fixture
+def logged_in_admin():
+    """API calls in a test run as the admin, without going through /auth/login."""
+    from app.api.auth import current_user
+    from app.db.models import User
+    from app.main import app
+
+    admin = User(
+        id=1, username="admin", name="Administrator", role="admin", status="active",
+        password_hash="not-used",
+    )
+    app.dependency_overrides[current_user] = lambda: admin
+    yield admin
+    app.dependency_overrides.pop(current_user, None)

@@ -30,3 +30,5 @@ whatsapp/failed/
 # shop's catalogue, and this repository is public.
 images/*
 !images/.gitkeep
+
+exports/

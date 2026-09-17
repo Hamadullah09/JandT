@@ -19,6 +19,9 @@ process.env.JT_WHATSAPP_OUTBOX_DIR = path.join(TMP, 'outbox');
 
 const {
   chooseGroup,
+  groupForJob,
+  planGroups,
+  planRound,
   terminalAsk,
   toBaileysContent,
   processJob,
@@ -261,4 +264,105 @@ test('with no keyboard input the picker stops with a clear message instead of ha
   await assert.rejects(pending, /terminal window/);
   await assert.rejects(ask('again? '), /terminal window/);
   ask.close();
+});
+
+// ---------------------------------------------------------------------------
+// drop-ship routing
+// ---------------------------------------------------------------------------
+const MAIN = { id: 'main@g.us', name: 'Orders' };
+const SUPPLIER = { id: 'supplier@g.us', name: 'Supplier' };
+
+test('a drop-ship job goes to the drop-ship group, anything else to the main group', () => {
+  const groups = { main: MAIN, dropship: SUPPLIER };
+  assert.equal(groupForJob({ route: 'dropship' }, groups), SUPPLIER);
+  assert.equal(groupForJob({ route: 'main' }, groups), MAIN);
+  // jobs queued before routing existed have no route: they stay in the main group
+  assert.equal(groupForJob({}, groups), MAIN);
+});
+
+test('drop-ship jobs wait while no drop-ship group is chosen, the rest still go out', () => {
+  const drop = writeJob('job-drop', { route: 'dropship' });
+  const normal = writeJob('job-main', { route: 'main' });
+  const { ready, held } = planRound(pendingJobs(), { main: MAIN, dropship: null });
+  assert.deepEqual(ready.map((r) => [path.basename(r.file), r.group.name]), [['job-main.json', 'Orders']]);
+  assert.deepEqual(held.map((f) => path.basename(f)), ['job-drop.json']);
+  assert.ok(fs.existsSync(drop) && fs.existsSync(normal), 'nothing is moved or failed');
+});
+
+test('once a drop-ship group is chosen its jobs are ready too', () => {
+  writeJob('job-drop', { route: 'dropship' });
+  const { ready, held } = planRound(pendingJobs(), { main: MAIN, dropship: SUPPLIER });
+  assert.deepEqual(ready.map((r) => r.group.name), ['Supplier']);
+  assert.equal(held.length, 0);
+});
+
+test('the drop-ship picker can be skipped with Enter; the main picker cannot', async () => {
+  const skipped = await chooseGroup(fakeGroups(['Orders', 'Supplier']), answers(''), {
+    question: 'Send paid drop-ship orders to which group?',
+    allowSkip: true,
+  });
+  assert.equal(skipped, null);
+  const main = await chooseGroup(fakeGroups(['Orders', 'Supplier']), answers('', '1'));
+  assert.equal(main.name, 'Orders');
+});
+
+test('with --pick-group, Enter keeps the group already chosen', async () => {
+  const kept = await chooseGroup(fakeGroups(['Orders', 'Supplier']), answers(''), { current: MAIN });
+  assert.equal(kept, MAIN);
+  const dropship = await chooseGroup(fakeGroups(['Orders', 'Supplier']), answers(''), {
+    current: SUPPLIER,
+    allowSkip: true,
+  });
+  assert.equal(dropship, SUPPLIER, 'Enter must not throw away the drop-ship group');
+});
+
+// ---------------------------------------------------------------------------
+// startup questions
+// ---------------------------------------------------------------------------
+const IN = [MAIN, SUPPLIER, { id: 'family@g.us', name: 'Family' }];
+const asks = (plan) => [plan.askMain, plan.askDropship];
+
+test('first start: both groups are asked for', () => {
+  assert.deepEqual(asks(planGroups({}, IN)), [true, true]);
+});
+
+test('updating from before drop-ship: only the drop-ship group is asked for, once', () => {
+  const plan = planGroups({ groupId: MAIN.id, groupName: 'Orders' }, IN);
+  assert.deepEqual(asks(plan), [false, true]);
+  assert.equal(plan.main, MAIN);
+});
+
+test('a restart after "decide later" asks nothing, so sending never stops at a question', () => {
+  const plan = planGroups({ groupId: MAIN.id, dropshipSkipped: true }, IN);
+  assert.deepEqual(asks(plan), [false, false]);
+  assert.equal(plan.dropship, null);
+  assert.deepEqual(plan.notes, []);
+});
+
+test('a restart with both groups saved asks nothing and uses them', () => {
+  const plan = planGroups({ groupId: MAIN.id, dropshipGroupId: SUPPLIER.id }, IN);
+  assert.deepEqual(asks(plan), [false, false]);
+  assert.deepEqual([plan.main, plan.dropship], [MAIN, SUPPLIER]);
+});
+
+test('leaving the drop-ship group holds its orders without blocking, and says how to pick again', () => {
+  const plan = planGroups(
+    { groupId: MAIN.id, dropshipGroupId: 'gone@g.us', dropshipGroupName: 'Old supplier' },
+    IN,
+  );
+  assert.deepEqual(asks(plan), [false, false]);
+  assert.equal(plan.dropship, null);
+  assert.match(plan.notes.join(' '), /"Old supplier".*jt-whatsapp --pick-group/);
+});
+
+test('leaving the orders group asks for it again', () => {
+  const plan = planGroups({ groupId: 'gone@g.us', groupName: 'Old orders', dropshipSkipped: true }, IN);
+  assert.deepEqual(asks(plan), [true, false]);
+  assert.match(plan.notes[0], /"Old orders"/);
+});
+
+test('--pick-group asks for both, offering the current choices', () => {
+  const plan = planGroups({ groupId: MAIN.id, dropshipGroupId: SUPPLIER.id }, IN, true);
+  assert.deepEqual(asks(plan), [true, true]);
+  assert.deepEqual([plan.main, plan.dropship], [MAIN, SUPPLIER]);
 });

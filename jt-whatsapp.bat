@@ -5,8 +5,8 @@ REM Keep this window open: orders are only sent while it is running. Orders
 REM created while it is closed wait in whatsapp\outbox and go out on the
 REM next start.
 REM
-REM   jt-whatsapp               start (first time: link the phone, pick a group)
-REM   jt-whatsapp --pick-group  post to a different group
+REM   jt-whatsapp               start (first time: link the phone, pick the groups)
+REM   jt-whatsapp --pick-group  choose the groups again (orders, drop-ship)
 REM   jt-whatsapp --qr          link with a QR code instead of a pairing code
 REM
 REM After a WhatsApp disconnect the service restarts itself in 10 seconds.

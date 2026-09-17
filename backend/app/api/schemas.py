@@ -46,6 +46,8 @@ class OrderItemIn(BaseModel):
     goods_name: str = Field(min_length=1, max_length=255)
     item_variant: str = Field(default="", max_length=32)
     quantity: int = Field(default=1, ge=1)
+    #: the supplier holds this item (a paid order of only these goes to them)
+    dropship: bool = False
 
 
 class NormalOrderIn(BaseModel):
@@ -144,6 +146,8 @@ class OrderOut(BaseModel):
     status: str
     batch_id: int | None
     created_at: datetime
+    tracking_status: str = "CREATED"
+    tracking_updated_at: datetime | None = None
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -284,3 +288,222 @@ class OutputDirCheckOut(BaseModel):
     ok: bool
     resolved: str | None = None
     message: str | None = None
+
+
+# ---------------------------------------------------------------------------
+# address: smart filling and the postcode check
+# ---------------------------------------------------------------------------
+class AddressCheckIn(BaseModel):
+    postcode: str = ""
+    state: str = ""
+    city: str = ""
+
+
+class AddressCheckOut(BaseModel):
+    postcode: str
+    #: the postcode is on the post-office list
+    known: bool
+    #: the postcode's state and post-office town(s), to fill in blanks
+    state: str = ""
+    city: str = ""
+    cities: list[str] = Field(default_factory=list)
+    ok: bool
+    #: receiver_state or receiver_city - what does not match the postcode
+    field: str | None = None
+    message: str | None = None
+    #: the postcode is not on the list at all - shown, but the order may go ahead
+    notice: str | None = None
+    #: postcodes of the city and state that were entered, closest first
+    suggestions: list[str] = Field(default_factory=list)
+    suggestions_total: int = 0
+    suggestions_for: str = ""
+
+
+class AddressParseIn(BaseModel):
+    text: str = Field(default="", max_length=2000)
+
+
+class AddressParseOut(BaseModel):
+    name: str
+    phone: str
+    postcode: str
+    city: str
+    state: str
+    address: str
+    check: AddressCheckOut
+
+
+# ---------------------------------------------------------------------------
+# track & trace
+# ---------------------------------------------------------------------------
+class EventTypeOut(BaseModel):
+    code: str
+    label: str
+    status: str
+    template: str
+    without_location: str
+
+
+class TrackingEventOut(BaseModel):
+    #: None for the "Order Created" line, which is the order itself
+    id: int | None
+    event_type: str
+    label: str
+    location: str
+    description: str
+    occurred_at: datetime
+    date_label: str
+    time_label: str
+
+
+class TrackingDayOut(BaseModel):
+    date_label: str
+    events: list[TrackingEventOut]
+
+
+class TrackingStepOut(BaseModel):
+    key: str
+    label: str
+    reached: bool
+
+
+class TrackingOut(BaseModel):
+    """One waybill on the public tracking page - no names or addresses."""
+
+    tracking_no: str
+    found: bool
+    status: str | None = None
+    status_label: str | None = None
+    #: masked as on jtexpress.my
+    origin: str = "***"
+    destination: str = "***"
+    steps: list[TrackingStepOut] = Field(default_factory=list)
+    days: list[TrackingDayOut] = Field(default_factory=list)
+
+
+class TrackingUpdateIn(BaseModel):
+    """A status update for one or several parcels (the dashboard's bulk bar)."""
+
+    tracking_nos: list[str] = Field(min_length=1, max_length=500)
+    event_type: str
+    location: str = Field(default="", max_length=128)
+    #: blank: J&T's wording for the event type and location
+    description: str = Field(default="", max_length=500)
+    #: blank: now.  A time without a zone is Malaysia time.
+    occurred_at: datetime | None = None
+
+
+class TrackingUpdateOut(BaseModel):
+    updated: int
+    not_found: list[str] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# admin portal
+# ---------------------------------------------------------------------------
+class AdminLastEventOut(BaseModel):
+    label: str
+    location: str
+    occurred_at: datetime
+
+
+class AdminOrderOut(BaseModel):
+    id: int
+    tracking_no: str
+    customer_order_no: str | None
+    created_at: datetime
+    receiver_name: str
+    receiver_phone: str
+    receiver_postcode: str
+    receiver_city: str | None
+    receiver_state: str
+    receiver_address: str
+    items: list[dict[str, Any]]
+    pieces: int
+    order_payment_type: str | None
+    cod_amount: Decimal
+    order_value: Decimal
+    freight_fee: Decimal | None
+    chargeable_weight: Decimal
+    #: paid and every item drop-shipped: the supplier sends it
+    supplier_ships: bool
+    tracking_status: str
+    status_label: str
+    tracking_updated_at: datetime | None
+    last_event: AdminLastEventOut | None = None
+    tracking_url: str
+    waybill_url: str
+
+
+class AdminOrderPage(BaseModel):
+    items: list[AdminOrderOut]
+    page: int
+    size: int
+    total: int
+    pages: int
+    #: orders per status for the current search and date range (all statuses)
+    counts: dict[str, int]
+    today: int
+    #: the highest order id, to spot orders created since the last look
+    newest_id: int
+
+
+class AdminOrderDetailOut(BaseModel):
+    order: AdminOrderOut
+    events: list[TrackingEventOut]
+
+
+# ---------------------------------------------------------------------------
+# login, sign-up and accounts
+# ---------------------------------------------------------------------------
+class LoginIn(BaseModel):
+    #: a username, phone number or email
+    login: str = Field(default="", max_length=254)
+    password: str = Field(default="", max_length=128)
+
+
+class MeOut(BaseModel):
+    username: str
+    name: str
+    role: str
+    #: the shop the portal belongs to, for the top bar: "JTMY027288"
+    account_code: str | None = None
+    company_name: str | None = None
+
+
+class SignupIn(BaseModel):
+    """Checked by the endpoint itself, so each problem gets a plain message."""
+
+    name: str = Field(default="", max_length=128)
+    username: str = Field(default="", max_length=64)
+    phone: str = Field(default="", max_length=32)
+    email: str = Field(default="", max_length=254)
+    password: str = Field(default="", max_length=128)
+    confirm_password: str = Field(default="", max_length=128)
+
+
+class SignupOut(BaseModel):
+    username: str
+    status: str
+    message: str
+
+
+class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    username: str
+    name: str
+    phone: str | None
+    email: str | None
+    role: str
+    status: str
+    created_at: datetime
+    last_login_at: datetime | None
+
+
+class UserUpdateIn(BaseModel):
+    #: active (approve / unblock) or blocked
+    status: Literal["active", "blocked"] | None = None
+    #: a new password, when resetting it
+    password: str | None = Field(default=None, max_length=128)

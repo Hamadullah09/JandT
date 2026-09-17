@@ -59,6 +59,13 @@ class Settings(BaseSettings):
     whatsapp_outbox_dir: str = ""    # "" -> <repo>/whatsapp/outbox
     whatsapp_images_dir: str = ""    # "" -> <repo>/images
 
+    # ---- track & trace ---------------------------------------------------
+    # The website's tracking page; a tracking number is appended.  Links in
+    # the admin portal and the exported CSV point here.
+    tracking_page_url: str = "http://localhost:3000/tracking/"
+    # Where jt-export writes its CSV files.  "" -> <repo>/exports
+    exports_dir: str = ""
+
     @field_validator("tracking_prefix")
     @classmethod
     def _prefix_digits(cls, v: str) -> str:
@@ -101,6 +108,14 @@ class Settings(BaseSettings):
         if self.whatsapp_images_dir:
             return Path(self.whatsapp_images_dir)
         return REPO_DIR / "images"
+
+    @property
+    def exports_path(self) -> Path:
+        return Path(self.exports_dir) if self.exports_dir else REPO_DIR / "exports"
+
+    def tracking_url(self, tracking_no: str) -> str:
+        base = self.tracking_page_url
+        return f"{base}{'' if base.endswith('/') else '/'}{tracking_no}"
 
 
 @lru_cache(maxsize=1)

@@ -393,6 +393,71 @@ directory, no sender profile).
 
 ---
 
+## 10a. Admin portal, tracking page and order export
+
+| Command | What it does |
+|---|---|
+| `jt-portal` | Starts the API and the website in two windows and opens the admin portal. |
+| `jt-export` | Writes every order to `exports/orders_<date>_<time>.csv` and opens it in Excel. `--today`, `--days 7`, `--status DELIVERED` narrow it down. |
+
+**Admin portal** (`/admin`) - every order, newest first, with its tracking status.
+New orders appear on their own (the page checks every 10 seconds) and are marked
+NEW. The tiles count and filter by status; search takes a tracking number, order
+number, name or phone. Tick orders to mark them Picked Up, In Transit, On
+Delivery, Delivered or Returned in one go, or open one to record a single scan
+(Departure, Dc Arrival, Dp Arrival...) with its place and time, or delete a
+mistake. **Export CSV** downloads what the page shows.
+
+**Tracking page** (`/tracking/<waybill>`, up to 10 separated by commas) - laid out
+like jtexpress.my/tracking: the stage icons, the status, and the scans grouped
+by day in Malaysia time. It shows no names or addresses. J&T's own page asks
+for a slide puzzle before it shows anything, so statuses cannot be read from it
+automatically; they are the scans recorded in the admin portal
+(`tracking_event`, migration `0004`).
+
+**The CSV** - one row per order. The tracking number is an Excel `HYPERLINK`
+to its tracking page (the plain address is repeated in the last column), phone
+numbers and postcodes are kept as text, and any value that starts like a
+formula is neutralised. Links point at `JT_TRACKING_PAGE_URL`
+(default `http://localhost:3000/tracking/`).
+
+**Zip code check** - Normal Order's Smart Address Filling reads a pasted address
+(one line, or the lines of a WhatsApp message) into name, phone, postcode, city,
+state and address. A postcode fills in a blank city and state. A state, or a
+post-office town, that does not belong to the postcode shows *Zip code does not
+match* with a one-click fix, and the API refuses such an order. Unknown
+localities such as "Kota Damansara" are never called a mismatch. The postcode
+list is `backend/app/db/data/malaysia_postcodes.json` (MIT, see the README
+beside it).
+
+---
+
+## 10b. Logins
+
+Every page except the tracking page needs a login. `jt-portal` opens
+`http://localhost:3000/login`, laid out like jtexpress.my/login. The box takes a
+username, phone number or email.
+
+| Account | Login | Sees |
+|---|---|---|
+| Admin | `admin` / `admin123` | the admin portal (`/admin`) and the merchant portal |
+| The shop | `linked` or `0135763706` / `linked123` | the merchant portal |
+
+These two are created when the API first starts with no accounts at all; change
+their passwords in **Admin Portal → Users → Set password** (they are simple on
+purpose, for now). **Create an account** (`/signup`) makes a merchant login that
+waits until the admin approves it on the Users page, where accounts can also be
+blocked (which logs them out) or given a new password. **Forgot password** says to
+ask the admin.
+
+Passwords are stored as PBKDF2-SHA256 hashes. A login is an HttpOnly cookie
+holding a random token; the `user_sessions` table keeps only its SHA-256, and it
+lasts 7 days. The API checks every call: the tracking page and login are public,
+the merchant portal needs any active account, and the admin portal - order
+statuses, exports, users - needs the admin (migration `0005`).
+
+---
+
 ## 11. Configuration
 
 Copy `.env.example` to `.env`. Every variable is prefixed `JT_`.

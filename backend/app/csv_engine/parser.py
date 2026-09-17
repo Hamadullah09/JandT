@@ -15,7 +15,7 @@ from typing import Any, Literal
 import pandas as pd
 from pydantic import ValidationError
 
-from app.core.items import normalise_items, order_columns
+from app.core.items import all_dropship, normalise_items, order_columns
 from app.csv_engine.schema import BulkRow, HeaderMapping, map_headers
 
 RowStatus = Literal["ok", "error"]
@@ -145,7 +145,7 @@ def parse_csv(source: bytes | str | Path, filename: str = "upload.csv") -> Parse
 # one row per item: rows sharing an order number are one order
 # ---------------------------------------------------------------------------
 #: fields that belong to an item line; everything else describes the order
-ITEM_FIELDS = ("goods_name", "item_variant", "quantity", "image")
+ITEM_FIELDS = ("goods_name", "item_variant", "quantity", "image", "dropship")
 
 
 @dataclass(slots=True)
@@ -252,12 +252,14 @@ def _parse_order(group: list[_Line]) -> RowResult:
             "variant": r.item_variant,
             "quantity": r.quantity,
             "image": r.image,
+            "dropship": r.dropship,
         }
         for r in item_rows
     )
     data = {k: _jsonable(v) for k, v in head.model_dump().items()}
     data.update(order_columns(items))
     data["image"] = next((item["image"] for item in items if item.get("image")), "")
+    data["dropship"] = all_dropship(items)
     data["items"] = items
     return RowResult(
         row_no=head_line.row_no, status="ok", raw=head_line.raw, data=data, rows=rows

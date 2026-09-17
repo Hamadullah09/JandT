@@ -20,7 +20,7 @@
  *
  *   node service.js               link (first run), pick a group, then send
  *   node service.js --qr          link with a QR code instead of a pairing code
- *   node service.js --pick-group  choose a different group
+ *   node service.js --pick-group  choose the groups again (orders, drop-ship)
  */
 const fs = require('fs');
 const path = require('path');
@@ -101,12 +101,15 @@ function writeJsonAtomic(file, data) {
   fs.renameSync(temp, file);
 }
 
-function beat(state, group) {
+function beat(state, groups, held = 0) {
   try {
     writeJsonAtomic(HEARTBEAT, {
       at: new Date().toISOString(),
       state,
-      group: group ? group.name : null,
+      group: groups && groups.main ? groups.main.name : null,
+      dropship_group: groups && groups.dropship ? groups.dropship.name : null,
+      // paid drop-ship orders waiting because no drop-ship group is chosen
+      held,
       pid: process.pid,
     });
   } catch {
@@ -193,13 +196,27 @@ function printGroups(groups) {
   console.log('    [0] refresh - a group created a moment ago can take a minute to appear\n');
 }
 
-/** Numbered picker.  0 re-reads the list, so a brand-new group can still be chosen. */
-async function chooseGroup(whatsapp, ask) {
+/**
+ * Numbered picker.  0 re-reads the list, so a brand-new group can still be
+ * chosen.  With `allowSkip`, Enter answers "not now" and returns null.
+ */
+async function chooseGroup(
+  whatsapp,
+  ask,
+  { question = 'Post orders to which group?', current = null, allowSkip = false } = {},
+) {
   let groups = await whatsapp.listGroups();
   printGroups(groups);
   for (;;) {
     const range = groups.length ? `1-${groups.length}, or 0 to refresh` : '0 to refresh';
-    const answer = String(await ask(`  Post orders to which group? ${range}: `)).trim();
+    const enter = current
+      ? `, Enter to keep "${current.name}"`
+      : allowSkip
+        ? ', Enter to decide later'
+        : '';
+    const answer = String(await ask(`  ${question} ${range}${enter}: `)).trim();
+    if (answer === '' && current) return current;
+    if (answer === '' && allowSkip) return null;
     if (answer === '0') {
       groups = await whatsapp.listGroups();
       printGroups(groups);
@@ -211,6 +228,11 @@ async function chooseGroup(whatsapp, ask) {
     }
     console.log(`  "${answer}" is not on the list.`);
   }
+}
+
+/** The group a job goes to; null while its group has not been chosen yet. */
+function groupForJob(job, groups) {
+  return job && job.route === 'dropship' ? groups.dropship : groups.main;
 }
 
 /** Group list with a few retries: a lookup can fail while the link settles. */
@@ -225,19 +247,83 @@ async function listGroupsPatiently(whatsapp) {
   }
 }
 
-async function resolveGroup(whatsapp) {
-  const config = readJson(CONFIG, {});
-  if (config.groupId && !args.has('--pick-group')) {
-    const saved = (await listGroupsPatiently(whatsapp)).find((g) => g.id === config.groupId);
-    if (saved) return saved;
-    log(`This number is no longer in "${config.groupName}" - pick the group again.`);
+const PICK_AGAIN = 'close this window and run:  jt-whatsapp --pick-group';
+
+/**
+ * Which groups have to be asked for at startup - from config.json and the
+ * groups this number is in.  No WhatsApp or keyboard involved, so it is tested.
+ *
+ * - The orders group is asked for until one is saved, and again when this
+ *   number has left it: nothing can be sent without it.
+ * - The drop-ship group is asked for ONCE.  A choice, or Enter to decide
+ *   later, is remembered - so the automatic restart after a disconnect never
+ *   stops at a question with orders waiting.  If this number leaves that
+ *   group, drop-ship orders wait and the window says how to pick again.
+ * - --pick-group asks for both again; Enter keeps the current choice.
+ */
+function planGroups(config, known, repick = false) {
+  const find = (id) => (id && known.find((g) => g.id === id)) || null;
+  const main = find(config.groupId);
+  const dropship = find(config.dropshipGroupId);
+  const notes = [];
+  if (config.groupId && !main) {
+    notes.push(`This number is no longer in "${config.groupName}" - pick the orders group again.`);
   }
+  if (config.dropshipGroupId && !dropship && !repick) {
+    notes.push(
+      `This number is no longer in "${config.dropshipGroupName}" - paid drop-ship orders ` +
+        `will wait. To choose another group, ${PICK_AGAIN}`,
+    );
+  }
+  const dropshipDecided = Boolean(config.dropshipGroupId) || config.dropshipSkipped === true;
+  return { main, dropship, askMain: repick || !main, askDropship: repick || !dropshipDecided, notes };
+}
+
+/**
+ * The main orders group and the drop-ship group.
+ *
+ * Paid orders whose items are all drop-shipped go to the drop-ship group; the
+ * rest to the main group.  Both are remembered in config.json and chosen again
+ * with --pick-group.  The drop-ship group may be left for later: its orders
+ * then wait in the outbox, and everything else still goes out.
+ */
+async function resolveGroups(whatsapp) {
+  const config = readJson(CONFIG, {});
+  const known = await listGroupsPatiently(whatsapp);
+  const plan = planGroups(config, known, args.has('--pick-group'));
+  plan.notes.forEach((note) => log(note));
+  let { main, dropship } = plan;
+  if (!plan.askMain && !plan.askDropship) return { main, dropship };
+
   const ask = terminalAsk();
   try {
-    const group = await chooseGroup(whatsapp, ask);
-    writeJsonAtomic(CONFIG, { ...config, groupId: group.id, groupName: group.name });
-    log(`Saved: new orders will go to "${group.name}".`);
-    return group;
+    if (plan.askMain) {
+      main = await chooseGroup(whatsapp, ask, { current: main });
+      config.groupId = main.id;
+      config.groupName = main.name;
+      log(`Saved: orders will go to "${main.name}".`);
+    }
+    if (plan.askDropship) {
+      console.log('\n  Paid orders where every item is drop-shipped go to a separate group.');
+      dropship = await chooseGroup(whatsapp, ask, {
+        question: 'Send paid drop-ship orders to which group?',
+        current: dropship,
+        allowSkip: true,
+      });
+      if (dropship) {
+        config.dropshipGroupId = dropship.id;
+        config.dropshipGroupName = dropship.name;
+        delete config.dropshipSkipped;
+        log(`Saved: paid drop-ship orders will go to "${dropship.name}".`);
+      } else {
+        delete config.dropshipGroupId;
+        delete config.dropshipGroupName;
+        config.dropshipSkipped = true;
+        log(`No drop-ship group for now - paid drop-ship orders will wait. To choose one later, ${PICK_AGAIN}`);
+      }
+    }
+    writeJsonAtomic(CONFIG, config);
+    return { main, dropship };
   } finally {
     ask.close();
   }
@@ -352,17 +438,45 @@ function pendingJobs() {
   }
 }
 
-async function drainForever(whatsapp, group) {
+/**
+ * Pending jobs that can go out now, each with its group, and those waiting
+ * for a group that has not been chosen.  An unreadable job counts as ready:
+ * processJob files it under failed/.
+ */
+function planRound(files, groups) {
+  const ready = [];
+  const held = [];
+  for (const file of files) {
+    const job = readJson(file, null);
+    const group = job ? groupForJob(job, groups) : groups.main;
+    if (group) ready.push({ file, group });
+    else held.push(file);
+  }
+  return { ready, held };
+}
+
+async function drainForever(whatsapp, groups) {
   let announcedIdle = false;
   let announcedOffline = false;
   let announcedRestricted = false;
+  let announcedHeld = 0;
   for (;;) {
     const connected = whatsapp.isConnected();
     const restricted = connected && whatsapp.isRestricted();
-    beat(restricted ? 'RESTRICTED' : connected ? 'CONNECTED' : 'RECONNECTING', group);
+    const { ready, held } = planRound(pendingJobs(), groups);
+    beat(restricted ? 'RESTRICTED' : connected ? 'CONNECTED' : 'RECONNECTING', groups, held.length);
 
-    const jobs = pendingJobs();
-    if (jobs.length === 0) {
+    if (held.length !== announcedHeld) {
+      if (held.length) {
+        log(
+          `${held.length} paid drop-ship order(s) waiting: no drop-ship group chosen. ` +
+            `To choose it, ${PICK_AGAIN}`,
+        );
+      }
+      announcedHeld = held.length;
+    }
+
+    if (ready.length === 0) {
       if (!announcedIdle) log('Waiting for new orders...');
       announcedIdle = true;
       await sleep(POLL_MS);
@@ -371,7 +485,7 @@ async function drainForever(whatsapp, group) {
     announcedIdle = false;
 
     if (!connected) {
-      if (!announcedOffline) log(`Not connected to WhatsApp - ${jobs.length} order(s) waiting`);
+      if (!announcedOffline) log(`Not connected to WhatsApp - ${ready.length} order(s) waiting`);
       announcedOffline = true;
       await sleep(POLL_MS);
       continue;
@@ -380,7 +494,7 @@ async function drainForever(whatsapp, group) {
 
     if (restricted) {
       if (!announcedRestricted) {
-        log(`Sending paused: WhatsApp restriction${whatsapp.restrictionText()} - ${jobs.length} order(s) waiting`);
+        log(`Sending paused: WhatsApp restriction${whatsapp.restrictionText()} - ${ready.length} order(s) waiting`);
       }
       announcedRestricted = true;
       await sleep(POLL_MS);
@@ -388,13 +502,13 @@ async function drainForever(whatsapp, group) {
     }
     announcedRestricted = false;
 
-    log(`${jobs.length} order(s) to send`);
-    for (let i = 0; i < jobs.length; i++) {
+    log(`${ready.length} order(s) to send`);
+    for (let i = 0; i < ready.length; i++) {
       if (i > 0) await sleep(between(ORDER_GAP_MS));
       // a restriction can arrive in the middle of a batch
       if (whatsapp.isRestricted()) break;
-      beat('CONNECTED', group);
-      const ok = await processJob(whatsapp, group, jobs[i]);
+      beat('CONNECTED', groups, held.length);
+      const ok = await processJob(whatsapp, ready[i].group, ready[i].file);
       if (!ok) {
         // Stop this round: keep the group in order, and give a flaky
         // connection time to recover instead of failing every job at once.
@@ -642,10 +756,12 @@ async function main() {
     onFatal: (message) => fatal(message),
     onFirstOpen: (wa) => {
       (async () => {
-        const group = await resolveGroup(wa);
-        log(`Ready. Posting new orders to "${group.name}".`);
+        const groups = await resolveGroups(wa);
+        log(`Ready. Posting new orders to "${groups.main.name}".`);
+        if (groups.dropship) log(`Paid drop-ship orders go to "${groups.dropship.name}".`);
+        else log('Paid drop-ship orders wait: no drop-ship group chosen.');
         log(`Outbox: ${OUTBOX}`);
-        await drainForever(wa, group);
+        await drainForever(wa, groups);
       })().catch((error) => fatal((error && error.message) || String(error)));
     },
   });
@@ -660,6 +776,9 @@ if (require.main === module) {
 
 module.exports = {
   chooseGroup,
+  groupForJob,
+  planGroups,
+  planRound,
   terminalAsk,
   toBaileysContent,
   processJob,

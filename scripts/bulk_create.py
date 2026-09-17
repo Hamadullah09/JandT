@@ -253,9 +253,15 @@ def _print_summary(console, Table, summary, elapsed: float, output_dir: Path) ->
     if get_settings().whatsapp_enabled:
         status = service_status()
         colour = "green" if status.running and status.connected else "yellow"
+        to_dropship = (
+            f" ({summary.whatsapp_to_dropship} to the drop-ship group)"
+            if summary.whatsapp_to_dropship
+            else ""
+        )
         table.add_row(
             "whatsapp",
-            f"{summary.whatsapp_queued} queued - [{colour}]{status.describe()}[/{colour}]",
+            f"{summary.whatsapp_queued} queued{to_dropship} - "
+            f"[{colour}]{status.describe()}[/{colour}]",
         )
     else:
         table.add_row("whatsapp", "[dim]off (JT_WHATSAPP_ENABLED in .env)[/dim]")
@@ -266,6 +272,11 @@ def _print_summary(console, Table, summary, elapsed: float, output_dir: Path) ->
     for packed in summary.packing_files:
         pieces = f"{packed.pieces} pcs" if packed.pieces != packed.orders else ""
         console.print(f"  [cyan]{packed.path.name}[/cyan]  [dim]{pieces}[/dim]")
+    if summary.packing_left_out:
+        console.print(
+            f"  [dim]{summary.packing_left_out} paid drop-ship order(s) left out of packing"
+            " - your supplier ships them[/dim]"
+        )
     for warning in summary.whatsapp_warnings:
         console.print(f"[yellow]whatsapp:[/yellow] {warning}")
 

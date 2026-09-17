@@ -171,3 +171,20 @@ export const ArrowRight = (p: P) => (
     <path d="M4.5 12h14M13 6.5l5.5 5.5L13 17.5" />
   </svg>
 );
+
+export const DashboardIcon = (p: P) => (
+  <svg {...base(p)}>
+    <rect x="3.5" y="3.5" width="7" height="8" rx="1.5" />
+    <rect x="13.5" y="3.5" width="7" height="5" rx="1.5" />
+    <rect x="13.5" y="11.5" width="7" height="9" rx="1.5" />
+    <rect x="3.5" y="14.5" width="7" height="6" rx="1.5" />
+  </svg>
+);
+
+export const TruckIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M2.5 6.5h11v10h-11zM13.5 10h4l3 3.5v3h-7" />
+    <circle cx="7" cy="18" r="1.8" />
+    <circle cx="17" cy="18" r="1.8" />
+  </svg>
+);
