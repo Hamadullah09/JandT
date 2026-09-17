@@ -2,20 +2,34 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { OrderDrawer } from '@/components/admin/OrderDrawer';
+import { ORDER_COLUMNS, OrderRow, SourceBar } from '@/components/admin/OrderTable';
 import {
   QUICK_STATUSES,
+  STATUS_HINT,
   STATUS_LABEL,
   STATUS_ORDER,
   STATUS_STYLE,
-  StatusBadge,
-  itemText,
-  itemsOf,
   type Status,
 } from '@/components/admin/status';
-import { ChevronLeftSm, ChevronRightSm, SearchIcon } from '@/components/ui/icons';
+import {
+  BoxIcon,
+  CheckCircleIcon,
+  ChevronLeftSm,
+  ChevronRightSm,
+  CloseIcon,
+  DownloadIcon,
+  FileIcon,
+  ListIcon,
+  PencilIcon,
+  RefreshIcon,
+  ReturnIcon,
+  ScooterIcon,
+  SearchIcon,
+  TruckIcon,
+} from '@/components/ui/icons';
 import { ApiError, api, type AdminFilter } from '@/lib/api';
-import { mytClock, mytDateTime } from '@/lib/myt';
-import type { AdminOrderOut, AdminOrderPage } from '@/lib/types.gen';
+import { mytClock } from '@/lib/myt';
+import type { AdminOrderPage } from '@/lib/types.gen';
 
 const PAGE_SIZE = 50;
 /** How often the dashboard looks for new orders and status changes. */
@@ -28,149 +42,59 @@ const PERIODS: { value: NonNullable<AdminFilter['period']>; label: string }[] = 
   { value: 'all', label: 'All time' },
 ];
 
-function ExternalIcon() {
-  return (
-    <svg width={11} height={11} viewBox="0 0 24 24" aria-hidden className="inline-block">
-      <path
-        d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+const STATUS_ICON: Record<Status | 'ALL', (p: { className?: string }) => JSX.Element> = {
+  ALL: ListIcon,
+  CREATED: FileIcon,
+  PICKED_UP: BoxIcon,
+  IN_TRANSIT: TruckIcon,
+  ON_DELIVERY: ScooterIcon,
+  DELIVERED: CheckCircleIcon,
+  RETURNED: ReturnIcon,
+};
 
-function Tile({
-  label,
+/* --------------------------------------------------------------- status */
+function StatusTile({
+  status,
   count,
   active,
-  accent,
   note,
   onClick,
 }: {
-  label: string;
+  status: Status | 'ALL';
   count: number;
   active: boolean;
-  accent: string;
   note?: string;
   onClick: () => void;
 }) {
+  const Icon = STATUS_ICON[status];
+  const colour = status === 'ALL' ? '#030302' : STATUS_STYLE[status].color;
+  const background = status === 'ALL' ? '#f4f2ee' : STATUS_STYLE[status].background;
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded border bg-white px-4 py-3 text-left transition-colors hover:border-jt-red ${
-        active ? 'border-jt-red ring-1 ring-jt-red' : 'border-line'
+      className={`flex flex-col rounded-xl border-2 bg-white p-4 text-left transition-colors hover:border-brand ${
+        active ? 'border-brand shadow-[0_0_0_3px_rgba(3,3,2,0.14)]' : 'border-line'
       }`}
     >
-      <span className="flex items-center gap-2 text-base text-text-regular">
-        <span className="h-[8px] w-[8px] shrink-0 rounded-full" style={{ background: accent }} />
-        <span className="truncate">{label}</span>
-      </span>
-      <span className="mt-1 block text-[24px] font-bold leading-8 text-text-primary">{count}</span>
-      {note && <span className="block text-mini text-[#3f8f1f]">{note}</span>}
-    </button>
-  );
-}
-
-function OrderRow({
-  order,
-  isNew,
-  selected,
-  onSelect,
-  onOpen,
-}: {
-  order: AdminOrderOut;
-  isNew: boolean;
-  selected: boolean;
-  onSelect: (checked: boolean) => void;
-  onOpen: () => void;
-}) {
-  const items = itemsOf(order.items);
-  const cod = order.order_payment_type === 'COD';
-  const cell = 'border-b border-line-light px-3 py-2.5 align-top';
-  return (
-    <tr
-      className={`cursor-pointer ${isNew ? 'bg-[#fffbe6]' : selected ? 'bg-[#fef0f0]' : 'hover:bg-surface-page'}`}
-      onClick={onOpen}
-    >
-      <td className={cell} onClick={(e) => e.stopPropagation()}>
-        <input
-          type="checkbox"
-          checked={selected}
-          aria-label={`Select ${order.customer_order_no ?? order.tracking_no}`}
-          onChange={(e) => onSelect(e.target.checked)}
-        />
-      </td>
-      <td className={`${cell} whitespace-nowrap`}>
-        {mytDateTime(order.created_at)}
-        {isNew && (
-          <span className="ml-2 rounded bg-jt-red px-1.5 py-[1px] text-[10px] font-bold text-white">NEW</span>
-        )}
-      </td>
-      <td className={`${cell} font-semibold`}>{order.customer_order_no}</td>
-      <td className={`${cell} whitespace-nowrap`} onClick={(e) => e.stopPropagation()}>
-        <a
-          href={`/tracking/${order.tracking_no}`}
-          target="_blank"
-          rel="noreferrer"
-          className="font-semibold text-jt-red hover:underline"
-          title="Open the tracking page"
+      <span className="flex items-center gap-3">
+        <span
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+          style={{ background, color: colour }}
         >
-          {order.tracking_no} <ExternalIcon />
-        </a>
-      </td>
-      <td className={cell}>
-        <span className="block">{order.receiver_name}</span>
-        <span className="block text-mini text-text-secondary">{order.receiver_phone}</span>
-      </td>
-      <td className={cell}>
-        <span className="block">
-          {order.receiver_postcode} {order.receiver_city}
+          <Icon className="h-6 w-6" />
         </span>
-        <span className="block text-mini text-text-secondary">{order.receiver_state}</span>
-      </td>
-      <td className={`${cell} max-w-[240px]`}>
-        {items.slice(0, 2).map((item, index) => (
-          <span key={index} className="block truncate" title={itemText(item)}>
-            {itemText(item)}
-          </span>
-        ))}
-        {items.length > 2 && (
-          <span className="block text-mini text-text-secondary">+{items.length - 2} more</span>
-        )}
-        {order.supplier_ships && (
-          <span className="mt-0.5 inline-block rounded bg-[#fdf6ec] px-1.5 text-mini text-[#b86e00]">
-            supplier ships
-          </span>
-        )}
-      </td>
-      <td className={`${cell} whitespace-nowrap`}>
-        {cod ? (
-          <span className="font-semibold text-[#b86e00]">COD RM {order.cod_amount}</span>
-        ) : (
-          <span className="font-semibold text-[#3f8f1f]">Paid</span>
-        )}
-      </td>
-      <td className={cell}>
-        <StatusBadge status={order.tracking_status} />
-        {order.last_event && (
-          <span className="mt-1 block text-mini text-text-secondary">
-            {order.last_event.label} · {mytDateTime(order.last_event.occurred_at)}
-            {order.last_event.location && <span className="block truncate">{order.last_event.location}</span>}
-          </span>
-        )}
-      </td>
-      <td className={cell} onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="el-btn h-[28px] px-3" onClick={onOpen}>
-          Update
-        </button>
-      </td>
-    </tr>
+        <span className="text-[34px] font-bold leading-none text-text-primary">{count}</span>
+      </span>
+      <span className="mt-3 text-[17px] font-semibold leading-6 text-text-primary">
+        {status === 'ALL' ? 'All orders' : STATUS_LABEL[status]}
+      </span>
+      <span className="text-[14px] leading-5 text-text-secondary">
+        {status === 'ALL' ? 'Every order' : STATUS_HINT[status]}
+      </span>
+      {note && <span className="mt-1 text-[14px] font-semibold text-[#3f8f1f]">{note}</span>}
+    </button>
   );
 }
 
@@ -202,9 +126,7 @@ export default function AdminDashboardPage() {
         const since = seen.current;
         const fresh = next.items.filter((order) => order.id > since).map((order) => order.id);
         setNewIds((prev) => new Set([...prev, ...fresh]));
-        setToast(
-          fresh.length > 1 ? `${fresh.length} new orders received` : 'New order received',
-        );
+        setToast(fresh.length > 1 ? `${fresh.length} new orders received` : 'A new order was received');
         seen.current = next.newest_id;
       }
     } catch (err) {
@@ -229,12 +151,12 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     if (!toast) return;
-    const timer = setTimeout(() => setToast(null), 5000);
+    const timer = setTimeout(() => setToast(null), 6000);
     return () => clearTimeout(timer);
   }, [toast]);
 
-  function chooseStatus(status: Status | undefined) {
-    setFilter((prev) => ({ ...prev, status }));
+  function change(patch: Partial<AdminFilter>) {
+    setFilter((prev) => ({ ...prev, ...patch }));
     setPage(1);
     setSelected(new Set());
   }
@@ -243,7 +165,7 @@ export default function AdminDashboardPage() {
     const trackingNos = [...selected];
     if (trackingNos.length === 0) return;
     const label = STATUS_LABEL[status];
-    if (!window.confirm(`Mark ${trackingNos.length} order(s) as ${label}?`)) return;
+    if (!window.confirm(`Change ${trackingNos.length} order(s) to "${label}"?`)) return;
     setBusy(true);
     try {
       const result = await api.addTrackingEvent({
@@ -251,12 +173,12 @@ export default function AdminDashboardPage() {
         event_type: event,
         location: location.trim(),
       });
-      setToast(`${result.updated} order(s) marked as ${label}`);
+      setToast(`${result.updated} order(s) changed to "${label}"`);
       setSelected(new Set());
       setLocation('');
       await load();
     } catch (err) {
-      setToast(err instanceof ApiError ? err.message : 'The update was not saved.');
+      setToast(err instanceof ApiError ? err.message : 'The change was not saved.');
     } finally {
       setBusy(false);
     }
@@ -269,135 +191,181 @@ export default function AdminDashboardPage() {
   const allOnPageSelected = items.length > 0 && pageTrackingNos.every((no) => selected.has(no));
   const first = data && data.total > 0 ? (data.page - 1) * data.size + 1 : 0;
   const last = data ? Math.min(data.page * data.size, data.total) : 0;
+  const filtered = Boolean(filter.status || filter.source || filter.q || (filter.period && filter.period !== 'all'));
 
   return (
-    <div className="space-y-4 p-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <div className="space-y-6 px-6 py-6">
+      {/* ------------------------------------------------------- title */}
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-[20px] font-bold text-text-primary">Orders</h1>
-          <p className="text-base text-text-secondary">
-            New orders appear here on their own.
+          <h1 className="text-[30px] font-bold leading-tight text-text-primary">Orders</h1>
+          <p className="mt-1 text-[17px] text-text-regular">
+            New orders appear here by themselves.
             {updatedAt && (
-              <span className="ml-2 inline-flex items-center gap-1 text-[#3f8f1f]">
-                <span className="h-[7px] w-[7px] animate-pulse rounded-full bg-[#3f8f1f]" />
+              <span className="ml-3 inline-flex items-center gap-2 text-[16px] text-[#3f8f1f]">
+                <span className="h-[9px] w-[9px] animate-pulse rounded-full bg-[#3f8f1f]" />
                 Live · updated {mytClock(updatedAt)}
               </span>
             )}
           </p>
+          <p className="mt-1 text-[15px] text-text-secondary">
+            Tip: click the <PencilIcon className="inline h-4 w-4" /> pencil to change an order&apos;s status, or tick
+            several orders to change them together.
+          </p>
         </div>
-        <div className="flex gap-2">
-          <a className="el-btn el-btn-outline" href={api.exportUrl(filter)}>
-            Export CSV
+        <div className="flex flex-wrap gap-3">
+          <a className="el-btn el-btn-outline h-12 gap-2 px-5 text-[16px]" href={api.exportUrl(filter)}>
+            <DownloadIcon className="h-5 w-5" /> Download Excel file
           </a>
-          <button type="button" className="el-btn" onClick={() => void load()}>
-            Refresh
+          <button type="button" className="el-btn h-12 gap-2 px-5 text-[16px]" onClick={() => void load()}>
+            <RefreshIcon className="h-5 w-5" /> Refresh
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="rounded border border-[#fbc4c4] bg-[#fef0f0] px-4 py-2.5 text-base text-jt-red">
+        <div className="rounded-lg border border-[#fbc4c4] bg-danger-tint px-5 py-3 text-[17px] text-danger" role="alert">
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
-        <Tile
-          label="All orders"
-          count={all}
-          accent="#da251c"
-          active={!filter.status}
-          note={data && data.today > 0 ? `+${data.today} today` : undefined}
-          onClick={() => chooseStatus(undefined)}
-        />
-        {STATUS_ORDER.map((status) => (
-          <Tile
-            key={status}
-            label={STATUS_LABEL[status]}
-            count={counts[status] ?? 0}
-            accent={STATUS_STYLE[status].color}
-            active={filter.status === status}
-            onClick={() => chooseStatus(status)}
-          />
-        ))}
-      </div>
+      {/* ------------------------------------------------------ source */}
+      <SourceBar
+        sources={data?.sources ?? []}
+        selected={filter.source}
+        onSelect={(source) => change({ source })}
+      />
 
+      {/* ------------------------------------------------------ status */}
+      <section aria-label="Order status">
+        <h2 className="mb-2 text-[18px] font-bold text-text-primary">Order status</h2>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
+          <StatusTile
+            status="ALL"
+            count={all}
+            active={!filter.status}
+            note={data && data.today > 0 ? `+${data.today} today` : undefined}
+            onClick={() => change({ status: undefined })}
+          />
+          {STATUS_ORDER.map((status) => (
+            <StatusTile
+              key={status}
+              status={status}
+              count={counts[status] ?? 0}
+              active={filter.status === status}
+              onClick={() => change({ status: filter.status === status ? undefined : status })}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* ----------------------------------------------------- filters */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative w-full max-w-[360px]">
-          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+        <div className="relative w-full max-w-[480px]">
+          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-secondary" />
           <input
-            className="el-input pl-9"
+            className="el-input h-12 pl-12 pr-12 text-[17px]"
             value={search}
-            placeholder="Tracking no., order no., name or phone"
+            placeholder="Search by name, phone, order no. or tracking no."
             aria-label="Search orders"
             onChange={(e) => setSearch(e.target.value)}
           />
-        </div>
-        <div className="flex overflow-hidden rounded border border-line bg-white">
-          {PERIODS.map((period) => (
+          {search && (
             <button
-              key={period.value}
               type="button"
-              aria-pressed={(filter.period ?? 'all') === period.value}
-              onClick={() => {
-                setFilter((prev) => ({ ...prev, period: period.value }));
-                setPage(1);
-              }}
-              className={`h-control border-r border-line px-3 text-base last:border-r-0 ${
-                (filter.period ?? 'all') === period.value
-                  ? 'bg-jt-red text-white'
-                  : 'text-text-regular hover:text-jt-red'
-              }`}
+              aria-label="Clear the search"
+              onClick={() => setSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-text-secondary hover:text-brand"
             >
-              {period.label}
+              <CloseIcon className="h-5 w-5" />
             </button>
-          ))}
+          )}
         </div>
-      </div>
-
-      {selected.size > 0 && (
-        <div className="flex flex-wrap items-center gap-2 rounded border border-jt-red bg-[#fef0f0] px-4 py-2.5 text-base">
-          <span className="font-semibold text-jt-red">{selected.size} selected</span>
-          <span className="text-text-regular">Mark as:</span>
-          {QUICK_STATUSES.map(({ status, event }) => (
-            <button
-              key={status}
-              type="button"
-              disabled={busy}
-              className="el-btn h-[28px] px-3"
-              onClick={() => void markAs(status, event)}
-            >
-              {STATUS_LABEL[status]}
-            </button>
-          ))}
-          <input
-            className="el-input h-[28px] w-[260px]"
-            value={location}
-            maxLength={128}
-            placeholder="Location (optional)"
-            aria-label="Location for the update"
-            onChange={(e) => setLocation(e.target.value)}
-          />
+        <div className="flex overflow-hidden rounded-lg border-2 border-line bg-white">
+          {PERIODS.map((period) => {
+            const active = (filter.period ?? 'all') === period.value;
+            return (
+              <button
+                key={period.value}
+                type="button"
+                aria-pressed={active}
+                onClick={() => change({ period: period.value })}
+                className={`h-11 border-r-2 border-line px-4 text-[16px] last:border-r-0 ${
+                  active ? 'bg-brand font-semibold text-white' : 'text-text-regular hover:text-brand'
+                }`}
+              >
+                {period.label}
+              </button>
+            );
+          })}
+        </div>
+        {filtered && (
           <button
             type="button"
-            className="ml-auto text-text-secondary hover:text-jt-red"
-            onClick={() => setSelected(new Set())}
+            className="text-[16px] text-brand underline underline-offset-4"
+            onClick={() => {
+              setSearch('');
+              change({ status: undefined, source: undefined, q: '', period: 'all' });
+            }}
           >
-            Clear selection
+            Show all orders again
           </button>
+        )}
+      </div>
+
+      {/* ---------------------------------------------------- bulk bar */}
+      {selected.size > 0 && (
+        <div className="space-y-3 rounded-xl border-2 border-brand bg-brand-tint px-5 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-[18px] font-bold text-brand">
+              {selected.size} order{selected.size === 1 ? '' : 's'} selected
+            </span>
+            <button
+              type="button"
+              className="text-[16px] text-text-regular underline underline-offset-4 hover:text-brand"
+              onClick={() => setSelected(new Set())}
+            >
+              Cancel
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-[17px] text-text-primary">Change their status to:</span>
+            {QUICK_STATUSES.map(({ status, event }) => (
+              <button
+                key={status}
+                type="button"
+                disabled={busy}
+                className="el-btn h-12 gap-2 border-2 px-4 text-[16px] font-semibold"
+                onClick={() => void markAs(status, event)}
+              >
+                <span className="h-[11px] w-[11px] rounded-full" style={{ background: STATUS_STYLE[status].color }} />
+                {STATUS_LABEL[status]}
+              </button>
+            ))}
+          </div>
+          <input
+            className="el-input h-12 max-w-[420px] text-[16px]"
+            value={location}
+            maxLength={128}
+            placeholder="Place (optional), e.g. Transit Center SHAHALAM GATEWAY"
+            aria-label="Place for the status change"
+            onChange={(e) => setLocation(e.target.value)}
+          />
         </div>
       )}
 
-      <section className="el-card overflow-hidden">
+      {/* ------------------------------------------------------- table */}
+      <section className="overflow-hidden rounded-xl border-2 border-line bg-white">
         <div className="thin-scroll overflow-x-auto">
-          <table className="w-full min-w-[1100px] text-base">
-            <thead className="bg-surface-head text-text-regular">
+          <table className="w-full min-w-[1080px]">
+            <thead className="bg-surface-head text-[15px] text-text-regular">
               <tr>
-                <th className="w-[36px] border-b border-line-light px-3 py-2 text-left">
+                <th className="w-[52px] border-b-2 border-line px-4 py-3 text-left">
                   <input
                     type="checkbox"
+                    className="h-5 w-5"
                     checked={allOnPageSelected}
-                    aria-label="Select all orders on this page"
+                    aria-label="Select every order on this page"
                     onChange={(e) =>
                       setSelected((prev) => {
                         const next = new Set(prev);
@@ -410,13 +378,12 @@ export default function AdminDashboardPage() {
                     }
                   />
                 </th>
-                {['Created', 'Order No.', 'Tracking Number', 'Receiver', 'Destination', 'Items', 'Payment', 'Status', ''].map(
-                  (heading) => (
-                    <th key={heading} className="border-b border-line-light px-3 py-2 text-left font-normal">
-                      {heading}
-                    </th>
-                  ),
-                )}
+                {ORDER_COLUMNS.map((heading) => (
+                  <th key={heading} className="border-b-2 border-line px-4 py-3 text-left font-semibold">
+                    {heading}
+                  </th>
+                ))}
+                <th className="border-b-2 border-line px-4 py-3 text-right font-semibold">Edit</th>
               </tr>
             </thead>
             <tbody>
@@ -446,14 +413,15 @@ export default function AdminDashboardPage() {
               ))}
               {data && items.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-3 py-12 text-center text-text-secondary">
-                    No orders match.
+                  <td colSpan={9} className="px-4 py-16 text-center text-[18px] text-text-secondary">
+                    No orders here.
+                    {filtered && ' Try "Show all orders again".'}
                   </td>
                 </tr>
               )}
               {!data && !error && (
                 <tr>
-                  <td colSpan={10} className="px-3 py-12 text-center text-text-secondary">
+                  <td colSpan={9} className="px-4 py-16 text-center text-[18px] text-text-secondary">
                     Loading orders...
                   </td>
                 </tr>
@@ -461,27 +429,25 @@ export default function AdminDashboardPage() {
             </tbody>
           </table>
         </div>
-        <div className="flex items-center justify-end gap-3 border-t border-line-light px-4 py-2.5 text-base text-text-regular">
+        <div className="flex flex-wrap items-center justify-end gap-3 border-t-2 border-line px-5 py-3 text-[16px] text-text-regular">
           <span>
-            {first}-{last} of {data?.total ?? 0}
+            Showing {first}-{last} of {data?.total ?? 0}
           </span>
           <button
             type="button"
-            className="el-btn h-[28px] px-2"
+            className="el-btn h-11 gap-1 px-4 text-[16px]"
             disabled={!data || data.page <= 1}
-            aria-label="Previous page"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
           >
-            <ChevronLeftSm />
+            <ChevronLeftSm /> Previous
           </button>
           <button
             type="button"
-            className="el-btn h-[28px] px-2"
+            className="el-btn h-11 gap-1 px-4 text-[16px]"
             disabled={!data || data.page >= data.pages}
-            aria-label="Next page"
             onClick={() => setPage((p) => p + 1)}
           >
-            <ChevronRightSm />
+            Next <ChevronRightSm />
           </button>
         </div>
       </section>
@@ -489,7 +455,7 @@ export default function AdminDashboardPage() {
       {toast && (
         <div
           role="status"
-          className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded bg-[#303133] px-4 py-2.5 text-base text-white shadow-lg"
+          className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-[#303133] px-6 py-4 text-[17px] text-white shadow-xl"
         >
           {toast}
         </div>

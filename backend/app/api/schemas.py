@@ -87,6 +87,8 @@ class NormalOrderIn(BaseModel):
     order_payment_type: Literal["PREPAID", "COD"] = "PREPAID"
     #: how the parcel reaches J&T: a courier collects it, or it is dropped off
     service_mode: Literal["PICK_UP", "DROP_OFF"] = "PICK_UP"
+    #: where the order came from: Website, Daraz, Amazon...
+    source: str = Field(default="Website", max_length=64)
     remark: str = ""
     output_dir: str | None = None
 
@@ -127,6 +129,7 @@ class OrderOut(BaseModel):
     quantity: int
     items: list[dict[str, Any]] | None = None
     service_mode: str | None = None
+    source: str = "Website"
     actual_weight: Decimal
     volumetric_weight: Decimal
     chargeable_weight: Decimal
@@ -246,6 +249,15 @@ class BulkCommitIn(BaseModel):
     merge_pdf: bool | None = None
 
 
+class PackingFileOut(BaseModel):
+    """One packing PDF: every label of one product, ready to print."""
+
+    title: str
+    orders: int
+    pieces: int
+    url: str
+
+
 class BulkCommitOut(BaseModel):
     batch_id: int
     total: int
@@ -260,6 +272,13 @@ class BulkCommitOut(BaseModel):
     manifest_url: str
     zip_url: str
     row_errors: list[RowError] = Field(default_factory=list)
+    #: WhatsApp group messages queued for the new orders (0 when WhatsApp is off)
+    whatsapp_queued: int = 0
+    whatsapp_to_dropship: int = 0
+    #: one PDF per product, e.g. "Embroidered Maxi Chic - 25 orders.pdf"
+    packing_files: list[PackingFileOut] = Field(default_factory=list)
+    #: paid all-drop-ship orders, left out of the packing PDFs
+    packing_left_out: int = 0
 
 
 class BulkProgressOut(BaseModel):
@@ -374,7 +393,7 @@ class TrackingOut(BaseModel):
     found: bool
     status: str | None = None
     status_label: str | None = None
-    #: masked as on jtexpress.my
+    #: hidden on the public tracking page
     origin: str = "***"
     destination: str = "***"
     steps: list[TrackingStepOut] = Field(default_factory=list)
@@ -427,6 +446,7 @@ class AdminOrderOut(BaseModel):
     chargeable_weight: Decimal
     #: paid and every item drop-shipped: the supplier sends it
     supplier_ships: bool
+    source: str
     tracking_status: str
     status_label: str
     tracking_updated_at: datetime | None
@@ -435,17 +455,53 @@ class AdminOrderOut(BaseModel):
     waybill_url: str
 
 
+class SourceCountOut(BaseModel):
+    name: str
+    count: int
+
+
 class AdminOrderPage(BaseModel):
     items: list[AdminOrderOut]
     page: int
     size: int
     total: int
     pages: int
-    #: orders per status for the current search and date range (all statuses)
+    #: orders per status for the current search, date range and source
     counts: dict[str, int]
+    #: orders per source for the current search, date range and status - every
+    #: known source in display order (zero counts included), then any others
+    sources: list[SourceCountOut]
     today: int
     #: the highest order id, to spot orders created since the last look
     newest_id: int
+
+
+class CalendarDayOut(BaseModel):
+    """One day of the admin calendar, in Malaysia time."""
+
+    day: date
+    #: orders created that day
+    orders: int
+    #: those orders by their status now
+    statuses: dict[str, int]
+    #: cash to collect for that day's COD orders
+    cod_amount: Decimal
+    #: parcels delivered / returned that day, whenever they were ordered
+    delivered: int
+    returned: int
+
+
+class CalendarOut(BaseModel):
+    #: "2026-09"
+    month: str
+    #: today in Malaysia, to highlight it
+    today: date
+    days: list[CalendarDayOut]
+    total_orders: int
+    total_delivered: int
+    total_returned: int
+    #: orders created this month per source, for the source filter
+    sources: list[SourceCountOut]
 
 
 class AdminOrderDetailOut(BaseModel):
@@ -500,6 +556,17 @@ class UserOut(BaseModel):
     status: str
     created_at: datetime
     last_login_at: datetime | None
+
+
+class UserCreateIn(BaseModel):
+    """An account the admin makes: active at once, no approval needed."""
+
+    name: str = Field(default="", max_length=128)
+    username: str = Field(default="", max_length=64)
+    phone: str = Field(default="", max_length=32)
+    email: str = Field(default="", max_length=254)
+    password: str = Field(default="", max_length=128)
+    role: Literal["admin", "merchant"] = "merchant"
 
 
 class UserUpdateIn(BaseModel):

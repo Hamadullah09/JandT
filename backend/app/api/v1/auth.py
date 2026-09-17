@@ -73,63 +73,88 @@ async def me(
     return await me_out(session, user)
 
 
-@router.post("/signup", response_model=SignupOut, status_code=201)
-async def signup(body: SignupIn, session: AsyncSession = Depends(get_session)) -> SignupOut:
-    """Create an account that can log in once the admin approves it."""
-    name = " ".join(body.name.split())
-    username = auth.clean_username(body.username)
-    email = auth.clean_email(body.email)
+async def new_account(
+    session: AsyncSession,
+    *,
+    name: str,
+    username: str,
+    phone: str,
+    email: str,
+    password: str,
+    phone_required: bool,
+    title: str,
+) -> dict:
+    """Check a new account's details - each problem gets one plain message.
+
+    Returns the cleaned fields for a :class:`User`.
+    """
+    name = " ".join(name.split())
+    username = auth.clean_username(username)
+    email = auth.clean_email(email)
 
     if len(name) < 2:
-        raise Problem(status=422, title="Sign-up failed", detail="Enter your name.")
+        raise Problem(status=422, title=title, detail="Enter a name.")
     if not auth.USERNAME.fullmatch(username):
         raise Problem(
             status=422,
-            title="Sign-up failed",
+            title=title,
             detail="Username must be 3-32 letters or numbers (dots, dashes and underscores are fine).",
         )
-    try:
-        phone = auth.clean_phone(body.phone)
-    except auth.PhoneError:
-        raise Problem(
-            status=422, title="Sign-up failed", detail="Enter a Malaysian mobile number, e.g. 0123456789."
-        ) from None
+    clean_phone = None
+    if phone.strip() or phone_required:
+        try:
+            clean_phone = auth.clean_phone(phone)
+        except auth.PhoneError:
+            raise Problem(
+                status=422, title=title, detail="Enter a Malaysian mobile number, e.g. 0123456789."
+            ) from None
     if email and not auth.EMAIL.fullmatch(email):
-        raise Problem(status=422, title="Sign-up failed", detail="Enter a valid email, or leave it empty.")
-    if len(body.password) < auth.MIN_PASSWORD:
+        raise Problem(status=422, title=title, detail="Enter a valid email, or leave it empty.")
+    if len(password) < auth.MIN_PASSWORD:
         raise Problem(
-            status=422,
-            title="Sign-up failed",
-            detail=f"Password must be at least {auth.MIN_PASSWORD} characters.",
+            status=422, title=title, detail=f"Password must be at least {auth.MIN_PASSWORD} characters."
         )
-    if body.password != body.confirm_password:
-        raise Problem(status=422, title="Sign-up failed", detail="The two passwords are not the same.")
 
-    clauses = [User.username == username, User.phone == phone]
+    clauses = [User.username == username]
+    if clean_phone:
+        clauses.append(User.phone == clean_phone)
     if email:
         clauses.append(User.email == email)
     taken = await session.scalar(select(User).where(or_(*clauses)))
     if taken is not None:
         what = (
             "username" if taken.username == username
-            else "phone number" if taken.phone == phone
+            else "phone number" if clean_phone and taken.phone == clean_phone
             else "email"
         )
-        raise Problem(
-            status=409, title="Sign-up failed", detail=f"An account with this {what} already exists."
-        )
+        raise Problem(status=409, title=title, detail=f"An account with this {what} already exists.")
 
-    session.add(
-        User(
-            username=username,
-            name=name,
-            phone=phone,
-            email=email or None,
-            password_hash=auth.hash_password(body.password),
-            role=auth.ROLE_MERCHANT,
-            status=auth.STATUS_PENDING,
-        )
+    return {
+        "username": username,
+        "name": name,
+        "phone": clean_phone,
+        "email": email or None,
+        "password_hash": auth.hash_password(password),
+    }
+
+
+@router.post("/signup", response_model=SignupOut, status_code=201)
+async def signup(body: SignupIn, session: AsyncSession = Depends(get_session)) -> SignupOut:
+    """Create an account that can log in once the admin approves it."""
+    if body.name.strip() and body.password and body.password != body.confirm_password:
+        raise Problem(status=422, title="Sign-up failed", detail="The two passwords are not the same.")
+    fields = await new_account(
+        session,
+        name=body.name,
+        username=body.username,
+        phone=body.phone,
+        email=body.email,
+        password=body.password,
+        phone_required=True,
+        title="Sign-up failed",
     )
+    username = fields["username"]
+    session.add(User(**fields, role=auth.ROLE_MERCHANT, status=auth.STATUS_PENDING))
     await session.commit()
     return SignupOut(
         username=username,

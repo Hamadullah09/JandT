@@ -4,6 +4,7 @@
     python scripts/export_orders.py --today             today's orders (Malaysia time)
     python scripts/export_orders.py --days 7            the last 7 days
     python scripts/export_orders.py --status DELIVERED  only delivered parcels
+    python scripts/export_orders.py --source Daraz      only orders from Daraz
     python scripts/export_orders.py --out orders.csv --no-open
 
 Writes ``exports/orders_<date>_<time>.csv`` and opens it.  One row per order:
@@ -38,6 +39,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     when.add_argument("--today", action="store_true", help="only today's orders")
     when.add_argument("--days", type=int, choices=(7, 30), help="only the last 7 or 30 days")
     p.add_argument("--status", help="only one status, e.g. IN_TRANSIT or DELIVERED")
+    p.add_argument("--source", help="only orders from one source, e.g. Daraz or Website")
     p.add_argument("--out", type=Path, help="file to write (default exports/orders_<date>_<time>.csv)")
     p.add_argument("--no-open", action="store_true", help="do not open the file afterwards")
     return p.parse_args(argv)
@@ -50,6 +52,7 @@ async def _run(args: argparse.Namespace) -> int:
     from app.config import get_settings
     from app.core import trace
     from app.core.export import ExportOrder, orders_csv
+    from app.core.sources import normalise_source
     from app.db.models import Order
     from app.db.session import dispose_engine, get_sessionmaker
 
@@ -62,12 +65,15 @@ async def _run(args: argparse.Namespace) -> int:
 
     try:
         async with get_sessionmaker()() as session:
-            stmt = select(Order).order_by(Order.id)
+            # newest first, like the admin dashboard
+            stmt = select(Order).order_by(Order.created_at.desc(), Order.id.desc())
             start = period_start(period)
             if start is not None:
                 stmt = stmt.where(Order.created_at >= start)
             if status:
                 stmt = stmt.where(Order.tracking_status == status)
+            if args.source:
+                stmt = stmt.where(Order.source == normalise_source(args.source))
             orders = [ExportOrder.of(order) for order in await session.scalars(stmt)]
     finally:
         await dispose_engine()

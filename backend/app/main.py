@@ -17,6 +17,7 @@ from app.api.v1 import (
     bulk,
     orders,
     settings as settings_router,
+    sources,
     tracking,
     users,
     waybills,
@@ -40,11 +41,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(
-    title="JT-CLONE API",
+    title="Inaaya Store Order Portal API",
     version="1.0.0",
     description=(
-        "Self-hosted replica of the J&T Express merchant portal: single order "
-        "creation, bulk CSV import and J&T-format waybill rendering."
+        "Order portal for Inaaya Store: single orders, bulk CSV import, courier "
+        "waybills, WhatsApp order messages, tracking and the admin portal."
     ),
     lifespan=lifespan,
 )
@@ -71,6 +72,7 @@ api.include_router(orders.router, dependencies=LOGGED_IN)
 api.include_router(bulk.router, dependencies=LOGGED_IN)
 api.include_router(waybills.router, dependencies=LOGGED_IN)
 api.include_router(address.router, dependencies=LOGGED_IN)
+api.include_router(sources.router, dependencies=LOGGED_IN)
 # the admin only: the admin portal
 api.include_router(admin.router, dependencies=[Depends(require_admin)])
 api.include_router(users.router)

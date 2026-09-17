@@ -26,7 +26,7 @@ export const STATUS_STYLE: Record<Status, { color: string; background: string }>
   IN_TRANSIT: { color: '#b86e00', background: '#fdf6ec' },
   ON_DELIVERY: { color: '#7c3aad', background: '#f5eefa' },
   DELIVERED: { color: '#3f8f1f', background: '#f0f9eb' },
-  RETURNED: { color: '#da251c', background: '#fef0f0' },
+  RETURNED: { color: '#c62828', background: '#fdecea' },
 };
 
 /** The one-click statuses of the bulk bar, and the scan each one records. */
@@ -57,7 +57,7 @@ export function StatusBadge({ status }: { status: string }) {
   const style = STATUS_STYLE[known];
   return (
     <span
-      className="inline-flex h-[22px] items-center whitespace-nowrap rounded-full px-[10px] text-[12px] font-semibold"
+      className="inline-flex h-[32px] items-center whitespace-nowrap rounded-full px-[14px] text-[15px] font-semibold"
       style={style}
     >
       {isStatus(status) ? STATUS_LABEL[status] : status}
@@ -81,4 +81,47 @@ export function itemText(item: Item): string {
   const variant = item.variant ? ` (${item.variant})` : '';
   const quantity = item.quantity > 1 ? ` x${item.quantity}` : '';
   return `${item.name}${variant}${quantity}`;
+}
+
+/** What each status means, in plain words, under its name on the dashboard. */
+export const STATUS_HINT: Record<Status, string> = {
+  CREATED: 'Waiting for the courier to collect',
+  PICKED_UP: 'The courier has the parcel',
+  IN_TRANSIT: 'On the way',
+  ON_DELIVERY: 'Out for delivery',
+  DELIVERED: 'Customer received it',
+  RETURNED: 'Came back to you',
+};
+
+/** A colour for each order source; any other source is grey-blue. */
+const SOURCE_COLOURS: Record<string, string> = {
+  Website: '#030302',
+  WhatsApp: '#1e9e45',
+  Facebook: '#1877f2',
+  Instagram: '#c13584',
+  'TikTok Shop': '#222222',
+  Daraz: '#f85606',
+  Shopee: '#ee4d2d',
+  Lazada: '#1a237e',
+  Amazon: '#e08a00',
+  eBay: '#0064d2',
+  Etsy: '#d5641c',
+  Other: '#909399',
+};
+
+export function sourceColour(name: string): string {
+  return SOURCE_COLOURS[name] ?? '#5f7d8c';
+}
+
+export function SourceTag({ name }: { name: string }) {
+  const colour = sourceColour(name);
+  return (
+    <span
+      className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-[3px] text-[15px] font-semibold"
+      style={{ color: colour, borderColor: `${colour}55`, background: `${colour}10` }}
+    >
+      <span className="h-[9px] w-[9px] rounded-full" style={{ background: colour }} />
+      {name}
+    </span>
+  );
 }

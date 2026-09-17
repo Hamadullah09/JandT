@@ -1,75 +1,62 @@
-/** The jtexpress.my frame around the tracking page: red top bar and footer. */
+/** The inaayastore.com frame around the tracking page: announcement bar, menu and footer. */
 import Link from 'next/link';
+import { InaayaLogo, STORE_NAME, STORE_URL } from '@/components/brand/Logo';
 
-const MENU = ['SHIPPING', 'SERVICES', 'JOIN US', 'INFO', 'VIP', 'J&T DISTRIBUTION', 'STAR DISPATCHERS'];
+/** The shop's own menu, so the page feels like part of inaayastore.com. */
+const MENU: [string, string][] = [
+  ['Home', '/'],
+  ['New Arrival', '/collections/new-arrivals'],
+  ['Best Sellers', '/collections/best-sellers'],
+  ['2PC', '/collections/2-piece-dress/2PC'],
+  ['3PC', '/collections/3-piece-dress'],
+  ['Gowns', '/collections/gown-and-duppata'],
+  ['Cord Sets', '/collections/cord-sets'],
+  ['Lehanga', '/collections/lehanga'],
+  ['Saree Collection', '/collections/sarees'],
+  ['Kids', '/collections/kids'],
+];
 
-export const SITE_RED = '#e60012';
-
-export function SiteLogo() {
+export function SiteHeader({ announcement = `Track your ${STORE_NAME} order` }: { announcement?: string }) {
   return (
-    <Link href="/tracking" className="flex select-none items-end text-white" aria-label="J&T Express">
-      <span
-        className="text-[31px] font-black italic leading-none tracking-[-0.05em]"
-        style={{ fontFamily: 'Arial Black, Arial, sans-serif' }}
-      >
-        J&amp;T
-      </span>
-      <span className="mb-[-2px] ml-[2px] text-[12px] font-bold italic tracking-[0.01em]">
-        EXPRESS
-      </span>
-    </Link>
-  );
-}
-
-export function SiteHeader() {
-  return (
-    <header
-      className="sticky top-0 z-30 flex h-[66px] items-center gap-6 px-5 text-white md:px-[52px]"
-      style={{ background: SITE_RED }}
-    >
-      <SiteLogo />
-      <nav className="hidden flex-1 items-center gap-[26px] text-[14px] font-medium lg:flex">
-        {MENU.map((item) => (
-          <span key={item} className="cursor-default whitespace-nowrap">
-            {item}
-          </span>
-        ))}
-      </nav>
-      <div className="ml-auto flex items-center gap-[26px] text-[14px] font-medium">
-        <Link href="/login" className="whitespace-nowrap hover:underline">
-          LOGIN
+    <header className="sticky top-0 z-30 bg-white">
+      <p className="bg-brand px-4 py-2 text-center text-[12px] font-semibold uppercase tracking-[1.5px] text-white">
+        {announcement}
+      </p>
+      <div className="flex h-[84px] items-center gap-6 border-b border-[#e8e6e1] px-5 md:px-[52px]">
+        <Link href="/tracking" aria-label={`${STORE_NAME} - track a parcel`}>
+          <InaayaLogo size="sm" />
         </Link>
-        <span className="hidden cursor-default sm:inline">LANGUAGE</span>
+        <nav className="hidden flex-1 flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[14px] text-[rgba(3,3,2,0.8)] xl:flex">
+          {MENU.map(([label, path]) => (
+            <a key={label} href={`${STORE_URL}${path}`} className="whitespace-nowrap hover:text-brand hover:underline">
+              {label}
+            </a>
+          ))}
+        </nav>
+        <div className="ml-auto flex items-center gap-5 text-[13px] font-semibold uppercase tracking-[1px]">
+          <a href={STORE_URL} className="hidden whitespace-nowrap hover:underline sm:inline">
+            Shop
+          </a>
+          <Link href="/login" className="whitespace-nowrap border border-brand px-4 py-2 hover:bg-brand hover:text-white">
+            Login
+          </Link>
+        </div>
       </div>
     </header>
   );
 }
 
-const FOOTER: [string, string[]][] = [
-  ['Shipping', ['Domestic Shipping', 'International Shipping']],
-  ['Services', ['Track & Trace', 'Shipping Rates']],
-  ['Join Us', ['VIP', 'E-Commerce']],
-  ['Info', ['About Us', 'FAQ']],
-];
-
 export function SiteFooter() {
   return (
-    <footer className="mt-16 bg-[#2f2f2f] px-5 py-10 text-white md:px-[52px]">
-      <div className="mx-auto grid max-w-[1246px] grid-cols-2 gap-8 md:grid-cols-4">
-        {FOOTER.map(([title, links]) => (
-          <div key={title}>
-            <h3 className="mb-3 text-[17px] font-semibold">{title}</h3>
-            <ul className="space-y-2 text-[13px] text-[#cfcfcf]">
-              {links.map((link) => (
-                <li key={link}>{link}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
+    <footer className="mt-16 border-t border-[#e8e6e1] bg-white px-5 py-10 md:px-[52px]">
+      <div className="mx-auto flex max-w-[1246px] flex-col items-center gap-4 text-center">
+        <InaayaLogo size="sm" />
+        <p className="text-[13px] font-semibold uppercase tracking-[1.5px] text-brand">Find your style with Inaaya</p>
+        <a href={STORE_URL} className="text-[14px] text-[rgba(3,3,2,0.75)] underline-offset-4 hover:underline">
+          inaayastore.com
+        </a>
+        <p className="text-[13px] text-[rgba(3,3,2,0.6)]">© {new Date().getFullYear()} {STORE_NAME}</p>
       </div>
-      <p className="mx-auto mt-10 max-w-[1246px] border-t border-[#474747] pt-5 text-center text-[12px] text-[#9b9b9b]">
-        Parcel statuses on this page are recorded in your J&amp;T merchant portal.
-      </p>
     </footer>
   );
 }

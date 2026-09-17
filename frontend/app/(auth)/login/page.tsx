@@ -49,7 +49,7 @@ export default function LoginPage() {
 
   return (
     <form onSubmit={submit} className="space-y-4" noValidate>
-      <h1 className="text-center text-[36px] font-normal leading-tight text-[#333]">Login</h1>
+      <h1 className="text-center text-[30px] font-bold uppercase leading-tight tracking-[1.5px] text-brand">Login</h1>
       <AuthInput
         label="Username / Phone Number / Email"
         value={login}
@@ -66,11 +66,11 @@ export default function LoginPage() {
       />
       {error && <AuthMessage kind="error">{error}</AuthMessage>}
       <AuthButton busy={busy}>{busy ? 'Logging in...' : 'Login'}</AuthButton>
-      <p className="flex justify-center gap-5 text-[11px] text-[#666]">
-        <Link href="/signup" className="hover:text-[#e60012] hover:underline">
+      <p className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[16px] text-[#55544f]">
+        <Link href="/signup" className="underline underline-offset-4 hover:text-brand">
           Create an account
         </Link>
-        <Link href="/forgot-password" className="hover:text-[#e60012] hover:underline">
+        <Link href="/forgot-password" className="underline underline-offset-4 hover:text-brand">
           Forgot password
         </Link>
       </p>

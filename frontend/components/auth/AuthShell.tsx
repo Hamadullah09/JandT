@@ -1,37 +1,41 @@
 'use client';
 
 import { useState, type InputHTMLAttributes, type ReactNode } from 'react';
-import { SITE_RED, SiteHeader } from '@/components/tracking/Site';
-import { Trucks } from './Trucks';
+import { InaayaLogo, STORE_NAME } from '@/components/brand/Logo';
+import { SiteHeader } from '@/components/tracking/Site';
+import { FileIcon, TruckIcon, UploadIcon } from '@/components/ui/icons';
 
-/** jtexpress.my/login: the brand on the left, the form on the right. */
+const PROMISES = [
+  { icon: FileIcon, text: 'Create an order in a minute' },
+  { icon: UploadIcon, text: 'Upload many orders from one CSV file' },
+  { icon: TruckIcon, text: 'Follow every parcel until it is delivered' },
+];
+
+/** The login and sign-up frame: the shop on the left, the form on the right. */
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
-    <div
-      className="flex min-h-screen flex-col bg-white text-[#333]"
-      style={{ fontFamily: "Nunito, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" }}
-    >
-      <SiteHeader />
+    <div className="flex min-h-screen flex-col bg-white text-brand">
+      <SiteHeader announcement={`${STORE_NAME} order portal`} />
       <div className="grid flex-1 md:grid-cols-2">
-        <section className="hidden flex-col items-center border-r border-[#e6e6e6] bg-[#fafafb] px-8 pb-10 pt-16 md:flex">
-          <div className="flex select-none flex-col items-center" style={{ color: SITE_RED }}>
-            <div className="flex items-end">
-              <span
-                className="text-[88px] font-black italic leading-none tracking-[-0.06em]"
-                style={{ fontFamily: 'Arial Black, Arial, sans-serif' }}
-              >
-                J&amp;T
-              </span>
-              <span className="mb-[6px] ml-1 text-[34px] font-extrabold italic leading-none">EXPRESS</span>
-            </div>
-            <p className="mt-3 text-[26px] font-bold italic">
-              <span className="mr-2">—</span>Express Your Online Business<span className="ml-2">—</span>
-            </p>
+        <section className="hidden flex-col items-center justify-center border-r border-[#e8e6e1] bg-brand-tint px-8 py-14 md:flex">
+          <InaayaLogo size="lg" />
+          <p className="mt-6 text-[15px] font-semibold uppercase tracking-[2px]">Find your style with Inaaya</p>
+          <div className="mt-12 w-full max-w-[420px] border-t border-[#dcd8d0] pt-8">
+            <h2 className="text-[20px] font-bold uppercase tracking-[1.5px]">Order portal</h2>
+            <ul className="mt-5 space-y-4">
+              {PROMISES.map(({ icon: Icon, text }) => (
+                <li key={text} className="flex items-center gap-4 text-[18px]">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  {text}
+                </li>
+              ))}
+            </ul>
           </div>
-          <Trucks className="mt-12 w-full max-w-[560px]" />
         </section>
-        <section className="flex items-center justify-center bg-[#f8f9fa] px-5 py-12">
-          <div className="w-full max-w-[300px]">{children}</div>
+        <section className="flex items-center justify-center px-5 py-12">
+          <div className="w-full max-w-[400px]">{children}</div>
         </section>
       </div>
     </div>
@@ -43,17 +47,17 @@ function EyeIcon({ open }: { open: boolean }) {
     <svg width={24} height={24} viewBox="0 0 24 24" aria-hidden>
       <path
         d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"
-        stroke="#333"
+        stroke="currentColor"
         strokeWidth="1.6"
         fill="none"
       />
-      <circle cx="12" cy="12" r="3.2" stroke="#333" strokeWidth="1.6" fill="none" />
-      {!open && <path d="M4 20 20 4" stroke="#333" strokeWidth="1.8" strokeLinecap="round" />}
+      <circle cx="12" cy="12" r="3.2" stroke="currentColor" strokeWidth="1.6" fill="none" />
+      {!open && <path d="M4 20 20 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />}
     </svg>
   );
 }
 
-/** A tall input whose placeholder carries J&T's red asterisk. */
+/** A tall input whose placeholder doubles as its label; required ones get a red asterisk. */
 export function AuthInput({
   label,
   required = true,
@@ -77,13 +81,13 @@ export function AuthInput({
         type={password && shown ? 'text' : type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={`h-[58px] w-full rounded-[2px] border border-[#dcdfe6] bg-white px-3 text-[15px] text-[#333] outline-none transition-colors focus:border-[#e60012] ${
+        className={`h-[58px] w-full border border-[#d6d3cc] bg-white px-4 text-[17px] text-brand outline-none transition-colors focus:border-brand focus:shadow-[0_0_0_1px_#030302] ${
           password ? 'pr-12' : ''
         }`}
       />
       {!value && (
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[15px] text-[#333]">
-          {required && <span style={{ color: SITE_RED }}>*</span>}
+        <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[17px] text-[#6b6a66]">
+          {required && <span className="mr-[2px] text-danger">*</span>}
           {label}
         </span>
       )}
@@ -92,7 +96,7 @@ export function AuthInput({
           type="button"
           onClick={() => setShown((value) => !value)}
           aria-label={shown ? 'Hide password' : 'Show password'}
-          className="absolute right-3 top-1/2 -translate-y-1/2"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-brand"
         >
           <EyeIcon open={shown} />
         </button>
@@ -106,22 +110,25 @@ export function AuthButton({ children, busy = false }: { children: ReactNode; bu
     <button
       type="submit"
       disabled={busy}
-      className="mx-auto block min-w-[62px] rounded-[3px] px-3 py-[8px] text-[15px] text-white disabled:opacity-70"
-      style={{ background: SITE_RED }}
+      className="block h-[56px] w-full bg-brand text-[16px] font-bold uppercase tracking-[1.5px] text-white transition-colors hover:bg-[#2e2d2a] disabled:opacity-70"
     >
       {children}
     </button>
   );
 }
 
+/** A black button-style link, e.g. "Back to Login". */
+export const AUTH_LINK_BUTTON =
+  'inline-flex h-[52px] items-center bg-brand px-6 text-[15px] font-bold uppercase tracking-[1.5px] text-white hover:bg-[#2e2d2a]';
+
 export function AuthMessage({ kind, children }: { kind: 'error' | 'ok'; children: ReactNode }) {
   return (
     <p
       role={kind === 'error' ? 'alert' : 'status'}
-      className={`rounded-[2px] border px-3 py-2 text-[13px] ${
+      className={`border px-4 py-3 text-[16px] leading-6 ${
         kind === 'error'
-          ? 'border-[#fbc4c4] bg-[#fef0f0] text-[#e60012]'
-          : 'border-[#c2e7b0] bg-[#f0f9eb] text-[#3f8f1f]'
+          ? 'border-[#f3c1bd] bg-danger-tint text-danger'
+          : 'border-[#c2e7b0] bg-[#f0f9eb] text-[#2f6f14]'
       }`}
     >
       {children}

@@ -71,6 +71,7 @@ export interface AdminOrderOut {
   freight_fee: string | null;
   chargeable_weight: string;
   supplier_ships: boolean;
+  source: string;
   tracking_status: string;
   status_label: string;
   tracking_updated_at: string | null;
@@ -86,6 +87,7 @@ export interface AdminOrderPage {
   total: number;
   pages: number;
   counts: Record<string, number>;
+  sources: SourceCountOut[];
   today: number;
   newest_id: number;
 }
@@ -114,6 +116,10 @@ export interface BulkCommitOut {
   manifest_url: string;
   zip_url: string;
   row_errors?: RowError[];
+  whatsapp_queued?: number;
+  whatsapp_to_dropship?: number;
+  packing_files?: PackingFileOut[];
+  packing_left_out?: number;
 }
 
 export interface BulkProgressOut {
@@ -147,6 +153,26 @@ export interface BulkUploadOut {
   warnings?: string[];
   rows?: BulkRowOut[];
   row_errors?: RowError[];
+}
+
+/** One day of the admin calendar, in Malaysia time. */
+export interface CalendarDayOut {
+  day: string;
+  orders: number;
+  statuses: Record<string, number>;
+  cod_amount: string;
+  delivered: number;
+  returned: number;
+}
+
+export interface CalendarOut {
+  month: string;
+  today: string;
+  days: CalendarDayOut[];
+  total_orders: number;
+  total_delivered: number;
+  total_returned: number;
+  sources: SourceCountOut[];
 }
 
 export interface DeleteRowsIn {
@@ -206,6 +232,7 @@ export interface NormalOrderIn {
   order_value?: number | string;
   order_payment_type?: "PREPAID" | "COD";
   service_mode?: "PICK_UP" | "DROP_OFF";
+  source?: string;
   remark?: string;
   output_dir?: string | null;
 }
@@ -244,6 +271,7 @@ export interface OrderOut {
   quantity: number;
   items?: Record<string, unknown>[] | null;
   service_mode?: string | null;
+  source?: string;
   actual_weight: string;
   volumetric_weight: string;
   chargeable_weight: string;
@@ -284,6 +312,14 @@ export interface OutputDirCheckOut {
   ok: boolean;
   resolved?: string | null;
   message?: string | null;
+}
+
+/** One packing PDF: every label of one product, ready to print. */
+export interface PackingFileOut {
+  title: string;
+  orders: number;
+  pieces: number;
+  url: string;
 }
 
 /** A draft parcel, for the live totals on the Normal Order footer. */
@@ -363,6 +399,17 @@ export interface SignupOut {
   message: string;
 }
 
+export interface SourceCountOut {
+  name: string;
+  count: number;
+}
+
+export interface SourceOut {
+  name: string;
+  kind: string;
+  default: boolean;
+}
+
 export interface TrackingDayOut {
   date_label: string;
   events: TrackingEventOut[];
@@ -409,6 +456,16 @@ export interface TrackingUpdateIn {
 export interface TrackingUpdateOut {
   updated: number;
   not_found?: string[];
+}
+
+/** An account the admin makes: active at once, no approval needed. */
+export interface UserCreateIn {
+  name?: string;
+  username?: string;
+  phone?: string;
+  email?: string;
+  password?: string;
+  role?: "admin" | "merchant";
 }
 
 export interface UserOut {

@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --jt-red: #da251c;
-  --jt-red-soft: #f08a85;
+  --brand: #030302;
+  --brand-soft: #5b5a56;
+  --brand-tint: #f4f2ee;
+  --danger: #c62828;
   --text-primary: #303133;
   --text-regular: #606266;
   --text-secondary: #909399;
@@ -13,7 +15,7 @@
   --bg-page: #f5f7fa;
   --bg-table-head: #fafafa;
   --bg-card-head: #f5f7fa;
-  --radius: 4px;
+  --radius: 2px;
 }
 
 html,
@@ -25,15 +27,15 @@ body {
   margin: 0;
   background: #ffffff;
   color: var(--text-primary);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 15px;
+  line-height: 22px;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Element-Plus-equivalent controls, hand-built (spec 4.1) ----------------- */
+/* Controls in Inaaya Store's style: square, ink-black, bold labels ---------- */
 @layer components {
   .el-input {
-    @apply h-control w-full rounded border border-line bg-white px-[11px] text-base
+    @apply h-control w-full rounded border border-line bg-white px-3 text-base
            text-text-primary outline-none transition-colors;
   }
   .el-input::placeholder {
@@ -43,7 +45,7 @@ body {
     border-color: #c0c4cc;
   }
   .el-input:focus:not(:disabled) {
-    border-color: var(--jt-red);
+    border-color: var(--brand);
   }
   .el-input:disabled {
     @apply cursor-not-allowed border-line bg-[#f5f7fa] text-text-secondary;
@@ -55,56 +57,56 @@ body {
 
   .el-btn {
     @apply inline-flex h-control select-none items-center justify-center gap-1
-           whitespace-nowrap rounded border border-line bg-white px-[15px]
+           whitespace-nowrap rounded border border-line bg-white px-4
            text-base text-text-primary transition-colors;
   }
   .el-btn:hover:not(:disabled) {
-    @apply border-jt-red text-jt-red;
+    @apply border-brand text-brand;
   }
   .el-btn:disabled {
     @apply cursor-not-allowed border-line bg-white text-[#c0c4cc];
   }
 
   .el-btn-primary {
-    @apply border-jt-red bg-jt-red text-white;
+    @apply border-brand bg-brand text-white;
   }
   .el-btn-primary:hover:not(:disabled) {
-    @apply border-jt-red bg-[#c31f17] text-white;
+    @apply border-[#2e2d2a] bg-[#2e2d2a] text-white;
   }
 
   .el-btn-soft {
-    @apply border-jt-red-soft bg-jt-red-soft text-white;
+    @apply border-brand-soft bg-brand-soft text-white;
   }
   .el-btn-soft:hover:not(:disabled) {
-    @apply border-[#ec7a74] bg-[#ec7a74] text-white;
+    @apply border-[#44433f] bg-[#44433f] text-white;
   }
   .el-btn-soft:disabled {
     @apply cursor-not-allowed border-line bg-white text-[#c0c4cc];
   }
 
   .el-btn-outline {
-    @apply border-jt-red bg-white text-jt-red;
+    @apply border-brand bg-white text-brand;
   }
   .el-btn-outline:hover:not(:disabled) {
-    @apply bg-[#fef0f0];
+    @apply bg-brand-tint;
   }
 
   .el-card {
     @apply rounded border border-line bg-white;
   }
   .el-card-head {
-    @apply flex h-[46px] items-center justify-between border-b border-line
+    @apply flex h-[52px] items-center justify-between border-b border-line
            bg-surface-card px-5;
   }
   .el-card-title {
-    @apply text-[15px] font-bold text-text-primary;
+    @apply text-[17px] font-bold text-text-primary;
   }
 }
 
 /* required-field asterisk sits BEFORE the label text */
 .req::before {
   content: '*';
-  color: var(--jt-red);
+  color: var(--danger);
   margin-right: 4px;
 }
 
@@ -124,8 +126,9 @@ body {
   background: #b9bec7;
 }
 
-input[type='checkbox'] {
-  accent-color: var(--jt-red);
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--brand);
 }
 
 /* number inputs: hide the native spinner, the stepper provides its own */
@@ -136,4 +139,14 @@ input[type='number']::-webkit-inner-spin-button {
 }
 input[type='number'] {
   -moz-appearance: textfield;
+}
+
+/* the "please wait" bar while orders are created */
+@keyframes slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
 }

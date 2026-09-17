@@ -8,158 +8,191 @@ import {
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useMemo, useRef } from 'react';
-import type { BulkRowOut, SenderProfileOut } from '@/lib/types.gen';
+import { sourceColour } from '@/components/admin/status';
+import type { BulkRowOut } from '@/lib/types.gen';
 
 export type GridRow = BulkRowOut;
 
-const EMPTY_BODY_HEIGHT = 480;
-const ROW_HEIGHT = 38;
+const EMPTY_BODY_HEIGHT = 240;
+const BODY_HEIGHT = 520;
+const ROW_HEIGHT = 64;
 
-function num(value: unknown): number {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : 0;
+type Item = { name?: unknown; variant?: unknown; quantity?: unknown };
+
+/** A value from the checked row, or from the file as typed when the row has a problem. */
+function field(row: GridRow, name: string): unknown {
+  return row.data?.[name] ?? row.raw?.[name];
 }
 
-/** Display-only mirror of the server's weight maths (spec 4.6). */
-function volumetric(row: GridRow): string {
-  const v =
-    (num(row.data?.length) * num(row.data?.width) * num(row.data?.height)) / 6000;
-  return v ? v.toFixed(2) : '0.00';
+function text(value: unknown): string {
+  return value === null || value === undefined ? '' : String(value);
 }
 
-function chargeable(row: GridRow): string {
-  const actual = num(row.data?.actual_weight);
-  const vol = Number(volumetric(row));
-  const max = Math.max(actual, vol);
-  return max ? (Math.ceil(max * 10) / 10).toFixed(1) : '';
+function itemsOf(row: GridRow): string[] {
+  const items = row.data?.items;
+  const list: Item[] = Array.isArray(items)
+    ? (items as Item[])
+    : [{ name: field(row, 'goods_name'), variant: field(row, 'item_variant'), quantity: field(row, 'quantity') }];
+  return list.map((item) => {
+    const variant = text(item.variant) ? ` - ${text(item.variant)}` : '';
+    const quantity = Number(item.quantity) > 1 ? ` x${text(item.quantity)}` : '';
+    return `${text(item.name)}${variant}${quantity}`;
+  });
 }
 
+function isDropship(value: unknown): boolean {
+  return value === true || ['yes', 'y', 'true', '1', 'dropship'].includes(text(value).trim().toLowerCase());
+}
+
+const STATUS: Record<string, { label: string; className: string }> = {
+  ok: { label: 'Ready', className: 'bg-[#f4f4f5] text-text-regular' },
+  created: { label: 'Created', className: 'bg-[#f0f9eb] text-[#3f8f1f]' },
+  duplicate: { label: 'Already created', className: 'bg-[#fdf6ec] text-[#b86e00]' },
+  error: { label: 'Problem', className: 'bg-danger-tint text-danger' },
+};
+
+function TwoLines({ top, bottom, title }: { top: string; bottom?: string; title?: string }) {
+  return (
+    <span className="block min-w-0" title={title ?? [top, bottom].filter(Boolean).join('\n')}>
+      <span className="block truncate font-semibold text-text-primary">{top}</span>
+      {bottom && <span className="block truncate text-[14px] text-text-secondary">{bottom}</span>}
+    </span>
+  );
+}
+
+/** The columns a shop needs to check before creating the orders. */
 export function buildColumns(
-  sender: SenderProfileOut | null,
   selection: Set<number>,
   toggle: (id: number, on: boolean) => void,
   toggleAll: (on: boolean) => void,
   allSelected: boolean,
 ): ColumnDef<GridRow>[] {
-  const cell = (get: (r: GridRow) => unknown) => ({
-    cell: ({ row }: { row: { original: GridRow } }) => (
-      <span className="block truncate">{String(get(row.original) ?? '')}</span>
-    ),
-  });
-
   return [
     {
       id: 'select',
-      size: 44,
+      size: 56,
       header: () => (
         <input
           type="checkbox"
-          aria-label="Select all rows"
+          aria-label="Tick all rows"
           checked={allSelected}
           onChange={(e) => toggleAll(e.target.checked)}
-          className="h-[14px] w-[14px]"
+          className="h-5 w-5"
         />
       ),
       cell: ({ row }) => (
         <input
           type="checkbox"
-          aria-label={`Select row ${row.original.row_no}`}
+          aria-label={`Tick row ${row.original.row_no}`}
           checked={selection.has(row.original.id)}
           onChange={(e) => toggle(row.original.id, e.target.checked)}
-          className="h-[14px] w-[14px]"
+          className="h-5 w-5"
         />
       ),
     },
-    { id: 'no', header: 'No.', size: 64, ...cell((r) => r.row_no) },
-    { id: 'interception', header: 'Order Interception', size: 150, ...cell(() => 'No') },
     {
-      id: 'actual_weight',
-      header: 'Actual Weight',
-      size: 120,
-      ...cell((r) => r.data?.actual_weight ?? r.raw?.actual_weight),
+      id: 'no',
+      header: 'Row',
+      size: 64,
+      cell: ({ row }) => <span className="text-text-secondary">{row.original.row_no}</span>,
     },
-    { id: 'sender_name', header: 'Sender Name', size: 200, ...cell(() => sender?.company_name) },
-    { id: 'sender_phone', header: 'Sender Phone Number', size: 170, ...cell(() => sender?.phone) },
-    { id: 'sender_postcode', header: 'Deliverer Postcode', size: 150, ...cell(() => sender?.postcode) },
-    { id: 'sender_address', header: 'Sender Address', size: 300, ...cell(() => sender?.address) },
-    {
-      id: 'receiver_name',
-      header: 'Receiver Name',
-      size: 180,
-      ...cell((r) => r.data?.receiver_name ?? r.raw?.receiver_name),
-    },
-    {
-      id: 'receiver_phone',
-      header: 'Receiver Phone Number',
-      size: 175,
-      ...cell((r) => r.data?.receiver_phone ?? r.raw?.receiver_phone),
-    },
-    {
-      id: 'receiver_postcode',
-      header: 'Receiver Postcode',
-      size: 150,
-      ...cell((r) => r.data?.receiver_postcode ?? r.raw?.receiver_postcode),
-    },
-    {
-      id: 'receiver_state',
-      header: 'Receiver State',
-      size: 140,
-      ...cell((r) => r.data?.receiver_state ?? r.raw?.receiver_state),
-    },
-    {
-      id: 'receiver_address',
-      header: 'Receiver Address',
-      size: 320,
-      ...cell((r) => r.data?.receiver_address ?? r.raw?.receiver_address),
-    },
-    {
-      id: 'address_type',
-      header: 'Address Type',
-      size: 120,
-      ...cell((r) => r.data?.address_type ?? r.raw?.address_type),
-    },
-    { id: 'goods_type', header: 'Goods Type', size: 110, ...cell(() => 'PARCEL') },
-    {
-      id: 'goods_name',
-      header: 'Goods Name',
-      size: 300,
-      ...cell((r) => r.data?.goods_name ?? r.raw?.goods_name),
-    },
-    { id: 'quantity', header: 'Quantity', size: 90, ...cell((r) => r.data?.quantity ?? r.raw?.quantity) },
-    { id: 'length', header: 'Length', size: 80, ...cell((r) => r.data?.length ?? r.raw?.length) },
-    { id: 'width', header: 'Width', size: 80, ...cell((r) => r.data?.width ?? r.raw?.width) },
-    { id: 'height', header: 'Height', size: 80, ...cell((r) => r.data?.height ?? r.raw?.height) },
-    { id: 'volumetric', header: 'Volumetric Weight', size: 150, ...cell(volumetric) },
-    { id: 'chargeable', header: 'Chargeable Weight', size: 150, ...cell(chargeable) },
-    {
-      id: 'customer_order_no',
-      header: 'Customer Order Number',
-      size: 180,
-      ...cell((r) => r.data?.order_no ?? r.raw?.order_no),
-    },
-    { id: 'remark', header: 'Remark', size: 200, ...cell((r) => r.data?.remark ?? r.raw?.remark) },
     {
       id: 'status',
       header: 'Status',
-      size: 110,
+      size: 160,
       cell: ({ row }) => {
-        const status = row.original.status;
-        const tone =
-          status === 'created'
-            ? 'text-[#529b2e]'
-            : status === 'ok'
-              ? 'text-text-regular'
-              : 'text-jt-red';
-        return <span className={`block truncate ${tone}`}>{status}</span>;
+        const status = STATUS[row.original.status] ?? STATUS.ok;
+        return (
+          <span className={`inline-flex rounded-full px-3 py-[3px] text-[15px] font-semibold ${status.className}`}>
+            {status.label}
+          </span>
+        );
       },
     },
-    { id: 'tracking_no', header: 'Tracking Number', size: 150, ...cell((r) => r.tracking_no) },
+    {
+      id: 'order_no',
+      header: 'Order No.',
+      size: 120,
+      cell: ({ row }) => <span className="font-bold text-text-primary">{text(field(row.original, 'order_no'))}</span>,
+    },
+    {
+      id: 'customer',
+      header: 'Customer',
+      size: 230,
+      cell: ({ row }) => (
+        <TwoLines top={text(field(row.original, 'receiver_name'))} bottom={text(field(row.original, 'receiver_phone'))} />
+      ),
+    },
+    {
+      id: 'address',
+      header: 'Address',
+      size: 340,
+      cell: ({ row }) => {
+        const place = [field(row.original, 'receiver_postcode'), field(row.original, 'receiver_city'), field(row.original, 'receiver_state')]
+          .map(text)
+          .filter(Boolean)
+          .join(' ');
+        return <TwoLines top={text(field(row.original, 'receiver_address'))} bottom={place} />;
+      },
+    },
+    {
+      id: 'items',
+      header: 'Items',
+      size: 320,
+      cell: ({ row }) => {
+        const items = itemsOf(row.original);
+        return (
+          <TwoLines
+            top={items[0] ?? ''}
+            bottom={items.length > 1 ? `+ ${items.length - 1} more item${items.length > 2 ? 's' : ''}` : undefined}
+            title={items.join('\n')}
+          />
+        );
+      },
+    },
+    {
+      id: 'source',
+      header: 'Source',
+      size: 150,
+      cell: ({ row }) => {
+        const source = text(field(row.original, 'source')) || 'Website';
+        return (
+          <span className="inline-flex items-center gap-2 font-semibold text-text-primary">
+            <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: sourceColour(source) }} />
+            <span className="truncate">{source}</span>
+          </span>
+        );
+      },
+    },
+    {
+      id: 'dropship',
+      header: 'Drop-ship',
+      size: 110,
+      cell: ({ row }) => (isDropship(field(row.original, 'dropship')) ? <b>Yes</b> : <span>No</span>),
+    },
+    {
+      id: 'payment',
+      header: 'Payment',
+      size: 150,
+      cell: ({ row }) =>
+        text(field(row.original, 'payment_type')).toUpperCase() === 'COD' ? (
+          <span className="font-semibold text-[#b86e00]">COD RM {text(field(row.original, 'cod_amount'))}</span>
+        ) : (
+          <span className="font-semibold text-[#3f8f1f]">Paid</span>
+        ),
+    },
+    {
+      id: 'tracking_no',
+      header: 'Tracking No.',
+      size: 170,
+      cell: ({ row }) => <span className="font-semibold">{row.original.tracking_no ?? ''}</span>,
+    },
     {
       id: 'error',
-      header: 'Error Message',
+      header: 'Problem',
       size: 380,
       cell: ({ row }) => (
-        <span className="block truncate text-jt-red" title={row.original.error_message ?? ''}>
+        <span className="block whitespace-normal text-[15px] leading-5 text-danger" title={row.original.error_message ?? ''}>
           {row.original.error_message ?? ''}
         </span>
       ),
@@ -198,60 +231,71 @@ export function BulkGrid({
   );
 
   const items = virtualizer.getVirtualItems();
+  const bodyHeight = model.length === 0 ? EMPTY_BODY_HEIGHT : Math.min(BODY_HEIGHT, model.length * ROW_HEIGHT);
 
   return (
-    <div
-      ref={parentRef}
-      className="thin-scroll overflow-auto border border-line"
-      style={{ height: EMPTY_BODY_HEIGHT + 40 }}
-    >
-      <div style={{ width: totalWidth, minWidth: '100%' }}>
-        {/* sticky header */}
-        <div className="sticky top-0 z-10 flex bg-surface-head">
-          {table.getFlatHeaders().map((header) => (
-            <div
-              key={header.id}
-              style={{ width: header.getSize() }}
-              className="shrink-0 border-b border-r border-line-light px-3 py-[10px] text-base font-semibold text-text-primary"
-            >
-              {flexRender(header.column.columnDef.header, header.getContext())}
-            </div>
-          ))}
-        </div>
-
-        {model.length === 0 ? (
-          // matches the reference: a blank body, no illustration, no "no data"
-          <div style={{ height: EMPTY_BODY_HEIGHT }} />
-        ) : (
-          <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
-            {items.map((virtualRow) => {
-              const row = model[virtualRow.index];
-              return (
-                <div
-                  key={row.id}
-                  onClick={() => onRowClick?.(row.original)}
-                  className="absolute left-0 flex cursor-pointer hover:bg-surface-page"
-                  style={{
-                    height: virtualRow.size,
-                    transform: `translateY(${virtualRow.start}px)`,
-                    width: totalWidth,
-                  }}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <div
-                      key={cell.id}
-                      style={{ width: cell.column.getSize() }}
-                      className="shrink-0 overflow-hidden border-b border-r border-line-light px-3 py-[9px] text-base text-text-primary"
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
+    <div className="relative">
+      <div
+        ref={parentRef}
+        className="thin-scroll overflow-auto rounded-xl border-2 border-line bg-white"
+        style={{ height: bodyHeight + 52 }}
+      >
+        <div style={{ width: totalWidth, minWidth: '100%' }}>
+          {/* sticky header */}
+          <div className="sticky top-0 z-10 flex bg-surface-head">
+            {table.getFlatHeaders().map((header) => (
+              <div
+                key={header.id}
+                style={{ width: header.getSize() }}
+                className="flex h-[52px] shrink-0 items-center border-b-2 border-line px-3 text-[15px] font-semibold text-text-regular"
+              >
+                {flexRender(header.column.columnDef.header, header.getContext())}
+              </div>
+            ))}
           </div>
-        )}
+
+          {model.length === 0 ? (
+            <div style={{ height: EMPTY_BODY_HEIGHT }} />
+          ) : (
+            <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
+              {items.map((virtualRow) => {
+                const row = model[virtualRow.index];
+                return (
+                  <div
+                    key={row.id}
+                    onClick={() => onRowClick?.(row.original)}
+                    className={`absolute left-0 flex ${row.original.status === 'error' ? 'bg-[#fffafa]' : 'hover:bg-surface-page'}`}
+                    style={{
+                      height: virtualRow.size,
+                      transform: `translateY(${virtualRow.start}px)`,
+                      width: totalWidth,
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <div
+                        key={cell.id}
+                        style={{ width: cell.column.getSize() }}
+                        className="flex shrink-0 items-center overflow-hidden border-b border-line-light px-3 text-[16px] text-text-primary"
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
+      {model.length === 0 && (
+        // outside the scrolling table, so it stays in the middle of what is visible
+        <p
+          className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-center text-[18px] text-text-secondary"
+          style={{ height: EMPTY_BODY_HEIGHT }}
+        >
+          Your orders will show here after you choose a CSV file.
+        </p>
+      )}
     </div>
   );
 }

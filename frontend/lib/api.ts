@@ -15,6 +15,7 @@ import type {
   BulkProgressOut,
   BulkRowOut,
   BulkUploadOut,
+  CalendarOut,
   DeleteRowsOut,
   EventTypeOut,
   LoginIn,
@@ -28,9 +29,11 @@ import type {
   SenderProfileOut,
   SignupIn,
   SignupOut,
+  SourceOut,
   TrackingOut,
   TrackingUpdateIn,
   TrackingUpdateOut,
+  UserCreateIn,
   UserOut,
   UserUpdateIn,
 } from './types.gen';
@@ -38,6 +41,10 @@ import type {
 /** The admin dashboard's filters; also what the CSV export uses. */
 export type AdminFilter = {
   status?: string;
+  /** where the orders came from: Website, Daraz, Amazon... */
+  source?: string;
+  /** orders created on one day (Malaysia time): YYYY-MM-DD */
+  day?: string;
   q?: string;
   period?: 'today' | '7d' | '30d' | 'all';
 };
@@ -45,6 +52,8 @@ export type AdminFilter = {
 function adminQuery(filter: AdminFilter, extra: Record<string, string> = {}): string {
   const search = new URLSearchParams(extra);
   if (filter.status) search.set('status', filter.status);
+  if (filter.source) search.set('source', filter.source);
+  if (filter.day) search.set('day', filter.day);
   if (filter.q?.trim()) search.set('q', filter.q.trim());
   if (filter.period && filter.period !== 'all') search.set('period', filter.period);
   const qs = search.toString();
@@ -132,6 +141,9 @@ export const api = {
 
   users: () => request<UserOut[]>('/api/v1/admin/users'),
 
+  createUser: (body: UserCreateIn) =>
+    request<UserOut>('/api/v1/admin/users', { method: 'POST', body: JSON.stringify(body) }),
+
   updateUser: (userId: number, body: UserUpdateIn) =>
     request<UserOut>(`/api/v1/admin/users/${userId}`, { method: 'PATCH', body: JSON.stringify(body) }),
 
@@ -197,6 +209,10 @@ export const api = {
   zipUrl: (batchId: number) => `${API_BASE}/api/v1/waybills/batch/${batchId}.zip`,
   waybillUrl: (trackingNo: string) => `${API_BASE}/api/v1/waybills/${trackingNo}.pdf`,
   templateUrl: () => `${API_BASE}/api/v1/templates/bulk.csv`,
+  /** A download path the API returned, e.g. a packing PDF. */
+  fileUrl: (path: string) => `${API_BASE}${path}`,
+
+  sources: () => request<SourceOut[]>('/api/v1/sources'),
 
   /* ---------------------------------------------------- address */
   parseAddress: (text: string, signal?: AbortSignal) =>
@@ -237,6 +253,12 @@ export const api = {
     request<AdminOrderPage>(
       `/api/v1/admin/orders${adminQuery(filter, { page: String(page), size: String(size) })}`,
     ),
+
+  adminCalendar: (month: string, source?: string) => {
+    const search = new URLSearchParams({ month });
+    if (source) search.set('source', source);
+    return request<CalendarOut>(`/api/v1/admin/calendar?${search.toString()}`);
+  },
 
   adminOrder: (trackingNo: string) =>
     request<AdminOrderDetailOut>(`/api/v1/admin/orders/${encodeURIComponent(trackingNo)}`),

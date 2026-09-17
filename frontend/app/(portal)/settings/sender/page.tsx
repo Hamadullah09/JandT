@@ -59,7 +59,7 @@ export default function SenderProfilePage() {
           className={`mb-3 rounded border px-4 py-2.5 text-base ${
             banner.kind === 'ok'
               ? 'border-[#c2e7b0] bg-[#f0f9eb] text-[#529b2e]'
-              : 'border-[#fbc4c4] bg-[#fef0f0] text-jt-red'
+              : 'border-[#fbc4c4] bg-danger-tint text-danger'
           }`}
         >
           {banner.text}

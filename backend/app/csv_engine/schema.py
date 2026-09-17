@@ -26,6 +26,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.core.phone import PhoneError, normalise_my_mobile
+from app.core.sources import normalise_source
 
 MAX_WEIGHT_KG = Decimal("30")
 MAX_NAME = 60
@@ -172,6 +173,14 @@ ALIASES: dict[str, str] = {
     "picture": "image",
     "productimage": "image",
     "productphoto": "image",
+    # where the order came from: Website, Daraz, Amazon... - optional like image
+    "source": "source",
+    "ordersource": "source",
+    "channel": "source",
+    "saleschannel": "source",
+    "platform": "source",
+    "marketplace": "source",
+    "store": "source",
     # yes = the supplier holds this item.  An optional extra like image.
     "dropship": "dropship",
     "dropshipped": "dropship",
@@ -278,6 +287,8 @@ class BulkRow(BaseModel):
     remark: str = ""
     image: str = ""
     dropship: bool = False
+    #: Website, Daraz, Amazon... blank or missing means Website - see app.core.sources
+    source: str = "Website"
 
     # -- required strings -------------------------------------------------
     @field_validator("order_no")
@@ -404,6 +415,12 @@ class BulkRow(BaseModel):
     @classmethod
     def _optional_text(cls, v: Any) -> str:
         return "" if _blank(v) else str(v).strip()
+
+    @field_validator("source", mode="before")
+    @classmethod
+    def _source(cls, v: Any) -> str:
+        """"daraz.pk" and "Daraz" are one source; blank is Website."""
+        return normalise_source(None if _blank(v) else str(v))
 
     @field_validator("dropship", mode="before")
     @classmethod

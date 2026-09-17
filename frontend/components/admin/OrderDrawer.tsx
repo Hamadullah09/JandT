@@ -19,7 +19,7 @@ function CloseIcon() {
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-[112px_1fr] gap-3 py-[5px]">
+    <div className="grid grid-cols-[130px_1fr] gap-3 py-[7px]">
       <dt className="text-text-secondary">{label}</dt>
       <dd className="min-w-0 break-words text-text-primary">{children}</dd>
     </div>
@@ -140,27 +140,33 @@ export function OrderDrawer({
   return (
     <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-label="Order">
       <button type="button" aria-label="Close" className="flex-1 bg-black/30" onClick={onClose} />
-      <aside className="flex h-full w-full max-w-[540px] flex-col bg-white shadow-2xl">
-        <header className="flex items-center gap-3 border-b border-line px-5 py-4">
+      <aside className="flex h-full w-full max-w-[640px] flex-col bg-white shadow-2xl">
+        <header className="flex items-center gap-3 border-b-2 border-line px-6 py-5">
           <div className="min-w-0 flex-1">
-            <p className="text-mini text-text-secondary">Order</p>
-            <h2 className="truncate text-[17px] font-bold text-text-primary">
+            <p className="text-[15px] text-text-secondary">Order</p>
+            <h2 className="truncate text-[24px] font-bold text-text-primary">
               {order?.customer_order_no || trackingNo}
             </h2>
           </div>
           {order && <StatusBadge status={order.tracking_status} />}
-          <button type="button" onClick={onClose} className="text-text-secondary hover:text-jt-red" aria-label="Close">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-line text-text-secondary hover:border-brand hover:text-brand"
+            aria-label="Close"
+            title="Close"
+          >
             <CloseIcon />
           </button>
         </header>
 
-        <div className="thin-scroll min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4 text-base">
+        <div className="thin-scroll min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-5 text-[16px]">
           {message && (
             <div
               className={`rounded border px-3 py-2 ${
                 message.kind === 'ok'
                   ? 'border-[#c2e7b0] bg-[#f0f9eb] text-[#529b2e]'
-                  : 'border-[#fbc4c4] bg-[#fef0f0] text-jt-red'
+                  : 'border-[#fbc4c4] bg-danger-tint text-danger'
               }`}
             >
               {message.text}
@@ -169,7 +175,7 @@ export function OrderDrawer({
 
           <div className="flex flex-wrap gap-2">
             <a
-              className="el-btn el-btn-outline"
+              className="el-btn el-btn-outline h-12 text-[16px]"
               href={`/tracking/${trackingNo}`}
               target="_blank"
               rel="noreferrer"
@@ -177,7 +183,7 @@ export function OrderDrawer({
               Open tracking page
             </a>
             {order && (
-              <a className="el-btn" href={`${API_BASE}${order.waybill_url}`} target="_blank" rel="noreferrer">
+              <a className="el-btn h-12 text-[16px]" href={`${API_BASE}${order.waybill_url}`} target="_blank" rel="noreferrer">
                 Waybill PDF
               </a>
             )}
@@ -185,12 +191,12 @@ export function OrderDrawer({
 
           {/* ------------------------------------------------ update */}
           <section className="rounded border border-line">
-            <h3 className="border-b border-line bg-surface-card px-4 py-2 font-bold">Add a status update</h3>
+            <h3 className="border-b border-line bg-surface-card px-4 py-3 text-[18px] font-bold">Change the status</h3>
             <div className="space-y-3 p-4">
               <label className="block">
                 <span className="el-label req">Status</span>
                 <select
-                  className="el-input"
+                  className="el-input h-12 text-[16px]"
                   value={form.code}
                   onChange={(e) => setForm({ ...form, code: e.target.value })}
                 >
@@ -205,7 +211,7 @@ export function OrderDrawer({
               <label className="block">
                 <span className="el-label">Location</span>
                 <input
-                  className="el-input"
+                  className="el-input h-12 text-[16px]"
                   value={form.location}
                   maxLength={128}
                   placeholder="e.g. Transit Center SHAHALAM GATEWAY"
@@ -215,7 +221,7 @@ export function OrderDrawer({
               <label className="block">
                 <span className="el-label">Description</span>
                 <input
-                  className="el-input"
+                  className="el-input h-12 text-[16px]"
                   value={description}
                   maxLength={500}
                   onChange={(e) => {
@@ -226,10 +232,10 @@ export function OrderDrawer({
                 {descriptionEdited && (
                   <button
                     type="button"
-                    className="mt-1 text-mini text-jt-red hover:underline"
+                    className="mt-1 text-[14px] text-brand hover:underline"
                     onClick={() => setDescriptionEdited(false)}
                   >
-                    Use J&amp;T&apos;s wording again
+                    Use the standard wording again
                   </button>
                 )}
               </label>
@@ -237,25 +243,25 @@ export function OrderDrawer({
                 <span className="el-label">Date &amp; time (Malaysia)</span>
                 <input
                   type="datetime-local"
-                  className="el-input"
+                  className="el-input h-12 text-[16px]"
                   value={form.when}
                   onChange={(e) => setForm({ ...form, when: e.target.value })}
                 />
               </label>
               <button
                 type="button"
-                className="el-btn el-btn-primary w-full"
+                className="el-btn el-btn-primary h-12 w-full text-[17px] font-semibold"
                 disabled={busy || !form.code || !detail}
                 onClick={save}
               >
-                {busy ? 'Saving...' : 'Save update'}
+                {busy ? 'Saving...' : 'Save'}
               </button>
             </div>
           </section>
 
           {/* ----------------------------------------------- history */}
           <section>
-            <h3 className="mb-2 font-bold">Tracking history</h3>
+            <h3 className="mb-3 text-[18px] font-bold">Tracking history</h3>
             {!detail ? (
               <p className="text-text-secondary">Loading...</p>
             ) : (
@@ -265,22 +271,22 @@ export function OrderDrawer({
                     key={`${event.id ?? 'created'}`}
                     className="relative border-l border-line pb-4 pl-4 last:pb-0"
                   >
-                    <span className="absolute -left-[5px] top-[6px] h-[9px] w-[9px] rounded-full bg-jt-red" />
+                    <span className="absolute -left-[5px] top-[6px] h-[9px] w-[9px] rounded-full bg-brand" />
                     <div className="flex items-start gap-2">
                       <div className="min-w-0 flex-1">
                         <p>
-                          <span className="font-semibold text-jt-red">{event.label}</span>
+                          <span className="font-semibold text-brand">{event.label}</span>
                           {event.location && (
-                            <span className="ml-2 text-mini text-text-secondary">({event.location})</span>
+                            <span className="ml-2 text-[14px] text-text-secondary">({event.location})</span>
                           )}
                         </p>
                         <p className="text-text-primary">{event.description}</p>
-                        <p className="text-mini text-text-secondary">{mytDateTime(event.occurred_at)}</p>
+                        <p className="text-[14px] text-text-secondary">{mytDateTime(event.occurred_at)}</p>
                       </div>
                       {event.id !== null && (
                         <button
                           type="button"
-                          className="mt-[2px] text-text-secondary hover:text-jt-red"
+                          className="mt-[2px] text-text-secondary hover:text-brand"
                           title="Delete this update"
                           aria-label={`Delete ${event.label}`}
                           disabled={busy}
@@ -299,7 +305,7 @@ export function OrderDrawer({
           {/* ------------------------------------------------ details */}
           {order && (
             <section>
-              <h3 className="mb-1 font-bold">Order details</h3>
+              <h3 className="mb-2 text-[18px] font-bold">Order details</h3>
               <dl>
                 <Row label="Tracking No.">{order.tracking_no}</Row>
                 <Row label="Created">{mytDateTime(order.created_at)}</Row>
@@ -317,7 +323,7 @@ export function OrderDrawer({
                     <span key={index} className="block">
                       {itemText(item)}
                       {item.dropship && (
-                        <span className="ml-2 rounded bg-[#fdf6ec] px-1.5 text-mini text-[#b86e00]">
+                        <span className="ml-2 rounded bg-[#fdf6ec] px-1.5 text-[14px] text-[#b86e00]">
                           drop-ship
                         </span>
                       )}
@@ -327,7 +333,7 @@ export function OrderDrawer({
                 <Row label="Payment">
                   {order.order_payment_type === 'COD' ? `COD - collect RM ${order.cod_amount}` : 'Paid'}
                   {order.supplier_ships && (
-                    <span className="ml-2 text-mini text-[#b86e00]">your supplier ships it</span>
+                    <span className="ml-2 text-[14px] text-[#b86e00]">your supplier ships it</span>
                   )}
                 </Row>
                 <Row label="Shipping fee">{order.freight_fee ? `RM ${order.freight_fee}` : '-'}</Row>

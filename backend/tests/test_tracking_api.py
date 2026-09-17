@@ -9,6 +9,7 @@ import io
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import text
 
 from app.main import app
 from tests.conftest import requires_db
@@ -104,9 +105,9 @@ class TestTracking:
         assert result["status"] == "IN_TRANSIT"
         assert [s["reached"] for s in result["steps"]] == [True, True, False, False]
         events = [e for day in result["days"] for e in day["events"]]
-        assert [e["label"] for e in events] == ["Departure", "Picked Up", "Order Created"]
+        assert [e["label"] for e in events] == ["On the Way", "Picked Up", "Order Created"]
         assert events[0]["time_label"] == "05:30 PM"
-        assert events[0]["description"] == "Package is departing from 【Transit Center SHAHALAM GATEWAY】"
+        assert events[0]["description"] == "The parcel has left Transit Center SHAHALAM GATEWAY"
         # the public page never shows who the parcel is for
         assert "Nur Aisyah" not in str(result)
 
@@ -156,6 +157,23 @@ class TestAdmin:
         assert {o["tracking_no"] for o in delivered["items"]} == {first, second}
         found = (await client.get("/api/v1/admin/orders?q=TRACK-0003")).json()
         assert [o["tracking_no"] for o in found["items"]] == [third]
+
+    async def test_orders_are_listed_by_date_not_by_when_they_were_entered(self, client, session):
+        today = await create(client, customer_order_no="TRACK-0001")
+        last_week = await create(client, customer_order_no="TRACK-0002")   # entered later...
+        await session.execute(                                                # ...for an older date
+            text("UPDATE orders SET created_at = created_at - interval '7 days' WHERE tracking_no = :no"),
+            {"no": last_week},
+        )
+        await session.commit()
+
+        page = (await client.get("/api/v1/admin/orders")).json()
+        assert [o["tracking_no"] for o in page["items"]] == [today, last_week]
+        mine = (await client.get("/api/v1/orders")).json()
+        assert [o["tracking_no"] for o in mine["items"]] == [today, last_week]
+        export = await client.get("/api/v1/admin/orders/export.csv")
+        rows = list(csv.DictReader(io.StringIO(export.content.decode("utf-8-sig"))))
+        assert [row["Tracking Link"].rsplit("/", 1)[-1] for row in rows] == [today, last_week]
 
     async def test_export_links_every_tracking_number(self, client):
         tracking_no = await create(client)

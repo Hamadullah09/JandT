@@ -55,6 +55,8 @@ type Item = {
   chargeableOverride: string;
   customerOrderNo: string;
   remark: string;
+  /** where the order came from: Website, Daraz, Amazon... */
+  source: string;
 };
 
 /** The Chargeable Information section. Values are the labels on screen. */
@@ -178,6 +180,7 @@ const EMPTY_ITEM: Item = {
   chargeableOverride: '',
   customerOrderNo: '',
   remark: '',
+  source: 'Website',
 };
 
 export default function NormalOrderPage() {
@@ -289,6 +292,14 @@ export default function NormalOrderPage() {
   const labelText = describeLines(lines);
 
   const [charge, setCharge] = useState<Charge>(EMPTY_CHARGE);
+  // Website, WhatsApp, Daraz, Amazon... for the Order Source list
+  const [sources, setSources] = useState<string[]>([]);
+  useEffect(() => {
+    api
+      .sources()
+      .then((list) => setSources(list.map((source) => source.name)))
+      .catch(() => setSources([]));
+  }, []);
   const routeNote = dropshipNote(lines, charge.cod === 'Yes');
   const [quote, setQuote] = useState<Quote>(EMPTY_QUOTE);
   const [list, setList] = useState<SavedParcel[]>([]);
@@ -401,6 +412,7 @@ export default function NormalOrderPage() {
       order_value: charge.itemValue.trim() || '0',
       order_payment_type: charge.cod === 'Yes' ? 'COD' : 'PREPAID',
       service_mode: charge.service === 'DROP OFF' ? 'DROP_OFF' : 'PICK_UP',
+      source: item.source,
       remark: item.remark.trim(),
     };
   }, [receiver, item, lines, charge, codAmount]);
@@ -540,7 +552,7 @@ export default function NormalOrderPage() {
             className={`rounded border px-4 py-2.5 text-base ${
               banner.kind === 'ok'
                 ? 'border-[#c2e7b0] bg-[#f0f9eb] text-[#529b2e]'
-                : 'border-[#fbc4c4] bg-[#fef0f0] text-jt-red'
+                : 'border-[#fbc4c4] bg-danger-tint text-danger'
             }`}
           >
             {banner.text}
@@ -683,7 +695,7 @@ export default function NormalOrderPage() {
               role={addressMismatch ? 'alert' : 'status'}
               className={`mx-5 mb-5 space-y-2 rounded border px-4 py-2.5 text-base ${
                 addressMismatch
-                  ? 'border-[#fbc4c4] bg-[#fef0f0] text-jt-red'
+                  ? 'border-[#fbc4c4] bg-danger-tint text-danger'
                   : 'border-[#f5dab1] bg-[#fdf6ec] text-[#b86e00]'
               }`}
             >
@@ -699,7 +711,7 @@ export default function NormalOrderPage() {
                       type="button"
                       onClick={() => applyPostcode(code)}
                       title={`Use postcode ${code}`}
-                      className="rounded border border-jt-red bg-white px-2.5 py-[1px] font-semibold text-jt-red hover:bg-[#fde2e1]"
+                      className="rounded border border-brand bg-white px-2.5 py-[1px] font-semibold text-brand hover:bg-brand-tint"
                     >
                       {code}
                     </button>
@@ -715,7 +727,7 @@ export default function NormalOrderPage() {
                 <button
                   type="button"
                   onClick={fixAddress}
-                  className="text-mini text-text-regular underline hover:text-jt-red"
+                  className="text-mini text-text-regular underline hover:text-brand"
                 >
                   {postcodeSuggestions.length > 0 ? 'Or keep' : 'Keep'} {currentCheck.postcode} and change
                   the {currentCheck.field === 'receiver_state' ? 'state' : 'city'} to{' '}
@@ -746,7 +758,7 @@ export default function NormalOrderPage() {
             </Field>
             {/* every product in this parcel, one line each */}
             <div className="col-span-4">
-              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_150px_96px_32px] gap-x-3">
+              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_170px_124px_40px] gap-x-3">
                 <label className="el-label req">Goods Name:</label>
                 <label className="el-label">Size / Colour:</label>
                 <label className="el-label req">Quantity:</label>
@@ -757,7 +769,7 @@ export default function NormalOrderPage() {
                 {lines.map((line, index) => (
                   <div
                     key={index}
-                    className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_150px_96px_32px] items-center gap-x-3"
+                    className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_170px_124px_40px] items-center gap-x-3"
                   >
                     <TextInput
                       value={line.goodsName}
@@ -797,7 +809,7 @@ export default function NormalOrderPage() {
                         aria-label={`Remove item ${index + 1}`}
                         title="Remove this item"
                         onClick={() => removeLine(index)}
-                        className="flex h-control items-center justify-center text-text-secondary hover:text-jt-red"
+                        className="flex h-control items-center justify-center text-text-secondary hover:text-brand"
                       >
                         <TrashIcon />
                       </button>
@@ -811,7 +823,7 @@ export default function NormalOrderPage() {
                 <button
                   type="button"
                   onClick={addLine}
-                  className="shrink-0 text-base text-jt-red hover:underline"
+                  className="shrink-0 text-base text-brand hover:underline"
                 >
                   + Add another item
                 </button>
@@ -874,6 +886,19 @@ export default function NormalOrderPage() {
                 maxLength={MAX_ORDER_NO}
                 onChange={(e) => setItem({ ...item, customerOrderNo: e.target.value })}
               />
+            </Field>
+            <Field label="Order Source" required>
+              <SelectInput
+                value={item.source}
+                aria-label="Where the order came from"
+                onChange={(e) => setItem({ ...item, source: e.target.value })}
+              >
+                {(sources.length ? sources : ['Website']).map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </SelectInput>
             </Field>
             <Field label="Remarks information" span={2}>
               <TextInput
@@ -999,7 +1024,7 @@ export default function NormalOrderPage() {
                     <td className="border-b border-line-light px-3 py-2">{row.freight_fee}</td>
                     <td className="border-b border-line-light px-3 py-2">
                       <a
-                        className="text-jt-red hover:underline"
+                        className="text-brand hover:underline"
                         href={api.waybillUrl(row.tracking_no)}
                         target="_blank"
                         rel="noreferrer"
@@ -1043,7 +1068,7 @@ export default function NormalOrderPage() {
           <button type="button" className="el-btn px-5">
             List <ArrowRight />
           </button>
-          <span className="absolute -right-1.5 -top-1.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-jt-red px-1 text-[10px] font-semibold text-white">
+          <span className="absolute -right-1.5 -top-1.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">
             {list.length}
           </span>
         </div>

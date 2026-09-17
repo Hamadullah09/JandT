@@ -1,15 +1,18 @@
-# JT-CLONE — J&T Express Merchant Portal Replica + Bulk CSV Order Engine
+# Inaaya Store Order Portal — order portal + bulk CSV order engine
 
-A self-hosted replica of the J&T Express (Malaysia) merchant portal with a working
+A self-hosted order portal for [Inaaya Store](https://inaayastore.com), in the shop's
+own style (ink black on white, Plus Jakarta Sans, the Inaaya wordmark), with a working
 order-creation engine.
 
-* **Normal Order** — a single-order form, matched to the supplied portal screenshots.
+* **Normal Order** — a single-order form.
 * **Bulk Import Orders** — upload one CSV of receiver + item data, get N orders, N unique
-  tracking numbers and N J&T-format 3-copy waybill PDFs written to a directory you choose.
+  tracking numbers, N parcel labels, one packing PDF per item and a WhatsApp
+  "order created" message per order.
 
-This is a **simulated carrier**. There is no live J&T API and no browser automation:
-tracking numbers, sortation codes, route codes and waybills are generated locally and
-deterministically.
+Parcels travel with J&T Express, so the **parcel label stays in the courier's 3-copy
+waybill format**; everything the shop and its customers see is Inaaya Store's.
+There is no live courier API and no browser automation: tracking numbers, sortation
+codes, route codes and waybills are generated locally and deterministically.
 
 ---
 
@@ -109,7 +112,9 @@ quantity, actual_weight, length, width, height, payment_type, cod_amount,
 order_value, remark
 ```
 
-`samples/bulk_orders_template.csv` is generated from exactly this column set.
+`samples/bulk_orders_template.csv` is generated from this column set plus the optional
+`source` and `dropship` columns, with fictional example customers (never real ones - the
+template is downloaded from the portal and this repository is public).
 
 | Column | Req | Rule |
 |---|---|---|
@@ -130,6 +135,9 @@ order_value, remark
 | `cod_amount` | ⬜ | ≥ 0. Must be > 0 when `payment_type` is `COD`; forced to 0 when `PREPAID`. |
 | `order_value` | ⬜ | ≥ 0, default 0 |
 | `remark` | ⬜ | free text |
+| `source` | ⬜ | where the order came from: `Website` (default), `WhatsApp`, `Facebook`, `Instagram`, `TikTok Shop`, `Daraz`, `Shopee`, `Lazada`, `Amazon`, `eBay`, `Etsy`, `Other` - common spellings such as `daraz.pk` are tidied; any other name is kept as written. Also read from `channel`, `platform`, `marketplace`. |
+| `image` | ⬜ | product photo for the WhatsApp message: a file in `images/` or a full path |
+| `dropship` | ⬜ | `yes` / `no` per item row - see the WhatsApp drop-ship group |
 
 **No sender columns.** If a file contains `sender_name`, `deliverer_postcode` and so on,
 they are ignored and reported as a warning — the sender is always the fixed profile.
@@ -400,20 +408,37 @@ directory, no sender profile).
 | `jt-portal` | Starts the API and the website in two windows and opens the admin portal. |
 | `jt-export` | Writes every order to `exports/orders_<date>_<time>.csv` and opens it in Excel. `--today`, `--days 7`, `--status DELIVERED` narrow it down. |
 
-**Admin portal** (`/admin`) - every order, newest first, with its tracking status.
-New orders appear on their own (the page checks every 10 seconds) and are marked
-NEW. The tiles count and filter by status; search takes a tracking number, order
-number, name or phone. Tick orders to mark them Picked Up, In Transit, On
+**Admin portal** (`/admin`) - every order, newest first, with its tracking status,
+in large type. New orders appear on their own (the page checks every 10 seconds)
+and are marked NEW. "Where did the orders come from?" filters by source
+(Website, Daraz, Amazon... with counts), the status boxes filter by status, and
+search takes a tracking number, order number, name or phone. The pencil on each
+row opens the order.
+
+**Calendar** (`/admin/calendar`) - a month of orders by day, Malaysia time: how many
+orders came in each day (busier days are a deeper sand colour), how many parcels were
+delivered or returned that day, and the month's totals with the cash on delivery
+to collect. It filters by source like the dashboard; clicking a day lists that
+day's orders, with the pencil and a download of just that day. Tick orders to mark them Picked Up, In Transit, On
 Delivery, Delivered or Returned in one go, or open one to record a single scan
-(Departure, Dc Arrival, Dp Arrival...) with its place and time, or delete a
+(On the Way, At Sorting Hub, At Local Branch...) with its place and time, or delete a
 mistake. **Export CSV** downloads what the page shows.
 
-**Tracking page** (`/tracking/<waybill>`, up to 10 separated by commas) - laid out
-like jtexpress.my/tracking: the stage icons, the status, and the scans grouped
-by day in Malaysia time. It shows no names or addresses. J&T's own page asks
-for a slide puzzle before it shows anything, so statuses cannot be read from it
+**Tracking page** (`/tracking/<waybill>`, up to 10 separated by commas) - in
+Inaaya Store's style, with the shop's menu: the stage icons, the status, and the
+scans grouped by day in Malaysia time, in plain words ("The parcel has arrived at
+Kuantan Hub"). It shows no names or addresses. The courier's own page asks for a
+slide puzzle before it shows anything, so statuses cannot be read from it
 automatically; they are the scans recorded in the admin portal
 (`tracking_event`, migration `0004`).
+
+**Upload many orders** (`/order/bulk-import`) - three steps: choose (or drag in)
+a CSV file, check the orders (source, drop-ship, payment and any problem per
+row), then **Create N orders**. The result says how many orders were created,
+how many WhatsApp "order created" messages are on their way (and how many go to
+the drop-shipping group), and offers one packing PDF per item - 25 customers
+ordering the same dress give one PDF with 25 labels - plus every label as a zip
+and the order list. Saving the labels to a folder of your own is optional.
 
 **The CSV** - one row per order. The tracking number is an Excel `HYPERLINK`
 to its tracking page (the plain address is repeated in the last column), phone
@@ -435,7 +460,7 @@ beside it).
 ## 10b. Logins
 
 Every page except the tracking page needs a login. `jt-portal` opens
-`http://localhost:3000/login`, laid out like jtexpress.my/login. The box takes a
+`http://localhost:3000/login`, in Inaaya Store's style. The box takes a
 username, phone number or email.
 
 | Account | Login | Sees |
@@ -445,7 +470,8 @@ username, phone number or email.
 
 These two are created when the API first starts with no accounts at all; change
 their passwords in **Admin Portal → Users → Set password** (they are simple on
-purpose, for now). **Create an account** (`/signup`) makes a merchant login that
+purpose, for now). **Add user** on the Users page makes an account that works at
+once - a shop user or another admin. **Create an account** (`/signup`) makes a merchant login that
 waits until the admin approves it on the Users page, where accounts can also be
 blocked (which logs them out) or given a new password. **Forgot password** says to
 ask the admin.

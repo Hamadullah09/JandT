@@ -30,6 +30,7 @@ COLUMNS = [
     "No.",
     "Order Date",
     "Order No.",
+    "Source",
     "Tracking Number",
     "Status",
     "Last Update",
@@ -77,6 +78,7 @@ class ExportOrder:
     order_value: Decimal
     freight_fee: Decimal | None
     chargeable_weight: Decimal
+    source: str = "Website"
 
     @classmethod
     def of(cls, order: object) -> "ExportOrder":
@@ -131,6 +133,7 @@ def rows(orders: Iterable[ExportOrder], tracking_url: Callable[[str], str]) -> l
             str(number),
             _when(order.created_at),
             as_text(order.customer_order_no),
+            safe(order.source),
             link(url, order.tracking_no),
             STATUS_LABELS.get(order.tracking_status, order.tracking_status),
             _when(order.tracking_updated_at),

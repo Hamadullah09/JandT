@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import type { TrackingOut } from '@/lib/types.gen';
-import { CashIcon, DuitNowIcon, EWalletIcon, STAGE_ICONS } from './icons';
-import { SITE_RED } from './Site';
+import { STAGE_ICONS } from './icons';
 
-/** Events shown before "See More", as jtexpress.my folds a long history. */
+/** Events shown before "See More", so a long history stays short. */
 const FOLDED = 4;
 const GREEN = '#27c93f';
 
@@ -27,7 +26,7 @@ function Stages({ result }: { result: TrackingOut }) {
           return (
             <div key={step.key} className="flex flex-col items-center">
               <Icon />
-              <span className="mt-[6px] text-[15px] text-[#333]">{step.label}</span>
+              <span className="mt-[6px] text-center text-[15px] font-semibold text-brand">{step.label}</span>
             </div>
           );
         })}
@@ -47,22 +46,9 @@ function Stages({ result }: { result: TrackingOut }) {
           </div>
         ))}
       </div>
-      <p className="mt-[10px] text-center text-[26px] leading-tight text-[#333]">
+      <p className="mt-4 text-center text-[26px] font-bold uppercase leading-tight tracking-[1.5px] text-brand">
         {result.status_label}
       </p>
-    </div>
-  );
-}
-
-function Payment() {
-  return (
-    <div className="bg-[#f2f2f2] px-4 py-5 text-center">
-      <h3 className="text-[26px] leading-tight text-[#333]">Payment Method</h3>
-      <div className="mt-6 flex items-end justify-center gap-[70px] md:gap-[96px]">
-        <DuitNowIcon />
-        <EWalletIcon />
-        <CashIcon />
-      </div>
     </div>
   );
 }
@@ -90,7 +76,7 @@ function Timeline({ result }: { result: TrackingOut }) {
                 <p className="pr-3 pt-[3px] text-right text-[13px] text-[#333] md:text-[15px]">{event.time_label}</p>
                 <div className="border-l border-[#8a8a8a] pb-[26px] pl-3">
                   <p className="leading-6">
-                    <span className="text-[15px] font-medium" style={{ color: SITE_RED }}>
+                    <span className="text-[16px] font-bold text-brand">
                       {event.label}
                     </span>
                     {event.location && (
@@ -108,8 +94,7 @@ function Timeline({ result }: { result: TrackingOut }) {
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          className="mx-auto mb-4 block text-[15px] font-medium hover:underline"
-          style={{ color: SITE_RED }}
+          className="mx-auto mb-4 block border border-brand px-5 py-2 text-[14px] font-bold uppercase tracking-[1px] text-brand hover:bg-brand hover:text-white"
         >
           {open ? 'See Less' : 'See More'}
         </button>
@@ -120,24 +105,26 @@ function Timeline({ result }: { result: TrackingOut }) {
 
 export function TrackingCard({ result }: { result: TrackingOut }) {
   return (
-    <article className="mt-9 overflow-hidden rounded-[20px] bg-white shadow-[0_2px_12px_rgba(0,0,0,0.14)]">
-      <header className="px-[15px] py-[17px] text-white" style={{ background: SITE_RED }}>
-        <p className="text-[15px] font-bold">{result.tracking_no}</p>
-        <p className="mt-1 flex items-center gap-2 text-[13px] font-bold">
-          {result.origin} <ArrowRightWhite /> {result.destination}
-        </p>
+    <article className="mx-auto mt-9 max-w-[1000px] overflow-hidden border border-[#e8e6e1] bg-white">
+      <header className="bg-brand px-5 py-4 text-white">
+        <p className="text-[17px] font-bold tracking-[1px]">{result.tracking_no}</p>
+        {/* the route is hidden on the public page; say nothing rather than "*** -> ***" */}
+        {!(result.origin === '***' && result.destination === '***') && (
+          <p className="mt-1 flex items-center gap-2 text-[14px] font-semibold uppercase tracking-[1px]">
+            {result.origin} <ArrowRightWhite /> {result.destination}
+          </p>
+        )}
       </header>
       {result.found ? (
         <>
           <Stages result={result} />
-          <Payment />
           <Timeline result={result} />
         </>
       ) : (
         <div className="px-4 py-12 text-center">
-          <p className="text-[22px] text-[#333]">No record found</p>
-          <p className="mt-2 text-[15px] text-[#777]">
-            Please check the waybill number and try again.
+          <p className="text-[22px] font-bold uppercase tracking-[1.5px] text-brand">No record found</p>
+          <p className="mt-2 text-[17px] text-[#55544f]">
+            Please check the tracking number and try again.
           </p>
         </div>
       )}

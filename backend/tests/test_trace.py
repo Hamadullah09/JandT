@@ -58,18 +58,18 @@ class TestStatus:
 
 
 class TestWording:
-    def test_j_and_t_descriptions_with_the_place(self):
+    def test_descriptions_with_the_place(self):
         assert (
             trace.describe("DEPARTURE", "Transit Center SHAHALAM GATEWAY")
-            == "Package is departing from 【Transit Center SHAHALAM GATEWAY】"
+            == "The parcel has left Transit Center SHAHALAM GATEWAY"
         )
         assert trace.describe("DP_ARRIVAL", " Drop Point CDC KOTA PUTERI 336 ") == (
-            "Package is arrived to 【Drop Point CDC KOTA PUTERI 336】"
+            "The parcel has arrived at Drop Point CDC KOTA PUTERI 336"
         )
 
-    def test_without_a_place_there_are_no_empty_brackets(self):
-        assert trace.describe("DEPARTURE", "") == "Package is in transit"
-        assert "【" not in trace.describe("DC_ARRIVAL", None)
+    def test_without_a_place_the_sentence_still_reads(self):
+        assert trace.describe("DEPARTURE", "") == "The parcel is on the way"
+        assert trace.describe("DC_ARRIVAL", None) == "The parcel has arrived at the sorting hub"
 
     def test_dates_and_times_as_jtexpress_my_prints_them(self):
         moment = datetime(2026, 8, 27, 8, 45, tzinfo=UTC)          # 04:45 PM in Malaysia

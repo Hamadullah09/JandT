@@ -76,6 +76,7 @@ ADMIN_ONLY = [
     ("post", "/api/v1/tracking/events"),
     ("delete", "/api/v1/tracking/events/1"),
     ("get", "/api/v1/admin/users"),
+    ("post", "/api/v1/admin/users"),
     ("patch", "/api/v1/admin/users/1"),
     ("delete", "/api/v1/admin/users/1"),
 ]
@@ -121,7 +122,7 @@ class TestWhoMayCallWhat:
         login = await call("post", "/api/v1/auth/login")
         assert (login.status_code, login.json()["detail"]) == (422, "Enter your username and password.")
         signup = await call("post", "/api/v1/auth/signup")
-        assert (signup.status_code, signup.json()["detail"]) == (422, "Enter your name.")
+        assert (signup.status_code, signup.json()["detail"]) == (422, "Enter a name.")
 
 
 # ---------------------------------------------------------------------------
@@ -217,3 +218,20 @@ class TestLoginFlow:
 
         assert await ensure_default_users(accounts) == []
 
+
+@requires_db
+@pytest.mark.db
+class TestAdminAddsUsers:
+    async def test_an_added_account_can_log_in_straight_away(self, browser):
+        await log_in(browser, "admin", "admin123")
+        response = await browser.post(
+            "/api/v1/admin/users",
+            json={"name": "Packing Staff", "username": "packer", "password": "secret1", "role": "merchant"},
+        )
+        assert response.status_code == 201 and response.json()["status"] == "active"
+        again = await browser.post(
+            "/api/v1/admin/users", json={"name": "Someone", "username": "packer", "password": "secret1"}
+        )
+        assert again.status_code == 409
+        await browser.post("/api/v1/auth/logout")
+        assert (await log_in(browser, "packer", "secret1")).status_code == 200

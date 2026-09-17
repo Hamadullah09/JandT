@@ -57,7 +57,7 @@ export default function QuickOrderPage() {
   return (
     <div className="p-5">
       {error && (
-        <div className="mb-3 rounded border border-[#fbc4c4] bg-[#fef0f0] px-4 py-2.5 text-base text-jt-red">
+        <div className="mb-3 rounded border border-[#fbc4c4] bg-danger-tint px-4 py-2.5 text-base text-danger">
           {error}
         </div>
       )}
@@ -65,7 +65,7 @@ export default function QuickOrderPage() {
         <div className="mb-3 rounded border border-[#c2e7b0] bg-[#f0f9eb] px-4 py-2.5 text-base text-[#529b2e]">
           Created {result.tracking_no} ({result.sortation_code} / {result.route_code}).{' '}
           <a
-            className="text-jt-red hover:underline"
+            className="text-brand hover:underline"
             href={api.waybillUrl(result.tracking_no)}
             target="_blank"
             rel="noreferrer"

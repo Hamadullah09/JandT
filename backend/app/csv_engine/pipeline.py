@@ -36,6 +36,7 @@ from app.core import sortation as S
 from app.core.items import items_of, order_columns, supplier_ships
 from app.core.naming import unique_path, waybill_filename
 from app.core.pricing import freight_fee
+from app.core.sources import normalise_source
 from app.core.tracking import allocate as allocate_tracking
 from app.core.weights import chargeable_weight, volumetric_weight
 from app.db.models import ImportBatch, Order, PostcodeZone, SenderProfile
@@ -256,6 +257,7 @@ async def enrich(
             "remark": data.get("remark") or None,
             # only the Normal Order page asks; a CSV import leaves it unknown
             "service_mode": data.get("service_mode") or None,
+            "source": normalise_source(data.get("source")),
             "order_date": today,
             "status": "created",
         }
@@ -291,6 +293,7 @@ _INSERT_COLUMNS: tuple[str, ...] = (
     "service_type", "service_scope", "sortation_code", "route_code",
     "payment_type", "order_payment_type", "cod_amount", "order_value",
     "freight_fee", "remark", "order_date", "status", "items", "service_mode",
+    "source",
 )
 
 #: text() binds carry no type, so JSON goes in as text and is cast here

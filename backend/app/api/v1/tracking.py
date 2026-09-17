@@ -23,7 +23,7 @@ from app.db.session import get_session
 
 router = APIRouter(prefix="/tracking", tags=["tracking"])
 
-#: jtexpress.my takes up to 10 waybills at once
+#: the tracking page takes up to 10 parcels at once
 MAX_WAYBILLS = 10
 
 
@@ -62,7 +62,7 @@ async def track(
     awb: str = Query("", description="tracking numbers, separated by commas"),
     session: AsyncSession = Depends(get_session),
 ) -> list[TrackingOut]:
-    """What jtexpress.my/tracking shows, for up to 10 waybills."""
+    """What the tracking page shows, for up to 10 parcels."""
     wanted = split_waybills(awb)
     if len(wanted) > MAX_WAYBILLS:
         raise Problem(

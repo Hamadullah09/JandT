@@ -19,6 +19,7 @@ from app.api.schemas import (
 )
 from app.core import address
 from app.core.pricing import fee_breakdown, freight_fee
+from app.core.sources import normalise_source
 from app.core.sortation import service_scope
 from app.core.weights import ceil_to_tenth, chargeable_weight, volumetric_weight
 from app.csv_engine.pipeline import create_single
@@ -65,6 +66,7 @@ def _payload(body: NormalOrderIn) -> dict:
         "cod_amount": body.cod_amount,
         "order_value": body.order_value,
         "service_mode": body.service_mode,
+        "source": normalise_source(body.source),
         "remark": body.remark.strip(),
     }
 
@@ -205,7 +207,7 @@ async def list_orders(
 
     total = int(await session.scalar(count_stmt) or 0)
     rows = await session.scalars(
-        stmt.order_by(Order.id.desc()).offset((page - 1) * size).limit(size)
+        stmt.order_by(Order.created_at.desc(), Order.id.desc()).offset((page - 1) * size).limit(size)
     )
     return OrderPage(
         items=[OrderOut.model_validate(r) for r in rows],

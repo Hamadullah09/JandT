@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { AdminChrome } from '@/components/admin/AdminChrome';
 
 export const metadata: Metadata = {
-  title: 'Admin Portal | J&T Express',
+  title: 'Admin Portal | Inaaya Store',
   description: 'Every order with its tracking status, and the accounts that can log in.',
 };
 

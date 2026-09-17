@@ -1,16 +1,16 @@
-"""Track & trace: where a parcel is, as J&T's tracking page shows it.
+"""Track & trace: where a parcel is, in plain words.
 
-J&T's own page cannot be read automatically (it asks for a slide puzzle
-first), so the statuses live here: the admin portal records each scan as a
-tracking event, and the tracking page shows them the way jtexpress.my does.
+The courier's own tracking page cannot be read automatically (it asks for a
+slide puzzle first), so the statuses live here: the admin portal records each
+scan as a tracking event, and the store's tracking page shows them.
 
-An event is one scan - ``Departure`` from a transit center, ``Delivered`` - and
-a parcel's status is the status of its latest scan:
+An event is one scan - ``On the Way`` from a hub, ``Delivered`` - and a
+parcel's status is the status of its latest scan:
 
     CREATED -> PICKED_UP -> IN_TRANSIT -> ON_DELIVERY -> DELIVERED
                                                       \\-> RETURNED
 
-Times are Malaysia time (UTC+8, no daylight saving), like J&T's page.
+Times are Malaysia time (UTC+8, no daylight saving).
 """
 from __future__ import annotations
 
@@ -41,11 +41,11 @@ STATUS_LABELS = {
 @dataclass(frozen=True, slots=True)
 class EventType:
     code: str
-    #: as J&T's page prints it
+    #: as the tracking page prints it
     label: str
     #: the parcel's status after this scan
     status: str
-    #: the description J&T shows; ``{location}`` is the scan's place
+    #: the description shown; ``{location}`` is the scan's place
     template: str
     #: the description when no place was given
     without_location: str
@@ -55,19 +55,19 @@ EVENT_TYPES: dict[str, EventType] = {
     event.code: event
     for event in (
         EventType("PICKED_UP", "Picked Up", PICKED_UP,
-                  "Package is received by J&T", "Package is received by J&T"),
-        EventType("DEPARTURE", "Departure", IN_TRANSIT,
-                  "Package is departing from 【{location}】", "Package is in transit"),
-        EventType("DC_ARRIVAL", "Dc Arrival", IN_TRANSIT,
-                  "Package is arrived to 【{location}】", "Package is arrived to the transit center"),
-        EventType("DP_ARRIVAL", "Dp Arrival", IN_TRANSIT,
-                  "Package is arrived to 【{location}】", "Package is arrived to the drop point"),
-        EventType("ON_DELIVERY", "On Delivery", ON_DELIVERY,
-                  "The package is out for delivery", "The package is out for delivery"),
+                  "The courier has collected the parcel", "The courier has collected the parcel"),
+        EventType("DEPARTURE", "On the Way", IN_TRANSIT,
+                  "The parcel has left {location}", "The parcel is on the way"),
+        EventType("DC_ARRIVAL", "At Sorting Hub", IN_TRANSIT,
+                  "The parcel has arrived at {location}", "The parcel has arrived at the sorting hub"),
+        EventType("DP_ARRIVAL", "At Local Branch", IN_TRANSIT,
+                  "The parcel has arrived at {location}", "The parcel has arrived at the local branch"),
+        EventType("ON_DELIVERY", "Out for Delivery", ON_DELIVERY,
+                  "The parcel is out for delivery", "The parcel is out for delivery"),
         EventType("DELIVERED", "Delivered", DELIVERED,
-                  "Package is received by customer", "Package is received by customer"),
+                  "The customer has received the parcel", "The customer has received the parcel"),
         EventType("RETURNED", "Returned", RETURNED,
-                  "Package is returned to the sender", "Package is returned to the sender"),
+                  "The parcel has been returned to the shop", "The parcel has been returned to the shop"),
     )
 }
 
@@ -82,7 +82,7 @@ QUICK_EVENT = {
 
 #: the order row itself, shown as the first line of every timeline
 CREATED_LABEL = "Order Created"
-CREATED_DESCRIPTION = "Order is created, waiting for J&T to pick up the package"
+CREATED_DESCRIPTION = "The order is created and waiting for the courier to collect it"
 
 
 class TraceError(ValueError):
@@ -99,7 +99,7 @@ def event_type(code: str) -> EventType:
 
 
 def describe(code: str, location: str | None) -> str:
-    """The description J&T prints for a scan at *location*."""
+    """The description of a scan at *location*."""
     kind = event_type(code)
     place = (location or "").strip()
     return kind.template.format(location=place) if place else kind.without_location

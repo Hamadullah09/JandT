@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.auth import require_admin
 from app.api.errors import Problem
-from app.api.schemas import UserOut, UserUpdateIn
+from app.api.schemas import UserCreateIn, UserOut, UserUpdateIn
+from app.api.v1.auth import new_account
 from app.core import auth
 from app.db.models import User, UserSession
 from app.db.session import get_session
@@ -30,6 +31,30 @@ async def _user(session: AsyncSession, user_id: int) -> User:
     if user is None:
         raise Problem(status=404, title="Account not found", detail=str(user_id))
     return user
+
+
+@router.post("", response_model=UserOut, status_code=201)
+async def create_user(
+    body: UserCreateIn,
+    admin: User = Depends(require_admin),
+    session: AsyncSession = Depends(get_session),
+) -> UserOut:
+    """Add an account that can log in straight away - no approval step."""
+    fields = await new_account(
+        session,
+        name=body.name,
+        username=body.username,
+        phone=body.phone,
+        email=body.email,
+        password=body.password,
+        phone_required=False,
+        title="Account not added",
+    )
+    user = User(**fields, role=body.role, status=auth.STATUS_ACTIVE)
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+    return UserOut.model_validate(user)
 
 
 @router.patch("/{user_id}", response_model=UserOut)
